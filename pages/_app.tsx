@@ -1,5 +1,6 @@
 import "../styles/globals.css";
 import type { AppProps } from "next/app";
+import { ChakraProvider } from "@chakra-ui/react";
 
 import { WalletProvider, NetworkConfig } from "@raidguild/quiver";
 
@@ -81,19 +82,21 @@ const DEFAULT_CHAIN_ID = "0x1"; // Used to switch to if the user is on an unsupp
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <WalletProvider
-      web3modalOptions={web3modalOptions}
-      networks={SUPPORTED_NETWORKS}
-      // Optional if you want to auto switch the network
-      defaultChainId={DEFAULT_CHAIN_ID}
-      // Optional but useful to handle events.
-      handleModalEvents={(eventName, error) => {
-        console.error(error);
-        console.log(eventName);
-      }}
-    >
-      <Component {...pageProps} />
-    </WalletProvider>
+    <ChakraProvider>
+      <WalletProvider
+        web3modalOptions={web3modalOptions}
+        networks={SUPPORTED_NETWORKS}
+        // Optional if you want to auto switch the network
+        defaultChainId={DEFAULT_CHAIN_ID}
+        // Optional but useful to handle events.
+        handleModalEvents={(eventName, error) => {
+          console.error(error);
+          console.log(eventName);
+        }}
+      >
+        <Component {...pageProps} />
+      </WalletProvider>
+    </ChakraProvider>
   );
 }
 
