@@ -77,7 +77,13 @@ export function handleBeaconUpgraded(event: BeaconUpgraded): void {}
 export function handleImpactClaimed(event: ImpactClaimed): void {
   let entity = new Hypercert(event.params.id.toString());
   entity.claimHash = event.params.claimHash;
-  entity.contributors = changetype<Array<string>>(event.params.contributors);
+  const contributors = [] as string[];
+  for (let i=0; i<event.params.contributors.length; i++)
+  {
+    const address = event.params.contributors[i];
+    contributors.push(address.toHexString());
+  }
+  entity.contributors = contributors;
   entity.impactDateFrom = event.params.impactTimeframe[0];
   entity.impactDateTo = event.params.impactTimeframe[1];
   entity.impactScopes = event.params.impactScopes;
