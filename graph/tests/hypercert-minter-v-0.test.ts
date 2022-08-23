@@ -7,17 +7,18 @@ import {
   beforeAll,
   afterAll,
 } from "matchstick-as/assembly/index";
-import { Hypercert } from "../generated/schema";
-import { handleImpactClaimed, handleImpactScopeAdded, handleRightAdded, handleWorkScopeAdded } from "../src/hypercert-minter-v-0";
-import { createImpactClaimedEvent, createImpactScopeAddedEvent, createRightAddedEvent, createWorkScopeAddedEvent } from "./hypercert-minter-v-0-utils";
+import { Hypercert, HypercertBalance } from "../generated/schema";
+import { handleImpactClaimed, handleImpactScopeAdded, handleRightAdded, handleTransferSingle, handleWorkScopeAdded } from "../src/hypercert-minter-v-0";
+import { createImpactClaimedEvent, createImpactScopeAddedEvent, createRightAddedEvent, createTransferSingleEvent, createWorkScopeAddedEvent } from "./hypercert-minter-v-0-utils";
 
 const HYPERCERT = "Hypercert";
+const HYPERCERT_BALANCE = "HypercertBalance";
 const IMPACT_SCOPE = "ImpactScope";
 const RIGHT = "Right";
 const WORK_SCOPE = "WorkScope";
 
 describe(HYPERCERT, () => {
-  const id = 1;
+  const id1 = 1;
   const claimHash = "0x307861626c6b736a6466736466736466";
   const contributor0 = "0x0716405125cfcad8aaa4f816d2468a8898da374b";
   const workTimeframe0 = 1669849200;
@@ -34,7 +35,7 @@ describe(HYPERCERT, () => {
 
   beforeAll(() => {
     const e = createImpactClaimedEvent(
-      BigInt.fromI32(id),
+      BigInt.fromI32(id1),
       Bytes.fromHexString(claimHash),
       [Address.fromString(contributor0)],
       [BigInt.fromI32(workTimeframe0), BigInt.fromI32(workTimeframe1)],
@@ -54,7 +55,7 @@ describe(HYPERCERT, () => {
 
   test("entity created and stored", () => {
     assert.entityCount(HYPERCERT, 1);
-    const idStr = id.toString();
+    const idStr = id1.toString();
     assert.fieldEquals(HYPERCERT, idStr, "claimHash", claimHash);
     assert.fieldEquals(HYPERCERT, idStr, "uri", uri);
     assert.fieldEquals(HYPERCERT, idStr, "version", version.toString());
@@ -91,13 +92,83 @@ describe(HYPERCERT, () => {
   });
 });
 
+describe(HYPERCERT_BALANCE, () => {
+  const address = "0x0716405125cfcad8aaa4f816d2468a8898da374b";
+  const id1 = 1;
+  const id2 = 2;
+  const amount1 = 1;
+  const amount2 = 1000;
+
+  beforeAll(() => {
+    const e1 = createTransferSingleEvent(
+      Address.fromString(address),
+      Address.zero(),
+      Address.fromString(address),
+      BigInt.fromI32(id1),
+      BigInt.fromI32(amount1)
+    );
+    handleTransferSingle(e1);
+    const e2 = createTransferSingleEvent(
+      Address.fromString(address),
+      Address.zero(),
+      Address.fromString(address),
+      BigInt.fromI32(id2),
+      BigInt.fromI32(amount2)
+    );
+    handleTransferSingle(e2);
+  });
+
+  afterAll(() => {
+    clearStore();
+  });
+
+  test("entity created and stored", () => {
+    assert.entityCount(HYPERCERT_BALANCE, 2);
+    const balance1 = HypercertBalance.load(`${address}-${BigInt.fromI32(id1)}`);
+    assert.assertNotNull(balance1);
+    if (balance1) {
+      assert.bigIntEquals(BigInt.fromI32(amount1), balance1.amount);
+    }
+    const balance2 = HypercertBalance.load(`${address}-${BigInt.fromI32(id2)}`);
+    assert.assertNotNull(balance2);
+    if (balance2) {
+      assert.bigIntEquals(BigInt.fromI32(amount2), balance2.amount);
+    }
+  });
+
+  test("balance updated upon burn", () => {
+    const burned = 100;
+    const e = createTransferSingleEvent(
+      Address.fromString(address),
+      Address.fromString(address),
+      Address.zero(),
+      BigInt.fromI32(id2),
+      BigInt.fromI32(burned)
+    );
+    handleTransferSingle(e);
+
+    assert.entityCount(HYPERCERT_BALANCE, 3);
+
+    const balance1 = HypercertBalance.load(`${address}-${BigInt.fromI32(id1)}`);
+    assert.assertNotNull(balance1);
+    if (balance1) {
+      assert.bigIntEquals(BigInt.fromI32(amount1), balance1.amount);
+    }
+    const balance2 = HypercertBalance.load(`${address}-${BigInt.fromI32(id2)}`);
+    assert.assertNotNull(balance2);
+    if (balance2) {
+      assert.bigIntEquals(BigInt.fromI32(amount2 - burned), balance2.amount);
+    }
+  });
+});
+
 describe(IMPACT_SCOPE, () => {
-  const id = "0x307861626c6b736a6466736466736466";
+  const id1 = "0x307861626c6b736a6466736466736466";
   const text = "test-impact-scope";
 
   beforeAll(() => {
     const e = createImpactScopeAddedEvent(
-      Bytes.fromHexString(id),
+      Bytes.fromHexString(id1),
       text
     );
     handleImpactScopeAdded(e);
@@ -109,17 +180,17 @@ describe(IMPACT_SCOPE, () => {
 
   test("entity created and stored", () => {
     assert.entityCount(IMPACT_SCOPE, 1);
-    assert.fieldEquals(IMPACT_SCOPE, id, "text", text);
+    assert.fieldEquals(IMPACT_SCOPE, id1, "text", text);
   });
 });
 
 describe(RIGHT, () => {
-  const id = "0x307861626c6b736a6466736466736466";
+  const id1 = "0x307861626c6b736a6466736466736466";
   const text = "test-right";
 
   beforeAll(() => {
     const e = createRightAddedEvent(
-      Bytes.fromHexString(id),
+      Bytes.fromHexString(id1),
       text
     );
     handleRightAdded(e);
@@ -131,17 +202,17 @@ describe(RIGHT, () => {
 
   test("entity created and stored", () => {
     assert.entityCount(RIGHT, 1);
-    assert.fieldEquals(RIGHT, id, "text", text);
+    assert.fieldEquals(RIGHT, id1, "text", text);
   });
 });
 
 describe(WORK_SCOPE, () => {
-  const id = "0x307861626c6b736a6466736466736466";
+  const id1 = "0x307861626c6b736a6466736466736466";
   const text = "test-work-scope";
 
   beforeAll(() => {
     const e = createWorkScopeAddedEvent(
-      Bytes.fromHexString(id),
+      Bytes.fromHexString(id1),
       text
     );
     handleWorkScopeAdded(e);
@@ -153,6 +224,6 @@ describe(WORK_SCOPE, () => {
 
   test("entity created and stored", () => {
     assert.entityCount(WORK_SCOPE, 1);
-    assert.fieldEquals(WORK_SCOPE, id, "text", text);
+    assert.fieldEquals(WORK_SCOPE, id1, "text", text);
   });
 });

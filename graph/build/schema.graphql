@@ -18,7 +18,7 @@ type Hypercert @entity {
 }
 
 type HypercertBalance @entity {
-  id: Bytes!
+  id: String!
   amount: BigInt!
   token: Hypercert!
 }

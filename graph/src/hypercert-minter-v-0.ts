@@ -1,3 +1,4 @@
+import { BigInt } from "@graphprotocol/graph-ts";
 import {
   AdminChanged,
   ApprovalForAll,
@@ -125,19 +126,22 @@ export function handleWorkScopeAdded(event: WorkScopeAdded): void {
 export function handleTransferBatch(event: TransferBatch): void {}
 
 export function handleTransferSingle(event: TransferSingle): void {
-  let balanceFrom = HypercertBalance.load(event.params.from);
-  // Entities only exist after they have been saved to the store;
-  // `null` checks allow to create entities on demand
+  const tokenId = event.params.id.toString();
+  const from = event.params.from.toHexString();
+  const to = event.params.to.toHexString();
+  const fromId = `${from}-${tokenId}`;
+  const balanceFrom = HypercertBalance.load(fromId);
   if (balanceFrom) {
-    // Entity fields can be set using simple assignments
     balanceFrom.amount = balanceFrom.amount - event.params.value;
     balanceFrom.save();
   }
 
-  let balanceTo = HypercertBalance.load(event.params.to);
+  const toId = `${to}-${tokenId}`;
+  let balanceTo = HypercertBalance.load(toId);
   if (!balanceTo) {
-    // Entity fields can be set using simple assignments
-    balanceTo = new HypercertBalance(event.params.to);
+    balanceTo = new HypercertBalance(toId);
+    balanceTo.token = tokenId;
+    balanceTo.amount = BigInt.fromI32(0);
   }
 
   balanceTo.amount = balanceTo.amount + event.params.value;
