@@ -98,7 +98,7 @@ export function handleImpactClaimed(event: ImpactClaimed): void {
 
 export function handleImpactScopeAdded(event: ImpactScopeAdded): void {
   let entity = new ImpactScope(event.params.id);
-  entity.text = event.params.text.toString();
+  entity.text = event.params.text;
   entity.save();
 }
 
@@ -112,13 +112,13 @@ export function handleRoleRevoked(event: RoleRevoked): void {}
 
 export function handleRightAdded(event: RightAdded): void {
   let entity = new Right(event.params.id);
-  entity.text = event.params.text.toString();
+  entity.text = event.params.text;
   entity.save();
 }
 
 export function handleWorkScopeAdded(event: WorkScopeAdded): void {
   let entity = new WorkScope(event.params.id);
-  entity.text = event.params.text.toString();
+  entity.text = event.params.text;
   entity.save();
 }
 

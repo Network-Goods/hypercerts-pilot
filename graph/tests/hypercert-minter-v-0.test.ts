@@ -8,14 +8,13 @@ import {
   afterAll,
 } from "matchstick-as/assembly/index";
 import { Hypercert } from "../generated/schema";
-import { handleImpactClaimed } from "../src/hypercert-minter-v-0";
-import { createImpactClaimedEvent } from "./hypercert-minter-v-0-utils";
+import { handleImpactClaimed, handleImpactScopeAdded, handleRightAdded, handleWorkScopeAdded } from "../src/hypercert-minter-v-0";
+import { createImpactClaimedEvent, createImpactScopeAddedEvent, createRightAddedEvent, createWorkScopeAddedEvent } from "./hypercert-minter-v-0-utils";
 
-const DEFAULT_ENTITY_ADDRESS = "0xa16081f360e3847006db660bae1c6d1b2e17ec2a"; // 0xa16081f360e3847006db660bae1c6d1b2e17ec2a is the default address used in newMockEvent() function
 const HYPERCERT = "Hypercert";
-
-// Tests structure (matchstick-as >=0.5.0)
-// https://thegraph.com/docs/en/developer/matchstick/#tests-structure-0-5-0
+const IMPACT_SCOPE = "ImpactScope";
+const RIGHT = "Right";
+const WORK_SCOPE = "WorkScope";
 
 describe(HYPERCERT, () => {
   const id = 1;
@@ -53,9 +52,6 @@ describe(HYPERCERT, () => {
     clearStore();
   });
 
-  // For more test scenarios, see:
-  // https://thegraph.com/docs/en/developer/matchstick/#write-a-unit-test
-
   test("entity created and stored", () => {
     assert.entityCount(HYPERCERT, 1);
     const idStr = id.toString();
@@ -92,8 +88,71 @@ describe(HYPERCERT, () => {
       assert.bytesEquals(Bytes.fromHexString(right0), entity.rights[0]);
       assert.bytesEquals(Bytes.fromHexString(right1), entity.rights[1]);
     }
+  });
+});
 
-    // More assert options:
-    // https://thegraph.com/docs/en/developer/matchstick/#asserts
+describe(IMPACT_SCOPE, () => {
+  const id = "0x307861626c6b736a6466736466736466";
+  const text = "test-impact-scope";
+
+  beforeAll(() => {
+    const e = createImpactScopeAddedEvent(
+      Bytes.fromHexString(id),
+      text
+    );
+    handleImpactScopeAdded(e);
+  });
+
+  afterAll(() => {
+    clearStore();
+  });
+
+  test("entity created and stored", () => {
+    assert.entityCount(IMPACT_SCOPE, 1);
+    assert.fieldEquals(IMPACT_SCOPE, id, "text", text);
+  });
+});
+
+describe(RIGHT, () => {
+  const id = "0x307861626c6b736a6466736466736466";
+  const text = "test-right";
+
+  beforeAll(() => {
+    const e = createRightAddedEvent(
+      Bytes.fromHexString(id),
+      text
+    );
+    handleRightAdded(e);
+  });
+
+  afterAll(() => {
+    clearStore();
+  });
+
+  test("entity created and stored", () => {
+    assert.entityCount(RIGHT, 1);
+    assert.fieldEquals(RIGHT, id, "text", text);
+  });
+});
+
+describe(WORK_SCOPE, () => {
+  const id = "0x307861626c6b736a6466736466736466";
+  const text = "test-work-scope";
+
+  beforeAll(() => {
+    const e = createWorkScopeAddedEvent(
+      Bytes.fromHexString(id),
+      text
+    );
+    handleWorkScopeAdded(e);
+  });
+
+  afterAll(() => {
+    clearStore();
+  });
+
+  test("entity created and stored", () => {
+    assert.entityCount(WORK_SCOPE, 1);
+    assert.fieldEquals(WORK_SCOPE, id, "text", text);
   });
 });
