@@ -1231,8 +1231,8 @@ export interface HypercertMinterUpgrade extends BaseContract {
     ): BeaconUpgradedEventFilter;
 
     "ImpactClaimed(uint256,bytes32,address[],uint256[2],uint256[2],bytes32[],bytes32[],bytes32[],uint256,string)"(
-      id?: PromiseOrValue<BigNumberish> | null,
-      claimHash?: PromiseOrValue<BytesLike> | null,
+      id?: null,
+      claimHash?: null,
       contributors?: null,
       workTimeframe?: null,
       impactTimeframe?: null,
@@ -1243,8 +1243,8 @@ export interface HypercertMinterUpgrade extends BaseContract {
       uri?: null
     ): ImpactClaimedEventFilter;
     ImpactClaimed(
-      id?: PromiseOrValue<BigNumberish> | null,
-      claimHash?: PromiseOrValue<BytesLike> | null,
+      id?: null,
+      claimHash?: null,
       contributors?: null,
       workTimeframe?: null,
       impactTimeframe?: null,
@@ -1256,25 +1256,16 @@ export interface HypercertMinterUpgrade extends BaseContract {
     ): ImpactClaimedEventFilter;
 
     "ImpactScopeAdded(bytes32,string)"(
-      id?: PromiseOrValue<BytesLike> | null,
-      text?: PromiseOrValue<string> | null
+      id?: null,
+      text?: null
     ): ImpactScopeAddedEventFilter;
-    ImpactScopeAdded(
-      id?: PromiseOrValue<BytesLike> | null,
-      text?: PromiseOrValue<string> | null
-    ): ImpactScopeAddedEventFilter;
+    ImpactScopeAdded(id?: null, text?: null): ImpactScopeAddedEventFilter;
 
     "Initialized(uint8)"(version?: null): InitializedEventFilter;
     Initialized(version?: null): InitializedEventFilter;
 
-    "RightAdded(bytes32,string)"(
-      id?: PromiseOrValue<BytesLike> | null,
-      text?: PromiseOrValue<string> | null
-    ): RightAddedEventFilter;
-    RightAdded(
-      id?: PromiseOrValue<BytesLike> | null,
-      text?: PromiseOrValue<string> | null
-    ): RightAddedEventFilter;
+    "RightAdded(bytes32,string)"(id?: null, text?: null): RightAddedEventFilter;
+    RightAdded(id?: null, text?: null): RightAddedEventFilter;
 
     "RoleAdminChanged(bytes32,bytes32,bytes32)"(
       role?: PromiseOrValue<BytesLike> | null,
@@ -1356,13 +1347,10 @@ export interface HypercertMinterUpgrade extends BaseContract {
     ): UpgradedEventFilter;
 
     "WorkScopeAdded(bytes32,string)"(
-      id?: PromiseOrValue<BytesLike> | null,
-      text?: PromiseOrValue<string> | null
+      id?: null,
+      text?: null
     ): WorkScopeAddedEventFilter;
-    WorkScopeAdded(
-      id?: PromiseOrValue<BytesLike> | null,
-      text?: PromiseOrValue<string> | null
-    ): WorkScopeAddedEventFilter;
+    WorkScopeAdded(id?: null, text?: null): WorkScopeAddedEventFilter;
   };
 
   estimateGas: {
