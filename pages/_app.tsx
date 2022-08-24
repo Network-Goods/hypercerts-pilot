@@ -33,8 +33,8 @@ const SUPPORTED_NETWORKS: NetworkConfig = {
     explorer: "https://goerli.etherscan.io/",
     rpc: "https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
   },
-  "0x539": {
-    chainId: "0x539",
+  "0x7A69": {
+    chainId: "0x7A69",
     name: "Hardhat",
     symbol: "ETH",
     explorer: "http://localhost:1234",
@@ -66,7 +66,7 @@ const providerOptions: IProviderOptions = {
       rpc: {
         1: SUPPORTED_NETWORKS["0x1"].rpc,
         4: SUPPORTED_NETWORKS["0x4"].rpc,
-        1337: SUPPORTED_NETWORKS["0x539"].rpc,
+        31337: SUPPORTED_NETWORKS["0x7A69"].rpc,
       },
     },
   },
@@ -78,7 +78,7 @@ const web3modalOptions = {
   theme: "dark",
 };
 
-const DEFAULT_CHAIN_ID = "7A69"; // Used to switch to if the user is on an unsupported network
+const DEFAULT_CHAIN_ID = "0x7A69"; // Used to switch to if the user is on an unsupported network
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
