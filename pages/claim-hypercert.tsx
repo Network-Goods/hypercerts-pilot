@@ -14,22 +14,31 @@ import {
   Input,
   Text,
   Textarea,
+  useToast,
 } from "@chakra-ui/react";
 import { Autocomplete, Option } from "chakra-ui-simple-autocomplete";
 import { useState } from "react";
 import { ConnectWallet } from "../components/ConnectWallet";
+import { UploadComponent } from "../components/DropZone";
+import { uploadImage, uploadJson } from "../utils/ipfsClient";
+import { MetaData } from "../types/MetaData";
+import { useWallet } from "@raidguild/quiver";
+import { useMintHyperCertificate } from "../hooks/mint";
 
-const options = [
-  { value: "Tree-planting", label: "referrals" },
-  { value: "Spain", label: "Spain" },
-  { value: "volunteer labor", label: "volunteer labor" },
-  { value: "financial support", label: "financial support" },
-  { value: "material support", label: "material support" },
-  { value: "referrals", label: "referrals" },
+const options: Option[] = [
+  { value: "0", label: "referrals" },
+  { value: "1", label: "Spain" },
+  { value: "2", label: "volunteer labor" },
+  { value: "3", label: "financial support" },
+  { value: "4", label: "material support" },
+  { value: "5", label: "referrals" },
 ];
 
 const TestPage: NextPage = () => {
+  const { address } = useWallet();
+  const mintHyperCertificate = useMintHyperCertificate();
   const [result, setResult] = useState<Option[]>([]);
+  const toast = useToast();
   return (
     <>
       <Container>
@@ -44,27 +53,126 @@ const TestPage: NextPage = () => {
             name: "",
             description: "",
             external_link: "",
+            image: null as File | null,
 
-            image: "",
             format_version: 0.1,
             prev_hypercert: "",
             creators: [],
-            workTimeStart: 0,
-            workTimeEnd: 0,
-            impactTimeStart: 0,
-            impactTimeEnd: 0,
-            workScopes: [],
+            workTimeStart: undefined as string | undefined,
+            workTimeEnd: undefined as string | undefined,
+            impactTimeStart: undefined as string | undefined,
+            impactTimeEnd: undefined as string | undefined,
+            workScopes: [] as Option[],
             rights: [],
             uri: "",
           }}
-          onSubmit={(val) => {
+          onSubmit={async (val) => {
+            console.log("Starting hypercert creation", val);
             /**
              * Steps:
              * 1. (optional) Upload image to IPFS and get the cid for the image
              * 2. Create the metadata json and upload to IPFS as file, including the (optional) cid for the image
              * 3. Call the mint function on the contract with the required parameters, including the cid for the metadata json.
              */
-            console.log(val);
+
+            // Upload image to ipfs
+            let ipfsImageCid: string | undefined;
+            if (val.image) {
+              toast({
+                description: "starting image file upload to ipfs",
+                status: "info",
+              });
+              try {
+                const imageMetadata = await uploadImage(
+                  `image-${val.name}`,
+                  `Cover image for ${val.name}`,
+                  val.image
+                );
+                ipfsImageCid = imageMetadata.ipnft;
+                toast({
+                  description: `Image uploaded successfully to ipfs, cid: ${ipfsImageCid}`,
+                  status: "success",
+                });
+              } catch (error) {
+                toast({
+                  description:
+                    "Something went wrong while uploading the image file to ipfs",
+                  status: "error",
+                });
+                console.error(error);
+              }
+            }
+
+            // Create and upload metadata json
+            let ipfsJsonId: string | undefined;
+            const metaData: MetaData = {
+              description: val.description,
+              external_link: val.external_link,
+              image: ipfsImageCid,
+              format_version: val.format_version,
+              name: val.name,
+              prev_hypercert: val.prev_hypercert,
+              refs: [],
+            };
+            toast({
+              description: "Starting upload of metadata json to ipfs",
+              status: "info",
+            });
+            try {
+              ipfsJsonId = await uploadJson(metaData);
+              toast({
+                description: `Uploaded metadata json to ipfs with cid ${ipfsJsonId}`,
+                status: "success",
+              });
+            } catch (error) {
+              toast({
+                description:
+                  "Something went wrong while uploading the metadata json to ipfs",
+                status: "error",
+              });
+              console.error(error);
+              return;
+            }
+
+            // Mint certificate using contract
+            const workTimeStart = val.workTimeStart
+              ? new Date(val.workTimeStart).getTime()
+              : 0;
+            const workTimeEnd = val.workTimeEnd
+              ? new Date(val.workTimeEnd).getTime()
+              : 0;
+            const impactTimeStart = val.impactTimeStart
+              ? new Date(val.impactTimeStart).getTime()
+              : 0;
+            const impactTimeEnd = val.impactTimeEnd
+              ? new Date(val.impactTimeEnd).getTime()
+              : 0;
+
+            try {
+              toast({
+                description: "Minting certificate",
+                status: "info",
+              });
+              await mintHyperCertificate({
+                creators: [address!],
+                workTime: [workTimeStart, workTimeEnd],
+                impactTime: [impactTimeEnd, impactTimeEnd],
+                uri: ipfsJsonId!,
+                rightsIds: val.rights,
+                impactScopeIds: val.workScopes.map((s) => parseInt(s.value)),
+                workScopeIds: [],
+              });
+              toast({
+                description: "Minted certificate!",
+                status: "success",
+              });
+            } catch (error) {
+              toast({
+                description:
+                  "Something went wrong while minting the certifcate",
+              });
+              console.error(error);
+            }
           }}
         >
           {({
@@ -74,6 +182,7 @@ const TestPage: NextPage = () => {
             handleBlur,
             handleSubmit,
             isSubmitting,
+            setFieldValue,
             /* and other goodies */
           }) => (
             <form onSubmit={handleSubmit}>
@@ -109,7 +218,7 @@ const TestPage: NextPage = () => {
                 <FormLabel>External link</FormLabel>
                 <Input
                   type="text"
-                  name=""
+                  name="external_link"
                   onChange={handleChange}
                   onBlur={handleBlur}
                   value={values.external_link}
@@ -118,6 +227,10 @@ const TestPage: NextPage = () => {
                 {errors.external_link && (
                   <FormErrorMessage>{errors.external_link}</FormErrorMessage>
                 )}
+              </FormControl>
+              <FormControl>
+                <FormLabel>Image</FormLabel>
+                <UploadComponent name="image" setFieldValue={setFieldValue} />
               </FormControl>
               <Divider my={3} />
               <HStack>
@@ -222,11 +335,11 @@ const TestPage: NextPage = () => {
                     certificate
                   </FormHelperText>
                 ) : (
-                  <FormErrorMessage>{errors.workScopes}</FormErrorMessage>
+                  <FormErrorMessage>Workscopes errors</FormErrorMessage>
                 )}
               </FormControl>
               <Divider my={3} />
-              <Button width="100%" type="submit" disabled={!isSubmitting}>
+              <Button width="100%" type="submit">
                 Claim hypercert
               </Button>
             </form>

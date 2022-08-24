@@ -78,7 +78,7 @@ const web3modalOptions = {
   theme: "dark",
 };
 
-const DEFAULT_CHAIN_ID = "0x539"; // Used to switch to if the user is on an unsupported network
+const DEFAULT_CHAIN_ID = "7A69"; // Used to switch to if the user is on an unsupported network
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
