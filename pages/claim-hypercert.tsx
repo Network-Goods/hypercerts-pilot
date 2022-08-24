@@ -156,7 +156,7 @@ const TestPage: NextPage = () => {
               await mintHyperCertificate({
                 creators: [address!],
                 workTime: [workTimeStart, workTimeEnd],
-                impactTime: [impactTimeEnd, impactTimeEnd],
+                impactTime: [impactTimeStart, impactTimeEnd],
                 uri: ipfsJsonId!,
                 rightsIds: val.rights,
                 impactScopeIds: val.workScopes.map((s) => parseInt(s.value)),
@@ -181,7 +181,6 @@ const TestPage: NextPage = () => {
             handleChange,
             handleBlur,
             handleSubmit,
-            isSubmitting,
             setFieldValue,
             /* and other goodies */
           }) => (

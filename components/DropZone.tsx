@@ -1,7 +1,6 @@
 import React from "react";
 import { useDropzone } from "react-dropzone";
-import { Box, Flex } from "@chakra-ui/react";
-import Accept from "react-dropzone/typings/tests/accept";
+import { Flex } from "@chakra-ui/react";
 
 export const UploadComponent = ({
   setFieldValue,
