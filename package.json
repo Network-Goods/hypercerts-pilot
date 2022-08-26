@@ -24,7 +24,8 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-dropzone": "^14.2.2",
-    "web3modal": "^1.9.8"
+    "web3modal": "^1.9.8",
+    "yup": "^0.32.11"
   },
   "devDependencies": {
     "@types/node": "18.7.3",
