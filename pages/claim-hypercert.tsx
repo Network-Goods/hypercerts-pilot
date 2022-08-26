@@ -224,7 +224,10 @@ const TestPage: NextPage = () => {
                   />
                 </FormControl>
                 <FormControl isRequired>
-                  <FormLabel>External link</FormLabel>
+                  <Flex>
+                    <FormLabel>External link</FormLabel>
+                    <ErrorMessage name="external_link" render={DisplayError} />
+                  </Flex>
                   <Input
                     type="text"
                     name="external_link"
@@ -233,7 +236,6 @@ const TestPage: NextPage = () => {
                     value={values.external_link}
                     placeholder="External link with more information"
                   />
-                  <ErrorMessage name="external_link" render={DisplayError} />
                 </FormControl>
                 <FormControl>
                   <FormLabel>Image</FormLabel>
@@ -321,7 +323,10 @@ const TestPage: NextPage = () => {
                 </HStack>
                 <Divider my={3} />
                 <FormControl isRequired>
-                  <FormLabel>Work scopes</FormLabel>
+                  <Flex>
+                    <FormLabel>Work scopes</FormLabel>
+                    <ErrorMessage name="workScopes" render={DisplayError} />
+                  </Flex>
                   <Field name="workScopes">
                     {({ form }: FieldProps) => (
                       <Autocomplete
