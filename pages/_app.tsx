@@ -82,7 +82,13 @@ const DEFAULT_CHAIN_ID = "0x7A69"; // Used to switch to if the user is on an uns
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <ChakraProvider>
+    <ChakraProvider
+      toastOptions={{
+        defaultOptions: {
+          position: "top-left",
+        },
+      }}
+    >
       <WalletProvider
         web3modalOptions={web3modalOptions}
         networks={SUPPORTED_NETWORKS}

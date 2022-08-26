@@ -19,7 +19,7 @@ import {
 import { Autocomplete, Option } from "chakra-ui-simple-autocomplete";
 import { useState } from "react";
 import { ConnectWallet } from "../components/ConnectWallet";
-import { UploadComponent } from "../components/DropZone";
+import { UploadField } from "../components/UploadField";
 import { uploadImage, uploadJson } from "../utils/ipfsClient";
 import { MetaData } from "../types/MetaData";
 import { useWallet } from "@raidguild/quiver";
@@ -88,7 +88,7 @@ const TestPage: NextPage = () => {
                   `Cover image for ${val.name}`,
                   val.image
                 );
-                ipfsImageCid = imageMetadata.ipnft;
+                ipfsImageCid = imageMetadata.url;
                 toast({
                   description: `Image uploaded successfully to ipfs, cid: ${ipfsImageCid}`,
                   status: "success",
@@ -229,7 +229,7 @@ const TestPage: NextPage = () => {
               </FormControl>
               <FormControl>
                 <FormLabel>Image</FormLabel>
-                <UploadComponent name="image" setFieldValue={setFieldValue} />
+                <UploadField name="image" setFieldValue={setFieldValue} />
               </FormControl>
               <Divider my={3} />
               <HStack>
@@ -314,7 +314,7 @@ const TestPage: NextPage = () => {
                   {({ form }: FieldProps) => (
                     <Autocomplete
                       renderBadge={(option) => (
-                        <Badge mr={3}>
+                        <Badge mr={3} cursor="pointer">
                           {option.label} <b>x</b>
                         </Badge>
                       )}
@@ -324,6 +324,7 @@ const TestPage: NextPage = () => {
                         form.setFieldValue("workScopes", options);
                         setResult(options);
                       }}
+                      width="100%"
                       placeholder="Click to start searching for work scopes"
                     />
                   )}

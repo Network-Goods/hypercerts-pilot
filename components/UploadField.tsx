@@ -2,7 +2,7 @@ import React from "react";
 import { useDropzone } from "react-dropzone";
 import { Flex } from "@chakra-ui/react";
 
-export const UploadComponent = ({
+export const UploadField = ({
   setFieldValue,
   name,
 }: {
@@ -23,7 +23,8 @@ export const UploadComponent = ({
       borderRadius={6}
       justifyContent="center"
       alignItems="center"
-      border="1px dotted blue"
+      border="2px solid rgb(226, 232, 240)"
+      cursor="pointer"
       p={4}
     >
       <div {...getRootProps({ className: "dropzone" })}>

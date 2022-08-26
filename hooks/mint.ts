@@ -8,6 +8,7 @@ import { HypercertMinterV0__factory } from "../contract-types";
 import { requireEnv } from "../utils/requireEnv";
 import { useToast } from "@chakra-ui/react";
 import { ethers } from "ethers";
+import { parseBlockchainError } from "../utils/parseBlockchainError";
 
 export const useMintHyperCertificate = () => {
   const { address } = useWallet();
@@ -25,7 +26,10 @@ export const useMintHyperCertificate = () => {
   const { mutate } = useWriteContract(contract, "mint", {
     onError: (error) => {
       toast({
-        description: "Something went wrong while minting the certificate",
+        description: parseBlockchainError(
+          error,
+          "Something went wrong while minting the certificate"
+        ),
         status: "error",
       });
       console.error(error);
