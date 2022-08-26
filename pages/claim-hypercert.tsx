@@ -24,19 +24,12 @@ import { uploadImage, uploadJson } from "../utils/ipfsClient";
 import { MetaData } from "../types/MetaData";
 import { useWallet } from "@raidguild/quiver";
 import { useMintHyperCertificate } from "../hooks/mint";
-
-const options: Option[] = [
-  { value: "0", label: "referrals" },
-  { value: "1", label: "Spain" },
-  { value: "2", label: "volunteer labor" },
-  { value: "3", label: "financial support" },
-  { value: "4", label: "material support" },
-  { value: "5", label: "referrals" },
-];
+import { useWorkScopes } from "../hooks/listWorkscopes";
 
 const TestPage: NextPage = () => {
   const { address } = useWallet();
   const mintHyperCertificate = useMintHyperCertificate();
+  const options = useWorkScopes();
   const [result, setResult] = useState<Option[]>([]);
   const toast = useToast();
   return (

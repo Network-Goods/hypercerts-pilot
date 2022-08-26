@@ -23,7 +23,7 @@ export const UploadField = ({
       borderRadius={6}
       justifyContent="center"
       alignItems="center"
-      border="2px solid rgb(226, 232, 240)"
+      border="1px solid rgb(226, 232, 240)"
       cursor="pointer"
       p={4}
     >

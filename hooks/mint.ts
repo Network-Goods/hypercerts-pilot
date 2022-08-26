@@ -1,26 +1,13 @@
 import { MintCertificateData } from "../types/MintCertificateData";
-import {
-  useTypedContract,
-  useWallet,
-  useWriteContract,
-} from "@raidguild/quiver";
-import { HypercertMinterV0__factory } from "../contract-types";
-import { requireEnv } from "../utils/requireEnv";
+import { useWallet, useWriteContract } from "@raidguild/quiver";
 import { useToast } from "@chakra-ui/react";
 import { ethers } from "ethers";
 import { parseBlockchainError } from "../utils/parseBlockchainError";
+import { useHypercertContract } from "./contracts";
 
 export const useMintHyperCertificate = () => {
   const { address } = useWallet();
-  const contractAddress = requireEnv(
-    process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
-    "NEXT_PUBLIC_CONTRACT_ADDRESS"
-  );
-  const { contract } = useTypedContract(
-    contractAddress,
-    HypercertMinterV0__factory
-  );
-
+  const contract = useHypercertContract();
   const toast = useToast();
 
   const { mutate } = useWriteContract(contract, "mint", {
