@@ -1,11 +1,12 @@
 import type { NextPage } from "next";
-import { Field, FieldProps, Formik } from "formik";
+import { ErrorMessage, Field, FieldProps, Formik } from "formik";
 import {
   Badge,
   Button,
   Center,
   Container,
   Divider,
+  Flex,
   FormControl,
   FormErrorMessage,
   FormHelperText,
@@ -25,6 +26,20 @@ import { MetaData } from "../types/MetaData";
 import { useWallet } from "@raidguild/quiver";
 import { useMintHyperCertificate } from "../hooks/mint";
 import { useWorkScopes } from "../hooks/listWorkscopes";
+import * as Yup from "yup";
+
+const ValidationSchema = Yup.object().shape({
+  name: Yup.string()
+    .min(2, "Too Short!")
+    .max(50, "Too Long!")
+    .required("Required"),
+  description: Yup.string()
+    .min(20, "Too Short!")
+    .max(500, "Too Long!")
+    .required("Required"),
+  external_link: Yup.string().url().required("Required"),
+  workScopes: Yup.array().min(1),
+});
 
 const TestPage: NextPage = () => {
   const { address } = useWallet();
@@ -42,6 +57,7 @@ const TestPage: NextPage = () => {
           Claim hypercert
         </Text>
         <Formik
+          validationSchema={ValidationSchema}
           initialValues={{
             name: "",
             description: "",
@@ -97,7 +113,7 @@ const TestPage: NextPage = () => {
             }
 
             // Create and upload metadata json
-            let ipfsJsonId: string | undefined;
+            let ipfsJsonUri: string | undefined;
             const metaData: MetaData = {
               description: val.description,
               external_link: val.external_link,
@@ -112,9 +128,10 @@ const TestPage: NextPage = () => {
               status: "info",
             });
             try {
-              ipfsJsonId = await uploadJson(metaData);
+              const jsonId = await uploadJson(metaData);
+              ipfsJsonUri = `ipfs://${jsonId}`;
               toast({
-                description: `Uploaded metadata json to ipfs with cid ${ipfsJsonId}`,
+                description: `Uploaded metadata json to ipfs with uri ${ipfsJsonUri}`,
                 status: "success",
               });
             } catch (error) {
@@ -150,14 +167,10 @@ const TestPage: NextPage = () => {
                 creators: [address!],
                 workTime: [workTimeStart, workTimeEnd],
                 impactTime: [impactTimeStart, impactTimeEnd],
-                uri: ipfsJsonId!,
+                uri: ipfsJsonUri!,
                 rightsIds: val.rights,
                 impactScopeIds: val.workScopes.map((s) => parseInt(s.value)),
                 workScopeIds: [],
-              });
-              toast({
-                description: "Minted certificate!",
-                status: "success",
               });
             } catch (error) {
               toast({
@@ -175,172 +188,187 @@ const TestPage: NextPage = () => {
             handleBlur,
             handleSubmit,
             setFieldValue,
+            isValid,
+            isSubmitting,
             /* and other goodies */
-          }) => (
-            <form onSubmit={handleSubmit}>
-              <FormControl>
-                <FormLabel>Certificate name</FormLabel>
-                <Input
-                  type="text"
-                  name="name"
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  value={values.name}
-                  placeholder="Human-readable name for the certificate"
-                />
-                {errors.name && (
-                  <FormErrorMessage>{errors.name}</FormErrorMessage>
-                )}
-              </FormControl>
-              <FormControl>
-                <FormLabel>Description</FormLabel>
-                <Textarea
-                  name="description"
-                  value={values.description}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  placeholder="Description for the certificate"
-                  size="sm"
-                />
-                {errors.description && (
-                  <FormErrorMessage>{errors.description}</FormErrorMessage>
-                )}
-              </FormControl>
-              <FormControl>
-                <FormLabel>External link</FormLabel>
-                <Input
-                  type="text"
-                  name="external_link"
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  value={values.external_link}
-                  placeholder="External link with more information"
-                />
-                {errors.external_link && (
-                  <FormErrorMessage>{errors.external_link}</FormErrorMessage>
-                )}
-              </FormControl>
-              <FormControl>
-                <FormLabel>Image</FormLabel>
-                <UploadField name="image" setFieldValue={setFieldValue} />
-              </FormControl>
-              <Divider my={3} />
-              <HStack>
-                <FormControl>
-                  <FormLabel>Work time start</FormLabel>
+          }) => {
+            console.log(isValid, isSubmitting, errors);
+            return (
+              <form onSubmit={handleSubmit}>
+                <FormControl isRequired>
+                  <Flex>
+                    <FormLabel>Certificate name</FormLabel>
+                    <ErrorMessage name="name" render={DisplayError} />
+                  </Flex>
                   <Input
-                    type="datetime-local"
-                    name="workTimeStart"
+                    type="text"
+                    name="name"
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    value={values.workTimeStart}
+                    value={values.name}
+                    placeholder="Human-readable name for the certificate"
                   />
-                  {!errors.workTimeStart ? (
-                    <FormHelperText>
-                      The moment at which work started
-                    </FormHelperText>
-                  ) : (
-                    <FormErrorMessage>{errors.workTimeStart}</FormErrorMessage>
-                  )}
                 </FormControl>
-                <FormControl>
-                  <FormLabel>Work time end</FormLabel>
-                  <Input
-                    type="datetime-local"
-                    name="workTimeEnd"
+                <FormControl isRequired>
+                  <Flex>
+                    <FormLabel>Description</FormLabel>
+                    <ErrorMessage name="description" render={DisplayError} />
+                  </Flex>
+                  <Textarea
+                    name="description"
+                    value={values.description}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    value={values.workTimeEnd}
+                    placeholder="Description for the certificate"
+                    size="sm"
                   />
-                  {!errors.workTimeEnd ? (
-                    <FormHelperText>
-                      The moment at which work ended
-                    </FormHelperText>
-                  ) : (
-                    <FormErrorMessage>{errors.workTimeEnd}</FormErrorMessage>
-                  )}
                 </FormControl>
-              </HStack>
-              <Divider my={3} />
-              <HStack>
-                <FormControl>
-                  <FormLabel>Impact time start</FormLabel>
+                <FormControl isRequired>
+                  <FormLabel>External link</FormLabel>
                   <Input
-                    type="datetime-local"
-                    name="impactTimeStart"
+                    type="text"
+                    name="external_link"
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    value={values.impactTimeStart}
+                    value={values.external_link}
+                    placeholder="External link with more information"
                   />
-                  {!errors.impactTimeStart ? (
-                    <FormHelperText>
-                      The moment at which impact started
-                    </FormHelperText>
-                  ) : (
-                    <FormErrorMessage>
-                      {errors.impactTimeStart}
-                    </FormErrorMessage>
-                  )}
+                  <ErrorMessage name="external_link" render={DisplayError} />
                 </FormControl>
                 <FormControl>
-                  <FormLabel>Impact time end</FormLabel>
-                  <Input
-                    type="datetime-local"
-                    name="impactTimeEnd"
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    value={values.impactTimeEnd}
-                  />
-                  {!errors.impactTimeEnd ? (
-                    <FormHelperText>
-                      The moment at which impact ended
-                    </FormHelperText>
-                  ) : (
-                    <FormErrorMessage>{errors.impactTimeEnd}</FormErrorMessage>
-                  )}
+                  <FormLabel>Image</FormLabel>
+                  <UploadField name="image" setFieldValue={setFieldValue} />
                 </FormControl>
-              </HStack>
-              <Divider my={3} />
-              <FormControl>
-                <FormLabel>Work scopes</FormLabel>
-                <Field name="workScopes">
-                  {({ form }: FieldProps) => (
-                    <Autocomplete
-                      renderBadge={(option) => (
-                        <Badge mr={3} cursor="pointer">
-                          {option.label} <b>x</b>
-                        </Badge>
-                      )}
-                      options={options}
-                      result={result}
-                      setResult={(options: Option[]) => {
-                        form.setFieldValue("workScopes", options);
-                        setResult(options);
-                      }}
-                      width="100%"
-                      placeholder="Click to start searching for work scopes"
+                <Divider my={3} />
+                <HStack>
+                  <FormControl>
+                    <FormLabel>Work time start</FormLabel>
+                    <Input
+                      type="datetime-local"
+                      name="workTimeStart"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.workTimeStart}
                     />
+                    {!errors.workTimeStart ? (
+                      <FormHelperText>
+                        The moment at which work started
+                      </FormHelperText>
+                    ) : (
+                      <FormErrorMessage>
+                        {errors.workTimeStart}
+                      </FormErrorMessage>
+                    )}
+                  </FormControl>
+                  <FormControl>
+                    <FormLabel>Work time end</FormLabel>
+                    <Input
+                      type="datetime-local"
+                      name="workTimeEnd"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.workTimeEnd}
+                    />
+                    {!errors.workTimeEnd ? (
+                      <FormHelperText>
+                        The moment at which work ended
+                      </FormHelperText>
+                    ) : (
+                      <FormErrorMessage>{errors.workTimeEnd}</FormErrorMessage>
+                    )}
+                  </FormControl>
+                </HStack>
+                <Divider my={3} />
+                <HStack>
+                  <FormControl>
+                    <FormLabel>Impact time start</FormLabel>
+                    <Input
+                      type="datetime-local"
+                      name="impactTimeStart"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.impactTimeStart}
+                    />
+                    {!errors.impactTimeStart ? (
+                      <FormHelperText>
+                        The moment at which impact started
+                      </FormHelperText>
+                    ) : (
+                      <FormErrorMessage>
+                        {errors.impactTimeStart}
+                      </FormErrorMessage>
+                    )}
+                  </FormControl>
+                  <FormControl>
+                    <FormLabel>Impact time end</FormLabel>
+                    <Input
+                      type="datetime-local"
+                      name="impactTimeEnd"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.impactTimeEnd}
+                    />
+                    {!errors.impactTimeEnd ? (
+                      <FormHelperText>
+                        The moment at which impact ended
+                      </FormHelperText>
+                    ) : (
+                      <FormErrorMessage>
+                        {errors.impactTimeEnd}
+                      </FormErrorMessage>
+                    )}
+                  </FormControl>
+                </HStack>
+                <Divider my={3} />
+                <FormControl isRequired>
+                  <FormLabel>Work scopes</FormLabel>
+                  <Field name="workScopes">
+                    {({ form }: FieldProps) => (
+                      <Autocomplete
+                        renderBadge={(option) => (
+                          <Badge mr={3} cursor="pointer">
+                            {option.label} <b>x</b>
+                          </Badge>
+                        )}
+                        options={options}
+                        result={result}
+                        setResult={(options: Option[]) => {
+                          form.setFieldValue("workScopes", options);
+                          setResult(options);
+                        }}
+                        width="100%"
+                        placeholder="Click to start searching for work scopes"
+                      />
+                    )}
+                  </Field>{" "}
+                  {!errors.workScopes ? (
+                    <FormHelperText>
+                      The different scopes that are encapsulated by this
+                      certificate
+                    </FormHelperText>
+                  ) : (
+                    <FormErrorMessage>Workscopes errors</FormErrorMessage>
                   )}
-                </Field>{" "}
-                {!errors.workScopes ? (
-                  <FormHelperText>
-                    The different scopes that are encapsulated by this
-                    certificate
-                  </FormHelperText>
-                ) : (
-                  <FormErrorMessage>Workscopes errors</FormErrorMessage>
-                )}
-              </FormControl>
-              <Divider my={3} />
-              <Button width="100%" type="submit">
-                Claim hypercert
-              </Button>
-            </form>
-          )}
+                </FormControl>
+                <Divider my={3} />
+                <Button
+                  width="100%"
+                  type="submit"
+                  disabled={!isValid || isSubmitting}
+                >
+                  Claim hypercert
+                </Button>
+              </form>
+            );
+          }}
         </Formik>
       </Container>
     </>
   );
 };
+
+const DisplayError = (message: string) => (
+  <span style={{ color: "red" }}>- {message}</span>
+);
 
 export default TestPage;
