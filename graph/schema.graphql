@@ -1,0 +1,43 @@
+type Contributor @entity {
+  id: String!
+  hypercerts: [Hypercert!]! @derivedFrom(field: "contributors")
+}
+
+type Hypercert @entity {
+  id: String!
+  claimHash: Bytes!
+  contributors: [Contributor!]!
+  impactDateFrom: BigInt!
+  impactDateTo: BigInt!
+  impactScopes: [ImpactScope!]!
+  rights: [Right!]!
+  uri: String!
+  version: BigInt!
+  workDateFrom: BigInt!
+  workDateTo: BigInt!
+  workScopes: [WorkScope!]!
+}
+
+type HypercertBalance @entity {
+  id: String!
+  amount: BigInt!
+  token: Hypercert!
+}
+
+type ImpactScope @entity {
+  id: Bytes!
+  text: String!
+  hypercerts: [Hypercert!]! @derivedFrom(field: "impactScopes")
+}
+
+type Right @entity {
+  id: Bytes!
+  text: String!
+  hypercerts: [Hypercert!]! @derivedFrom(field: "rights")
+}
+
+type WorkScope @entity {
+  id: Bytes!
+  text: String!
+  hypercerts: [Hypercert!]! @derivedFrom(field: "workScopes")
+}

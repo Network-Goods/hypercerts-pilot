@@ -9,7 +9,7 @@ import type {
   TypedListener,
   OnEvent,
   PromiseOrValue,
-} from "../common";
+} from "../../common";
 import type {
   FunctionFragment,
   Result,
@@ -39,9 +39,9 @@ export declare namespace HypercertMinterV0 {
       PromiseOrValue<BigNumberish>,
       PromiseOrValue<BigNumberish>
     ];
-    workScopes: PromiseOrValue<BigNumberish>[];
-    impactScopes: PromiseOrValue<BigNumberish>[];
-    rights: PromiseOrValue<BigNumberish>[];
+    workScopes: PromiseOrValue<BytesLike>[];
+    impactScopes: PromiseOrValue<BytesLike>[];
+    rights: PromiseOrValue<BytesLike>[];
     version: PromiseOrValue<BigNumberish>;
     exists: PromiseOrValue<boolean>;
   };
@@ -51,9 +51,9 @@ export declare namespace HypercertMinterV0 {
     string[],
     [BigNumber, BigNumber],
     [BigNumber, BigNumber],
-    BigNumber[],
-    BigNumber[],
-    BigNumber[],
+    string[],
+    string[],
+    string[],
     BigNumber,
     boolean
   ] & {
@@ -61,18 +61,21 @@ export declare namespace HypercertMinterV0 {
     contributors: string[];
     workTimeframe: [BigNumber, BigNumber];
     impactTimeframe: [BigNumber, BigNumber];
-    workScopes: BigNumber[];
-    impactScopes: BigNumber[];
-    rights: BigNumber[];
+    workScopes: string[];
+    impactScopes: string[];
+    rights: string[];
     version: BigNumber;
     exists: boolean;
   };
 }
 
-export interface HypercertMinterV0Interface extends utils.Interface {
+export interface HypercertMinterUpgradeInterface extends utils.Interface {
   functions: {
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
     "UPGRADER_ROLE()": FunctionFragment;
+    "addImpactScope(string)": FunctionFragment;
+    "addRight(string)": FunctionFragment;
+    "addWorkScope(string)": FunctionFragment;
     "balanceOf(address,uint256)": FunctionFragment;
     "balanceOfBatch(address[],uint256[])": FunctionFragment;
     "burn(address,uint256,uint256)": FunctionFragment;
@@ -84,30 +87,34 @@ export interface HypercertMinterV0Interface extends utils.Interface {
     "getRoleAdmin(bytes32)": FunctionFragment;
     "grantRole(bytes32,address)": FunctionFragment;
     "hasRole(bytes32,address)": FunctionFragment;
-    "impactScopes(uint256)": FunctionFragment;
+    "impactScopes(bytes32)": FunctionFragment;
     "initialize()": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
     "mint(address,uint256,bytes)": FunctionFragment;
     "proxiableUUID()": FunctionFragment;
     "renounceRole(bytes32,address)": FunctionFragment;
     "revokeRole(bytes32,address)": FunctionFragment;
-    "rights(uint256)": FunctionFragment;
+    "rights(bytes32)": FunctionFragment;
     "safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)": FunctionFragment;
     "safeTransferFrom(address,address,uint256,uint256,bytes)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
+    "split(uint256)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "totalSupply(uint256)": FunctionFragment;
     "upgradeTo(address)": FunctionFragment;
     "upgradeToAndCall(address,bytes)": FunctionFragment;
     "uri(uint256)": FunctionFragment;
     "version()": FunctionFragment;
-    "workScopes(uint256)": FunctionFragment;
+    "workScopes(bytes32)": FunctionFragment;
   };
 
   getFunction(
     nameOrSignatureOrTopic:
       | "DEFAULT_ADMIN_ROLE"
       | "UPGRADER_ROLE"
+      | "addImpactScope"
+      | "addRight"
+      | "addWorkScope"
       | "balanceOf"
       | "balanceOfBatch"
       | "burn"
@@ -130,6 +137,7 @@ export interface HypercertMinterV0Interface extends utils.Interface {
       | "safeBatchTransferFrom"
       | "safeTransferFrom"
       | "setApprovalForAll"
+      | "split"
       | "supportsInterface"
       | "totalSupply"
       | "upgradeTo"
@@ -146,6 +154,18 @@ export interface HypercertMinterV0Interface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "UPGRADER_ROLE",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "addImpactScope",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "addRight",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "addWorkScope",
+    values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
     functionFragment: "balanceOf",
@@ -198,7 +218,7 @@ export interface HypercertMinterV0Interface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "impactScopes",
-    values: [PromiseOrValue<BigNumberish>]
+    values: [PromiseOrValue<BytesLike>]
   ): string;
   encodeFunctionData(
     functionFragment: "initialize",
@@ -230,7 +250,7 @@ export interface HypercertMinterV0Interface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "rights",
-    values: [PromiseOrValue<BigNumberish>]
+    values: [PromiseOrValue<BytesLike>]
   ): string;
   encodeFunctionData(
     functionFragment: "safeBatchTransferFrom",
@@ -257,6 +277,10 @@ export interface HypercertMinterV0Interface extends utils.Interface {
     values: [PromiseOrValue<string>, PromiseOrValue<boolean>]
   ): string;
   encodeFunctionData(
+    functionFragment: "split",
+    values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
     functionFragment: "supportsInterface",
     values: [PromiseOrValue<BytesLike>]
   ): string;
@@ -279,7 +303,7 @@ export interface HypercertMinterV0Interface extends utils.Interface {
   encodeFunctionData(functionFragment: "version", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "workScopes",
-    values: [PromiseOrValue<BigNumberish>]
+    values: [PromiseOrValue<BytesLike>]
   ): string;
 
   decodeFunctionResult(
@@ -288,6 +312,15 @@ export interface HypercertMinterV0Interface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "UPGRADER_ROLE",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "addImpactScope",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "addRight", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "addWorkScope",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
@@ -345,6 +378,7 @@ export interface HypercertMinterV0Interface extends utils.Interface {
     functionFragment: "setApprovalForAll",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "split", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "supportsInterface",
     data: BytesLike
@@ -366,29 +400,37 @@ export interface HypercertMinterV0Interface extends utils.Interface {
     "AdminChanged(address,address)": EventFragment;
     "ApprovalForAll(address,address,bool)": EventFragment;
     "BeaconUpgraded(address)": EventFragment;
-    "ImpactClaimed(uint256,bytes32,address[],uint256[2],uint256[2],uint256[],uint256[],uint256,string)": EventFragment;
+    "ImpactClaimed(uint256,bytes32,address[],uint256[2],uint256[2],bytes32[],bytes32[],bytes32[],uint256,string)": EventFragment;
+    "ImpactScopeAdded(bytes32,string)": EventFragment;
     "Initialized(uint8)": EventFragment;
+    "RightAdded(bytes32,string)": EventFragment;
     "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
     "RoleGranted(bytes32,address,address)": EventFragment;
     "RoleRevoked(bytes32,address,address)": EventFragment;
+    "Split(uint256,uint256[])": EventFragment;
     "TransferBatch(address,address,address,uint256[],uint256[])": EventFragment;
     "TransferSingle(address,address,address,uint256,uint256)": EventFragment;
     "URI(string,uint256)": EventFragment;
     "Upgraded(address)": EventFragment;
+    "WorkScopeAdded(bytes32,string)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "AdminChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "BeaconUpgraded"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ImpactClaimed"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ImpactScopeAdded"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "RightAdded"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleAdminChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleGranted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleRevoked"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Split"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TransferBatch"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TransferSingle"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "URI"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Upgraded"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "WorkScopeAdded"): EventFragment;
 }
 
 export interface AdminChangedEventObject {
@@ -430,8 +472,9 @@ export interface ImpactClaimedEventObject {
   contributors: string[];
   workTimeframe: [BigNumber, BigNumber];
   impactTimeframe: [BigNumber, BigNumber];
-  workScopes: BigNumber[];
-  impactScopes: BigNumber[];
+  workScopes: string[];
+  impactScopes: string[];
+  rights: string[];
   version: BigNumber;
   uri: string;
 }
@@ -442,8 +485,9 @@ export type ImpactClaimedEvent = TypedEvent<
     string[],
     [BigNumber, BigNumber],
     [BigNumber, BigNumber],
-    BigNumber[],
-    BigNumber[],
+    string[],
+    string[],
+    string[],
     BigNumber,
     string
   ],
@@ -452,12 +496,35 @@ export type ImpactClaimedEvent = TypedEvent<
 
 export type ImpactClaimedEventFilter = TypedEventFilter<ImpactClaimedEvent>;
 
+export interface ImpactScopeAddedEventObject {
+  id: string;
+  text: string;
+}
+export type ImpactScopeAddedEvent = TypedEvent<
+  [string, string],
+  ImpactScopeAddedEventObject
+>;
+
+export type ImpactScopeAddedEventFilter =
+  TypedEventFilter<ImpactScopeAddedEvent>;
+
 export interface InitializedEventObject {
   version: number;
 }
 export type InitializedEvent = TypedEvent<[number], InitializedEventObject>;
 
 export type InitializedEventFilter = TypedEventFilter<InitializedEvent>;
+
+export interface RightAddedEventObject {
+  id: string;
+  text: string;
+}
+export type RightAddedEvent = TypedEvent<
+  [string, string],
+  RightAddedEventObject
+>;
+
+export type RightAddedEventFilter = TypedEventFilter<RightAddedEvent>;
 
 export interface RoleAdminChangedEventObject {
   role: string;
@@ -495,6 +562,14 @@ export type RoleRevokedEvent = TypedEvent<
 >;
 
 export type RoleRevokedEventFilter = TypedEventFilter<RoleRevokedEvent>;
+
+export interface SplitEventObject {
+  fromID: BigNumber;
+  toID: BigNumber[];
+}
+export type SplitEvent = TypedEvent<[BigNumber, BigNumber[]], SplitEventObject>;
+
+export type SplitEventFilter = TypedEventFilter<SplitEvent>;
 
 export interface TransferBatchEventObject {
   operator: string;
@@ -539,12 +614,23 @@ export type UpgradedEvent = TypedEvent<[string], UpgradedEventObject>;
 
 export type UpgradedEventFilter = TypedEventFilter<UpgradedEvent>;
 
-export interface HypercertMinterV0 extends BaseContract {
+export interface WorkScopeAddedEventObject {
+  id: string;
+  text: string;
+}
+export type WorkScopeAddedEvent = TypedEvent<
+  [string, string],
+  WorkScopeAddedEventObject
+>;
+
+export type WorkScopeAddedEventFilter = TypedEventFilter<WorkScopeAddedEvent>;
+
+export interface HypercertMinterUpgrade extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: HypercertMinterV0Interface;
+  interface: HypercertMinterUpgradeInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
@@ -569,6 +655,21 @@ export interface HypercertMinterV0 extends BaseContract {
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
     UPGRADER_ROLE(overrides?: CallOverrides): Promise<[string]>;
+
+    addImpactScope(
+      text: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    addRight(
+      text: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    addWorkScope(
+      text: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
 
     balanceOf(
       account: PromiseOrValue<string>,
@@ -632,7 +733,7 @@ export interface HypercertMinterV0 extends BaseContract {
     ): Promise<[boolean]>;
 
     impactScopes(
-      arg0: PromiseOrValue<BigNumberish>,
+      arg0: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<[string]>;
 
@@ -668,7 +769,7 @@ export interface HypercertMinterV0 extends BaseContract {
     ): Promise<ContractTransaction>;
 
     rights(
-      arg0: PromiseOrValue<BigNumberish>,
+      arg0: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<[string]>;
 
@@ -693,6 +794,11 @@ export interface HypercertMinterV0 extends BaseContract {
     setApprovalForAll(
       operator: PromiseOrValue<string>,
       approved: PromiseOrValue<boolean>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    split(
+      id: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -725,7 +831,7 @@ export interface HypercertMinterV0 extends BaseContract {
     version(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     workScopes(
-      arg0: PromiseOrValue<BigNumberish>,
+      arg0: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<[string]>;
   };
@@ -733,6 +839,21 @@ export interface HypercertMinterV0 extends BaseContract {
   DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
   UPGRADER_ROLE(overrides?: CallOverrides): Promise<string>;
+
+  addImpactScope(
+    text: PromiseOrValue<string>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  addRight(
+    text: PromiseOrValue<string>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  addWorkScope(
+    text: PromiseOrValue<string>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
   balanceOf(
     account: PromiseOrValue<string>,
@@ -796,7 +917,7 @@ export interface HypercertMinterV0 extends BaseContract {
   ): Promise<boolean>;
 
   impactScopes(
-    arg0: PromiseOrValue<BigNumberish>,
+    arg0: PromiseOrValue<BytesLike>,
     overrides?: CallOverrides
   ): Promise<string>;
 
@@ -832,7 +953,7 @@ export interface HypercertMinterV0 extends BaseContract {
   ): Promise<ContractTransaction>;
 
   rights(
-    arg0: PromiseOrValue<BigNumberish>,
+    arg0: PromiseOrValue<BytesLike>,
     overrides?: CallOverrides
   ): Promise<string>;
 
@@ -857,6 +978,11 @@ export interface HypercertMinterV0 extends BaseContract {
   setApprovalForAll(
     operator: PromiseOrValue<string>,
     approved: PromiseOrValue<boolean>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  split(
+    id: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -889,7 +1015,7 @@ export interface HypercertMinterV0 extends BaseContract {
   version(overrides?: CallOverrides): Promise<BigNumber>;
 
   workScopes(
-    arg0: PromiseOrValue<BigNumberish>,
+    arg0: PromiseOrValue<BytesLike>,
     overrides?: CallOverrides
   ): Promise<string>;
 
@@ -897,6 +1023,21 @@ export interface HypercertMinterV0 extends BaseContract {
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
     UPGRADER_ROLE(overrides?: CallOverrides): Promise<string>;
+
+    addImpactScope(
+      text: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    addRight(
+      text: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    addWorkScope(
+      text: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<string>;
 
     balanceOf(
       account: PromiseOrValue<string>,
@@ -960,7 +1101,7 @@ export interface HypercertMinterV0 extends BaseContract {
     ): Promise<boolean>;
 
     impactScopes(
-      arg0: PromiseOrValue<BigNumberish>,
+      arg0: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<string>;
 
@@ -994,7 +1135,7 @@ export interface HypercertMinterV0 extends BaseContract {
     ): Promise<void>;
 
     rights(
-      arg0: PromiseOrValue<BigNumberish>,
+      arg0: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<string>;
 
@@ -1019,6 +1160,11 @@ export interface HypercertMinterV0 extends BaseContract {
     setApprovalForAll(
       operator: PromiseOrValue<string>,
       approved: PromiseOrValue<boolean>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    split(
+      id: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1051,7 +1197,7 @@ export interface HypercertMinterV0 extends BaseContract {
     version(overrides?: CallOverrides): Promise<BigNumber>;
 
     workScopes(
-      arg0: PromiseOrValue<BigNumberish>,
+      arg0: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<string>;
   };
@@ -1084,7 +1230,7 @@ export interface HypercertMinterV0 extends BaseContract {
       beacon?: PromiseOrValue<string> | null
     ): BeaconUpgradedEventFilter;
 
-    "ImpactClaimed(uint256,bytes32,address[],uint256[2],uint256[2],uint256[],uint256[],uint256,string)"(
+    "ImpactClaimed(uint256,bytes32,address[],uint256[2],uint256[2],bytes32[],bytes32[],bytes32[],uint256,string)"(
       id?: null,
       claimHash?: null,
       contributors?: null,
@@ -1092,6 +1238,7 @@ export interface HypercertMinterV0 extends BaseContract {
       impactTimeframe?: null,
       workScopes?: null,
       impactScopes?: null,
+      rights?: null,
       version?: null,
       uri?: null
     ): ImpactClaimedEventFilter;
@@ -1103,12 +1250,22 @@ export interface HypercertMinterV0 extends BaseContract {
       impactTimeframe?: null,
       workScopes?: null,
       impactScopes?: null,
+      rights?: null,
       version?: null,
       uri?: null
     ): ImpactClaimedEventFilter;
 
+    "ImpactScopeAdded(bytes32,string)"(
+      id?: null,
+      text?: null
+    ): ImpactScopeAddedEventFilter;
+    ImpactScopeAdded(id?: null, text?: null): ImpactScopeAddedEventFilter;
+
     "Initialized(uint8)"(version?: null): InitializedEventFilter;
     Initialized(version?: null): InitializedEventFilter;
+
+    "RightAdded(bytes32,string)"(id?: null, text?: null): RightAddedEventFilter;
+    RightAdded(id?: null, text?: null): RightAddedEventFilter;
 
     "RoleAdminChanged(bytes32,bytes32,bytes32)"(
       role?: PromiseOrValue<BytesLike> | null,
@@ -1142,6 +1299,9 @@ export interface HypercertMinterV0 extends BaseContract {
       account?: PromiseOrValue<string> | null,
       sender?: PromiseOrValue<string> | null
     ): RoleRevokedEventFilter;
+
+    "Split(uint256,uint256[])"(fromID?: null, toID?: null): SplitEventFilter;
+    Split(fromID?: null, toID?: null): SplitEventFilter;
 
     "TransferBatch(address,address,address,uint256[],uint256[])"(
       operator?: PromiseOrValue<string> | null,
@@ -1185,12 +1345,33 @@ export interface HypercertMinterV0 extends BaseContract {
     Upgraded(
       implementation?: PromiseOrValue<string> | null
     ): UpgradedEventFilter;
+
+    "WorkScopeAdded(bytes32,string)"(
+      id?: null,
+      text?: null
+    ): WorkScopeAddedEventFilter;
+    WorkScopeAdded(id?: null, text?: null): WorkScopeAddedEventFilter;
   };
 
   estimateGas: {
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
     UPGRADER_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
+
+    addImpactScope(
+      text: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    addRight(
+      text: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    addWorkScope(
+      text: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
 
     balanceOf(
       account: PromiseOrValue<string>,
@@ -1254,7 +1435,7 @@ export interface HypercertMinterV0 extends BaseContract {
     ): Promise<BigNumber>;
 
     impactScopes(
-      arg0: PromiseOrValue<BigNumberish>,
+      arg0: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1290,7 +1471,7 @@ export interface HypercertMinterV0 extends BaseContract {
     ): Promise<BigNumber>;
 
     rights(
-      arg0: PromiseOrValue<BigNumberish>,
+      arg0: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1315,6 +1496,11 @@ export interface HypercertMinterV0 extends BaseContract {
     setApprovalForAll(
       operator: PromiseOrValue<string>,
       approved: PromiseOrValue<boolean>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    split(
+      id: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -1347,7 +1533,7 @@ export interface HypercertMinterV0 extends BaseContract {
     version(overrides?: CallOverrides): Promise<BigNumber>;
 
     workScopes(
-      arg0: PromiseOrValue<BigNumberish>,
+      arg0: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
   };
@@ -1358,6 +1544,21 @@ export interface HypercertMinterV0 extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     UPGRADER_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    addImpactScope(
+      text: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    addRight(
+      text: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    addWorkScope(
+      text: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
 
     balanceOf(
       account: PromiseOrValue<string>,
@@ -1421,7 +1622,7 @@ export interface HypercertMinterV0 extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     impactScopes(
-      arg0: PromiseOrValue<BigNumberish>,
+      arg0: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1457,7 +1658,7 @@ export interface HypercertMinterV0 extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     rights(
-      arg0: PromiseOrValue<BigNumberish>,
+      arg0: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1482,6 +1683,11 @@ export interface HypercertMinterV0 extends BaseContract {
     setApprovalForAll(
       operator: PromiseOrValue<string>,
       approved: PromiseOrValue<boolean>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    split(
+      id: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1514,7 +1720,7 @@ export interface HypercertMinterV0 extends BaseContract {
     version(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     workScopes(
-      arg0: PromiseOrValue<BigNumberish>,
+      arg0: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
   };
