@@ -3,5 +3,10 @@
     "HypercertMinterV0": {
       "address": "0x78f7E8c17df758ffBfa4a0Cab38EcDFb8d9C82E2"
     }
+  },
+  "goerli": {
+    "HypercertMinterV0": {
+      "address": "0x126abf1ca4db7389b1f5fd3B8a84b3434313854d"
+    }
   }
 }
