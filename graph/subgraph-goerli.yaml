@@ -1,0 +1,67 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: HypercertMinterV0
+    network: goerli
+    source:
+      address: "0x126abf1ca4db7389b1f5fd3B8a84b3434313854d"
+      abi: HypercertMinterV0
+      startBlock: 7492774
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - AdminChanged
+        - ApprovalForAll
+        - BeaconUpgraded
+        - Contributor
+        - ImpactClaimed
+        - ImpactScope
+        - Initialized
+        - Right
+        - RoleAdminChanged
+        - RoleGranted
+        - RoleRevoked
+        - TransferBatch
+        - TransferSingle
+        - URI
+        - Upgraded
+        - WorkScope
+      abis:
+        - name: HypercertMinterV0
+          file: ./abis/contracts/HypercertMinterV0.sol/HypercertMinterV0.json
+      eventHandlers:
+        - event: AdminChanged(address,address)
+          handler: handleAdminChanged
+        - event: ApprovalForAll(indexed address,indexed address,bool)
+          handler: handleApprovalForAll
+        - event: BeaconUpgraded(indexed address)
+          handler: handleBeaconUpgraded
+        - event: ImpactClaimed(uint256,bytes32,address[],uint256[2],uint256[2],bytes32[],bytes32[],bytes32[],uint256,string)
+          handler: handleImpactClaimed
+        - event: ImpactScopeAdded(bytes32,string)
+          handler: handleImpactScopeAdded
+        - event: RightAdded(bytes32,string)
+          handler: handleRightAdded
+        - event: WorkScopeAdded(bytes32,string)
+          handler: handleWorkScopeAdded
+        - event: Initialized(uint8)
+          handler: handleInitialized
+        - event: RoleAdminChanged(indexed bytes32,indexed bytes32,indexed bytes32)
+          handler: handleRoleAdminChanged
+        - event: RoleGranted(indexed bytes32,indexed address,indexed address)
+          handler: handleRoleGranted
+        - event: RoleRevoked(indexed bytes32,indexed address,indexed address)
+          handler: handleRoleRevoked
+        - event: TransferBatch(indexed address,indexed address,indexed address,uint256[],uint256[])
+          handler: handleTransferBatch
+        - event: TransferSingle(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleTransferSingle
+        - event: URI(string,indexed uint256)
+          handler: handleURI
+        - event: Upgraded(indexed address)
+          handler: handleUpgraded
+      file: ./src/hypercert-minter-v-0.ts
