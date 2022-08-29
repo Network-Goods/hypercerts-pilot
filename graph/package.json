@@ -6,8 +6,10 @@
     "build": "graph build",
     "deploy": "graph deploy --node https://api.thegraph.com/deploy/ protocol/hypercerts",
     "create-local": "graph create --node http://localhost:8020/ protocol/hypercerts",
-    "remove-local": "graph remove --node http://localhost:8020/ protocol/hypercerts",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 protocol/hypercerts",
+    "remove-local": "graph remove --node http://localhost:8020/ protocol/hypercerts",
+    "start-local": "docker-compose up -d",
+    "stop-local": "docker-compose down --volume",
     "test": "graph test"
   },
   "dependencies": {

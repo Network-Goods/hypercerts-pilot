@@ -4,7 +4,7 @@ schema:
 dataSources:
   - kind: ethereum
     name: HypercertMinterV0
-    network: mainnet
+    network: hardhat
     source:
       address: "0x78f7E8c17df758ffBfa4a0Cab38EcDFb8d9C82E2"
       abi: HypercertMinterV0

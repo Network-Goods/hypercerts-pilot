@@ -1,5 +1,5 @@
 {
-  "localhost": {
+  "hardhat": {
     "HypercertMinterV0": {
       "address": "0x78f7E8c17df758ffBfa4a0Cab38EcDFb8d9C82E2"
     }
