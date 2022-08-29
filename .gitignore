@@ -38,6 +38,7 @@ next-env.d.ts
 /.idea
 
 # graph
+build
 build-info
 data
 generated
