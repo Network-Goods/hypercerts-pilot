@@ -43,3 +43,4 @@ data
 generated
 hardhat
 .bin
+.latest.json
