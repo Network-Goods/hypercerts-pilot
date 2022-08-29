@@ -1,4 +1,4 @@
-import { Address, BigInt, Bytes } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import {
   assert,
   describe,
@@ -7,10 +7,11 @@ import {
   beforeAll,
   afterAll,
 } from "matchstick-as/assembly/index";
-import { Hypercert, HypercertBalance } from "../generated/schema";
-import { handleImpactClaimed, handleImpactScopeAdded, handleRightAdded, handleTransferSingle, handleWorkScopeAdded } from "../src/hypercert-minter-v-0";
-import { createImpactClaimedEvent, createImpactScopeAddedEvent, createRightAddedEvent, createTransferSingleEvent, createWorkScopeAddedEvent } from "./hypercert-minter-v-0-utils";
+import { Contributor, Hypercert, HypercertBalance } from "../generated/schema";
+import { handleImpactClaimed, handleImpactScopeAdded, handleRightAdded, handleTransferBatch, handleTransferSingle, handleWorkScopeAdded } from "../src/hypercert-minter-v-0";
+import { createImpactClaimedEvent, createImpactScopeAddedEvent, createRightAddedEvent, createTransferBatchEvent, createTransferSingleEvent, createWorkScopeAddedEvent } from "./hypercert-minter-v-0-utils";
 
+const CONTRIBUTOR = "Contributor";
 const HYPERCERT = "Hypercert";
 const HYPERCERT_BALANCE = "HypercertBalance";
 const IMPACT_SCOPE = "ImpactScope";
@@ -53,41 +54,48 @@ describe(HYPERCERT, () => {
     clearStore();
   });
 
-  test("entity created and stored", () => {
+  test("entities created and stored", () => {
+    assert.entityCount(CONTRIBUTOR, 1);
+    const contributor = Contributor.load(contributor0);
+    assert.assertNotNull(contributor);
+    if (contributor) {
+      assert.equals(ethereum.Value.fromI32(1), ethereum.Value.fromI32(contributor.hypercerts.length));
+      assert.stringEquals("1", contributor.hypercerts[0]);
+    }
     assert.entityCount(HYPERCERT, 1);
     const idStr = id1.toString();
     assert.fieldEquals(HYPERCERT, idStr, "claimHash", claimHash);
     assert.fieldEquals(HYPERCERT, idStr, "uri", uri);
     assert.fieldEquals(HYPERCERT, idStr, "version", version.toString());
-    const entity = Hypercert.load(idStr);
-    assert.assertNotNull(entity);
-    if (entity) {
-      assert.assertTrue(entity.contributors.length === 1);
-      assert.stringEquals(contributor0, entity.contributors[0]);
-      assert.bigIntEquals(BigInt.fromI32(workTimeframe0), entity.workDateFrom);
-      assert.bigIntEquals(BigInt.fromI32(workTimeframe1), entity.workDateTo);
+    const hypercert = Hypercert.load(idStr);
+    assert.assertNotNull(hypercert);
+    if (hypercert) {
+      assert.assertTrue(hypercert.contributors.length === 1);
+      assert.stringEquals(contributor0, hypercert.contributors[0]);
+      assert.bigIntEquals(BigInt.fromI32(workTimeframe0), hypercert.workDateFrom);
+      assert.bigIntEquals(BigInt.fromI32(workTimeframe1), hypercert.workDateTo);
       assert.bigIntEquals(
         BigInt.fromI32(impactTimeframe0),
-        entity.impactDateFrom
+        hypercert.impactDateFrom
       );
       assert.bigIntEquals(
         BigInt.fromI32(impactTimeframe1),
-        entity.impactDateTo
+        hypercert.impactDateTo
       );
-      assert.assertTrue(entity.workScopes.length === 1);
-      assert.bytesEquals(Bytes.fromHexString(workScope0), entity.workScopes[0]);
-      assert.assertTrue(entity.impactScopes.length === 2);
+      assert.assertTrue(hypercert.workScopes.length === 1);
+      assert.bytesEquals(Bytes.fromHexString(workScope0), hypercert.workScopes[0]);
+      assert.assertTrue(hypercert.impactScopes.length === 2);
       assert.bytesEquals(
         Bytes.fromHexString(impactScope0),
-        entity.impactScopes[0]
+        hypercert.impactScopes[0]
       );
       assert.bytesEquals(
         Bytes.fromHexString(impactScope1),
-        entity.impactScopes[1]
+        hypercert.impactScopes[1]
       );
-      assert.assertTrue(entity.rights.length === 2);
-      assert.bytesEquals(Bytes.fromHexString(right0), entity.rights[0]);
-      assert.bytesEquals(Bytes.fromHexString(right1), entity.rights[1]);
+      assert.assertTrue(hypercert.rights.length === 2);
+      assert.bytesEquals(Bytes.fromHexString(right0), hypercert.rights[0]);
+      assert.bytesEquals(Bytes.fromHexString(right1), hypercert.rights[1]);
     }
   });
 });
@@ -98,6 +106,9 @@ describe(HYPERCERT_BALANCE, () => {
   const id2 = 2;
   const amount1 = 1;
   const amount2 = 1000;
+  const burned20 = 100;
+  const burned1 = 25;
+  const burned21 = 35;
 
   beforeAll(() => {
     const e1 = createTransferSingleEvent(
@@ -137,17 +148,16 @@ describe(HYPERCERT_BALANCE, () => {
   });
 
   test("balance updated upon burn", () => {
-    const burned = 100;
     const e = createTransferSingleEvent(
       Address.fromString(address),
       Address.fromString(address),
       Address.zero(),
       BigInt.fromI32(id2),
-      BigInt.fromI32(burned)
+      BigInt.fromI32(burned20)
     );
     handleTransferSingle(e);
 
-    assert.entityCount(HYPERCERT_BALANCE, 3);
+    assert.entityCount(HYPERCERT_BALANCE, 2);
 
     const balance1 = HypercertBalance.load(`${address}-${BigInt.fromI32(id1)}`);
     assert.assertNotNull(balance1);
@@ -157,7 +167,31 @@ describe(HYPERCERT_BALANCE, () => {
     const balance2 = HypercertBalance.load(`${address}-${BigInt.fromI32(id2)}`);
     assert.assertNotNull(balance2);
     if (balance2) {
-      assert.bigIntEquals(BigInt.fromI32(amount2 - burned), balance2.amount);
+      assert.bigIntEquals(BigInt.fromI32(amount2 - burned20), balance2.amount);
+    }
+  });
+
+  test("balance updated upon batch burn", () => {
+    const e = createTransferBatchEvent(
+      Address.fromString(address),
+      Address.fromString(address),
+      Address.zero(),
+      [BigInt.fromI32(id1), BigInt.fromI32(id2)],
+      [BigInt.fromI32(burned1), BigInt.fromI32(burned21)]
+    );
+    handleTransferBatch(e);
+
+    assert.entityCount(HYPERCERT_BALANCE, 2);
+
+    const balance1 = HypercertBalance.load(`${address}-${BigInt.fromI32(id1)}`);
+    assert.assertNotNull(balance1);
+    if (balance1) {
+      assert.bigIntEquals(BigInt.fromI32(amount1 - burned1), balance1.amount);
+    }
+    const balance2 = HypercertBalance.load(`${address}-${BigInt.fromI32(id2)}`);
+    assert.assertNotNull(balance2);
+    if (balance2) {
+      assert.bigIntEquals(BigInt.fromI32(amount2 - burned20 - burned21), balance2.amount);
     }
   });
 });

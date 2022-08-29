@@ -1,4 +1,4 @@
-import { BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigInt } from "@graphprotocol/graph-ts";
 import {
   AdminChanged,
   ApprovalForAll,
@@ -16,7 +16,14 @@ import {
   WorkScopeAdded,
   ImpactScopeAdded,
 } from "../generated/HypercertMinterV0/HypercertMinterV0";
-import { Hypercert, HypercertBalance, ImpactScope, Right, WorkScope } from "../generated/schema";
+import {
+  Contributor,
+  Hypercert,
+  HypercertBalance,
+  ImpactScope,
+  Right,
+  WorkScope,
+} from "../generated/schema";
 
 export function handleAdminChanged(event: AdminChanged): void {
   // Entities can be loaded from the store using a string ID; this ID
@@ -76,15 +83,25 @@ export function handleApprovalForAll(event: ApprovalForAll): void {}
 export function handleBeaconUpgraded(event: BeaconUpgraded): void {}
 
 export function handleImpactClaimed(event: ImpactClaimed): void {
-  let entity = new Hypercert(event.params.id.toString());
+  const hypercertId = event.params.id.toString();
+  let entity = new Hypercert(hypercertId);
   entity.claimHash = event.params.claimHash;
   const contributors = [] as string[];
-  for (let i=0; i<event.params.contributors.length; i++)
-  {
+  for (let i = 0; i < event.params.contributors.length; i++) {
     const address = event.params.contributors[i];
     contributors.push(address.toHexString());
   }
   entity.contributors = contributors;
+  for (let i = 0; i < contributors.length; i++) {
+    const contributorId = contributors[i];
+    let contributor = Contributor.load(contributorId);
+    if (!contributor) {
+      contributor = new Contributor(contributorId);
+      contributor.hypercerts = [];
+    }
+    contributor.hypercerts.push(hypercertId);
+    contributor.save();
+  }
   entity.impactDateFrom = event.params.impactTimeframe[0];
   entity.impactDateTo = event.params.impactTimeframe[1];
   entity.impactScopes = event.params.impactScopes;
@@ -123,30 +140,56 @@ export function handleWorkScopeAdded(event: WorkScopeAdded): void {
   entity.save();
 }
 
-export function handleTransferBatch(event: TransferBatch): void {}
+export function handleTransferBatch(event: TransferBatch): void {
+  for (let i = 0; i < event.params.ids.length; i++) {
+    const id = event.params.ids[i];
+    const value = event.params.values[i];
+    handleTransfer(id, event.params.from, event.params.to, value);
+  }
+}
 
 export function handleTransferSingle(event: TransferSingle): void {
-  const tokenId = event.params.id.toString();
-  const from = event.params.from.toHexString();
-  const to = event.params.to.toHexString();
-  const fromId = `${from}-${tokenId}`;
-  const balanceFrom = HypercertBalance.load(fromId);
-  if (balanceFrom) {
-    balanceFrom.amount = balanceFrom.amount - event.params.value;
-    balanceFrom.save();
-  }
-
-  const toId = `${to}-${tokenId}`;
-  let balanceTo = HypercertBalance.load(toId);
-  if (!balanceTo) {
-    balanceTo = new HypercertBalance(toId);
-    balanceTo.token = tokenId;
-    balanceTo.amount = BigInt.fromI32(0);
-  }
-
-  balanceTo.amount = balanceTo.amount + event.params.value;
-  balanceTo.save();
+  handleTransfer(
+    event.params.id,
+    event.params.from,
+    event.params.to,
+    event.params.value
+  );
 }
+
+const handleTransfer = (
+  id: BigInt,
+  from: Address,
+  to: Address,
+  value: BigInt
+): void => {
+  const token = id.toString();
+  const zeroAddress = Address.zero().toHexString();
+  const fromHex = from.toHexString();
+  const toHex = to.toHexString();
+
+  if (fromHex != zeroAddress) {
+    const fromId = `${fromHex}-${token}`;
+    const balanceFrom = HypercertBalance.load(fromId);
+    if (balanceFrom) {
+      balanceFrom.amount = balanceFrom.amount.minus(value);
+      balanceFrom.save();
+    }
+  }
+
+  if (toHex != zeroAddress) {
+    const toId = `${toHex}-${token}`;
+    let balanceTo = HypercertBalance.load(toId);
+    if (!balanceTo) {
+      balanceTo = new HypercertBalance(toId);
+      balanceTo.token = token;
+      balanceTo.amount = BigInt.fromI32(0);
+    }
+
+    balanceTo.amount = balanceTo.amount.plus(value);
+    balanceTo.save();
+  }
+};
 
 export function handleURI(event: URI): void {}
 

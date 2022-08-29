@@ -1,5 +1,6 @@
 type Contributor @entity {
   id: String!
+  hypercerts: [Hypercert!]! @derivedFrom(field: "contributors")
 }
 
 type Hypercert @entity {
@@ -26,14 +27,17 @@ type HypercertBalance @entity {
 type ImpactScope @entity {
   id: Bytes!
   text: String!
+  hypercerts: [Hypercert!]! @derivedFrom(field: "impactScopes")
 }
 
 type Right @entity {
   id: Bytes!
   text: String!
+  hypercerts: [Hypercert!]! @derivedFrom(field: "rights")
 }
 
 type WorkScope @entity {
   id: Bytes!
   text: String!
+  hypercerts: [Hypercert!]! @derivedFrom(field: "workScopes")
 }
