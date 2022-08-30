@@ -12,6 +12,7 @@ import WalletConnectProvider from "@walletconnect/web3-provider";
 import { IProviderOptions } from "web3modal";
 import { Layout } from "../components/Layout";
 import Head from "next/head";
+import {requireEnv} from "../utils/requireEnv";
 
 const SUPPORTED_NETWORKS: NetworkConfig = {
   "0x1": {
@@ -68,6 +69,7 @@ const providerOptions: IProviderOptions = {
       rpc: {
         1: SUPPORTED_NETWORKS["0x1"].rpc,
         4: SUPPORTED_NETWORKS["0x4"].rpc,
+        5: SUPPORTED_NETWORKS["0x5"].rpc,
         31337: SUPPORTED_NETWORKS["0x7A69"].rpc,
       },
     },
@@ -80,7 +82,7 @@ const web3modalOptions = {
   theme: "dark",
 };
 
-const DEFAULT_CHAIN_ID = "0x7A69"; // Used to switch to if the user is on an unsupported network
+const DEFAULT_CHAIN_ID = requireEnv(process.env.NEXT_PUBLIC_DEFAULT_CHAIN, 'NEXT_PUBLIC_DEFAULT_CHAIN');
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -92,6 +94,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       }}
     >
       <WalletProvider
+
         web3modalOptions={web3modalOptions}
         networks={SUPPORTED_NETWORKS}
         // Optional if you want to auto switch the network
