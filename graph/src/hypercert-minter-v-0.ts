@@ -97,9 +97,7 @@ export function handleImpactClaimed(event: ImpactClaimed): void {
     let contributor = Contributor.load(contributorId);
     if (!contributor) {
       contributor = new Contributor(contributorId);
-      contributor.hypercerts = [];
     }
-    contributor.hypercerts.push(hypercertId);
     contributor.save();
   }
   entity.impactDateFrom = event.params.impactTimeframe[0];

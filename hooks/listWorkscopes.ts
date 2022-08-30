@@ -1,14 +1,16 @@
-import { Option } from "chakra-ui-simple-autocomplete";
+import { gql, useQuery } from "@apollo/client";
 
-const options: Option[] = [
-  { value: "0", label: "referrals" },
-  { value: "1", label: "Spain" },
-  { value: "2", label: "volunteer labor" },
-  { value: "3", label: "financial support" },
-  { value: "4", label: "material support" },
-  { value: "5", label: "referrals" },
-];
+const WORK_SCOPES_QUERY = gql`
+  query getWorkScopes {
+    workScopes {
+      id
+      text
+    }
+  }
+`;
 
 export const useWorkScopes = () => {
-  return options;
+  return useQuery<{ workScopes: { id: string; text: string }[] }>(
+    WORK_SCOPES_QUERY
+  );
 };

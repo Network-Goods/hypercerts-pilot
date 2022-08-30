@@ -1,6 +1,6 @@
 export interface MintCertificateData {
   creators: string[];
-  workScopeIds: number[];
+  workScopeIds: string[];
   workTime: [number, number];
   impactScopeIds: number[];
   impactTime: [number, number];

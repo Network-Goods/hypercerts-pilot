@@ -18,7 +18,7 @@ import {
 import { Autocomplete, Option } from "chakra-ui-simple-autocomplete";
 import { useState } from "react";
 import { UploadField } from "../components/UploadField";
-import { uploadImage, uploadJson } from "../utils/ipfsClient";
+import { uploadCertificateToIpfs } from "../utils/ipfsClient";
 import { MetaData } from "../types/MetaData";
 import { useWallet } from "@raidguild/quiver";
 import { useMintHyperCertificate } from "../hooks/mint";
@@ -41,7 +41,10 @@ const ValidationSchema = Yup.object().shape({
 const TestPage: NextPage = () => {
   const { address } = useWallet();
   const mintHyperCertificate = useMintHyperCertificate();
-  const options = useWorkScopes();
+  const { data: workscopeData, loading: workscopesLoading } = useWorkScopes();
+  const autocompleteOptions: Option[] =
+    workscopeData?.workScopes.map((w) => ({ label: w.text, value: w.id })) ||
+    [];
   const [result, setResult] = useState<Option[]>([]);
   const toast = useToast();
   return (
@@ -77,64 +80,37 @@ const TestPage: NextPage = () => {
            * 3. Call the mint function on the contract with the required parameters, including the cid for the metadata json.
            */
 
-          // Upload image to ipfs
-          let ipfsImageCid: string | undefined;
-          if (val.image) {
-            toast({
-              description: "starting image file upload to ipfs",
-              status: "info",
-            });
-            try {
-              const imageMetadata = await uploadImage(
-                `image-${val.name}`,
-                `Cover image for ${val.name}`,
-                val.image
-              );
-              ipfsImageCid = imageMetadata.url;
-              toast({
-                description: `Image uploaded successfully to ipfs, cid: ${ipfsImageCid}`,
-                status: "success",
-              });
-            } catch (error) {
-              toast({
-                description:
-                  "Something went wrong while uploading the image file to ipfs",
-                status: "error",
-              });
-              console.error(error);
-            }
-          }
-
-          // Create and upload metadata json
-          let ipfsJsonUri: string | undefined;
-          const metaData: MetaData = {
-            description: val.description,
-            external_link: val.external_link,
-            image: ipfsImageCid,
-            format_version: val.format_version,
-            name: val.name,
-            prev_hypercert: val.prev_hypercert,
-            refs: [],
-          };
+          // Upload certificate to ipfs
+          let certificateMetadataIpfsId: string | undefined;
           toast({
-            description: "Starting upload of metadata json to ipfs",
+            description: "starting certificate metadata upload to ipfs",
             status: "info",
           });
           try {
-            const jsonId = await uploadJson(metaData);
-            ipfsJsonUri = `ipfs://${jsonId}`;
+            const metaData: MetaData = {
+              description: val.description,
+              external_url: val.external_link,
+              format_version: val.format_version,
+              name: val.name,
+              prev_hypercert: val.prev_hypercert,
+              refs: [],
+            };
+            const certificateIpfsMetadata = await uploadCertificateToIpfs(
+              metaData,
+              val.image
+            );
+            certificateMetadataIpfsId = certificateIpfsMetadata.url;
             toast({
-              description: `Uploaded metadata json to ipfs with uri ${ipfsJsonUri}`,
+              description: `Certificate uploaded successfully to ipfs, cid: ${certificateMetadataIpfsId}`,
               status: "success",
             });
           } catch (error) {
             toast({
               description:
-                "Something went wrong while uploading the metadata json to ipfs",
+                "Something went wrong while uploading the image file to ipfs",
               status: "error",
             });
             console.error(error);
-            return;
           }
 
           // Mint certificate using contract
@@ -160,10 +136,10 @@ const TestPage: NextPage = () => {
               creators: [address!],
               workTime: [workTimeStart, workTimeEnd],
               impactTime: [impactTimeStart, impactTimeEnd],
-              uri: ipfsJsonUri!,
+              uri: certificateMetadataIpfsId!,
               rightsIds: val.rights,
-              impactScopeIds: val.workScopes.map((s) => parseInt(s.value)),
-              workScopeIds: [],
+              workScopeIds: val.workScopes.map((s) => s.value),
+              impactScopeIds: [],
             });
           } catch (error) {
             toast({
@@ -184,7 +160,6 @@ const TestPage: NextPage = () => {
           isSubmitting,
           /* and other goodies */
         }) => {
-          console.log(isValid, isSubmitting, errors);
           return (
             <form onSubmit={handleSubmit}>
               <FormControl isRequired>
@@ -310,39 +285,42 @@ const TestPage: NextPage = () => {
                 </FormControl>
               </HStack>
               <Divider my={3} />
-              <FormControl isRequired>
-                <Flex>
-                  <FormLabel>Work scopes</FormLabel>
-                  <ErrorMessage name="workScopes" render={DisplayError} />
-                </Flex>
-                <Field name="workScopes">
-                  {({ form }: FieldProps) => (
-                    <Autocomplete
-                      renderBadge={(option) => (
-                        <Badge mr={3} cursor="pointer">
-                          {option.label} <b>x</b>
-                        </Badge>
-                      )}
-                      options={options}
-                      result={result}
-                      setResult={(options: Option[]) => {
-                        form.setFieldValue("workScopes", options);
-                        setResult(options);
-                      }}
-                      width="100%"
-                      placeholder="Click to start searching for work scopes"
-                    />
+              {!workscopesLoading && (
+                <FormControl isRequired>
+                  <Flex>
+                    <FormLabel>Work scopes</FormLabel>
+                    <ErrorMessage name="workScopes" render={DisplayError} />
+                  </Flex>
+                  <Field name="workScopes">
+                    {({ form }: FieldProps) => (
+                      <Autocomplete
+                        allowCreation={false}
+                        renderBadge={(option) => (
+                          <Badge mr={3} cursor="pointer">
+                            {option.label} <b>x</b>
+                          </Badge>
+                        )}
+                        options={autocompleteOptions}
+                        result={result}
+                        setResult={(options: Option[]) => {
+                          form.setFieldValue("workScopes", options);
+                          setResult(options);
+                        }}
+                        width="100%"
+                        placeholder="Click to start searching for work scopes"
+                      />
+                    )}
+                  </Field>
+                  {!errors.workScopes ? (
+                    <FormHelperText>
+                      The different scopes that are encapsulated by this
+                      certificate
+                    </FormHelperText>
+                  ) : (
+                    <FormErrorMessage>Workscopes errors</FormErrorMessage>
                   )}
-                </Field>{" "}
-                {!errors.workScopes ? (
-                  <FormHelperText>
-                    The different scopes that are encapsulated by this
-                    certificate
-                  </FormHelperText>
-                ) : (
-                  <FormErrorMessage>Workscopes errors</FormErrorMessage>
-                )}
-              </FormControl>
+                </FormControl>
+              )}
               <Divider my={3} />
               <Button
                 width="100%"

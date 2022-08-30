@@ -1,6 +1,7 @@
 import "../styles/globals.css";
 import type { AppProps } from "next/app";
 import { ChakraProvider } from "@chakra-ui/react";
+import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 
 import { WalletProvider, NetworkConfig } from "@raidguild/quiver";
 
@@ -12,7 +13,7 @@ import WalletConnectProvider from "@walletconnect/web3-provider";
 import { IProviderOptions } from "web3modal";
 import { Layout } from "../components/Layout";
 import Head from "next/head";
-import {requireEnv} from "../utils/requireEnv";
+import { requireEnv } from "../utils/requireEnv";
 
 const SUPPORTED_NETWORKS: NetworkConfig = {
   "0x1": {
@@ -82,37 +83,46 @@ const web3modalOptions = {
   theme: "dark",
 };
 
-const DEFAULT_CHAIN_ID = requireEnv(process.env.NEXT_PUBLIC_DEFAULT_CHAIN, 'NEXT_PUBLIC_DEFAULT_CHAIN');
+const DEFAULT_CHAIN_ID = requireEnv(
+  process.env.NEXT_PUBLIC_DEFAULT_CHAIN,
+  "NEXT_PUBLIC_DEFAULT_CHAIN"
+);
+
+const client = new ApolloClient({
+  uri: "https://api.thegraph.com/subgraphs/name/bitbeckers/hypercerts-goerli",
+  cache: new InMemoryCache(),
+});
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <ChakraProvider
-      toastOptions={{
-        defaultOptions: {
-          position: "top-left",
-        },
-      }}
-    >
-      <WalletProvider
-
-        web3modalOptions={web3modalOptions}
-        networks={SUPPORTED_NETWORKS}
-        // Optional if you want to auto switch the network
-        defaultChainId={DEFAULT_CHAIN_ID}
-        // Optional but useful to handle events.
-        handleModalEvents={(eventName, error) => {
-          console.error(error);
-          console.log(eventName);
+    <ApolloProvider client={client}>
+      <ChakraProvider
+        toastOptions={{
+          defaultOptions: {
+            position: "top-left",
+          },
         }}
       >
-        <Head>
-          <title>HyperCert v0.1</title>
-        </Head>
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
-      </WalletProvider>
-    </ChakraProvider>
+        <WalletProvider
+          web3modalOptions={web3modalOptions}
+          networks={SUPPORTED_NETWORKS}
+          // Optional if you want to auto switch the network
+          defaultChainId={DEFAULT_CHAIN_ID}
+          // Optional but useful to handle events.
+          handleModalEvents={(eventName, error) => {
+            console.error(error);
+            console.log(eventName);
+          }}
+        >
+          <Head>
+            <title>HyperCert v0.1</title>
+          </Head>
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </WalletProvider>
+      </ChakraProvider>
+    </ApolloProvider>
   );
 }
 

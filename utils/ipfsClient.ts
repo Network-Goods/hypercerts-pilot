@@ -8,25 +8,30 @@ const NFT_STORAGE_TOKEN = requireEnv(
 );
 export const client = new NFTStorage({ token: NFT_STORAGE_TOKEN });
 
-export const uploadImage = async (
-  name: string,
-  description: string,
-  image: File
+async function getDefaultImageUrl() {
+  const imageOriginUrl =
+    "https://bafybeig72v6dvoq2jbd7g7cpe25uxdkpxlpvune6mrt3uiidwge7qvydiy.ipfs.dweb.link";
+  const r = await fetch(imageOriginUrl);
+  if (!r.ok) {
+    throw new Error(`error fetching image: [${r.status}]: ${r.statusText}`);
+  }
+  return r.blob();
+}
+
+export const uploadCertificateToIpfs = async (
+  { name, description, external_url, ...rest }: MetaData,
+  image: File | null
 ) => {
-  const token = {
+  const imageOrExampleImage = image ?? (await getDefaultImageUrl());
+  const metadata = await client.store({
     name,
     description,
-    image: image,
-  };
-  const metadata = await client.store(token);
-  console.log("Uploaded file to ipfs", metadata);
+    image: imageOrExampleImage,
+    external_url,
+    properties: {
+      ...rest,
+    },
+  });
+  console.log("Uploaded to IPFS", metadata);
   return metadata;
-};
-
-export const uploadJson = async (metaData: MetaData) => {
-  const json = JSON.stringify(metaData);
-  const blob = new Blob([json]);
-  const result = await client.storeBlob(blob);
-  console.log("Uploaded meta to ipfs", result);
-  return result;
 };
