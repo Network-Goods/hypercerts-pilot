@@ -11,6 +11,7 @@ import ethProvider from "eth-provider";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { IProviderOptions } from "web3modal";
 import { Layout } from "../components/Layout";
+import Head from "next/head";
 
 const SUPPORTED_NETWORKS: NetworkConfig = {
   "0x1": {
@@ -101,6 +102,9 @@ function MyApp({ Component, pageProps }: AppProps) {
           console.log(eventName);
         }}
       >
+        <Head>
+          <title>HyperCert v0.1</title>
+        </Head>
         <Layout>
           <Component {...pageProps} />
         </Layout>
