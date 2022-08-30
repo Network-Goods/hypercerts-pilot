@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Box, Center, Container, Flex, HStack, Text } from "@chakra-ui/react";
 import { ConnectWallet } from "./ConnectWallet";
 
-const HeaderLinks = [
+const headerLinks = [
   { label: "Claim", href: "/claim-hypercert" },
   { label: "Burn", href: "/burn-hypercert" },
   { label: "Donate", href: "/donate-hypercert" },
@@ -17,7 +17,7 @@ export const Layout = ({ children }: PropsWithChildren) => {
         boxShadow="sm"
         display="flex"
         position="sticky"
-        zIndex={10}
+        zIndex="sticky"
         top={0}
         as="header"
       >
@@ -31,7 +31,7 @@ export const Layout = ({ children }: PropsWithChildren) => {
             <Text fontSize="xl">HyperCert</Text>
             <Text color="gray.400">v0.1</Text>
             <HStack pl={5}>
-              {HeaderLinks.map((headerLink) => (
+              {headerLinks.map((headerLink) => (
                 <Text key={headerLink.href} fontWeight={600}>
                   <Link href={headerLink.href}>{headerLink.label}</Link>
                 </Text>
