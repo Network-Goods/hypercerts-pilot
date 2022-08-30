@@ -10,6 +10,7 @@ import ethProvider from "eth-provider";
 // If using wallet connect
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { IProviderOptions } from "web3modal";
+import { Layout } from "../components/Layout";
 
 const SUPPORTED_NETWORKS: NetworkConfig = {
   "0x1": {
@@ -100,7 +101,9 @@ function MyApp({ Component, pageProps }: AppProps) {
           console.log(eventName);
         }}
       >
-        <Component {...pageProps} />
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
       </WalletProvider>
     </ChakraProvider>
   );
