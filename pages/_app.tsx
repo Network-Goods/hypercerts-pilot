@@ -91,6 +91,7 @@ const DEFAULT_CHAIN_ID = requireEnv(
 const client = new ApolloClient({
   uri: "https://api.thegraph.com/subgraphs/name/bitbeckers/hypercerts-goerli",
   cache: new InMemoryCache(),
+  connectToDevTools: true,
 });
 
 function MyApp({ Component, pageProps }: AppProps) {

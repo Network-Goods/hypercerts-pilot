@@ -13,6 +13,7 @@ import {
   Input,
   Text,
   Textarea,
+  useDisclosure,
   useToast,
 } from "@chakra-ui/react";
 import { Autocomplete, Option } from "chakra-ui-simple-autocomplete";
@@ -24,6 +25,7 @@ import { useWallet } from "@raidguild/quiver";
 import { useMintHyperCertificate } from "../hooks/mint";
 import { useWorkScopes } from "../hooks/listWorkscopes";
 import * as Yup from "yup";
+import { AddWorkscopeModal } from "../components/AddWorkscopeModal";
 
 const ValidationSchema = Yup.object().shape({
   name: Yup.string()
@@ -40,6 +42,7 @@ const ValidationSchema = Yup.object().shape({
 
 const TestPage: NextPage = () => {
   const { address } = useWallet();
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const mintHyperCertificate = useMintHyperCertificate();
   const { data: workscopeData, loading: workscopesLoading } = useWorkScopes();
   const autocompleteOptions: Option[] =
@@ -293,22 +296,34 @@ const TestPage: NextPage = () => {
                   </Flex>
                   <Field name="workScopes">
                     {({ form }: FieldProps) => (
-                      <Autocomplete
-                        allowCreation={false}
-                        renderBadge={(option) => (
-                          <Badge mr={3} cursor="pointer">
-                            {option.label} <b>x</b>
-                          </Badge>
-                        )}
-                        options={autocompleteOptions}
-                        result={result}
-                        setResult={(options: Option[]) => {
-                          form.setFieldValue("workScopes", options);
-                          setResult(options);
-                        }}
-                        width="100%"
-                        placeholder="Click to start searching for work scopes"
-                      />
+                      <Flex>
+                        <Autocomplete
+                          allowCreation={false}
+                          renderBadge={(option) => (
+                            <Badge mr={3} cursor="pointer">
+                              {option.label} <b>x</b>
+                            </Badge>
+                          )}
+                          options={autocompleteOptions}
+                          result={result}
+                          setResult={(options: Option[]) => {
+                            form.setFieldValue("workScopes", options);
+                            setResult(options);
+                          }}
+                          width="100%"
+                          style={{
+                            flexGrow: 1,
+                          }}
+                          placeholder="Click to start searching for work scopes"
+                        />
+                        <Button
+                          colorScheme="green"
+                          marginLeft="auto"
+                          onClick={onOpen}
+                        >
+                          Add
+                        </Button>
+                      </Flex>
                     )}
                   </Field>
                   {!errors.workScopes ? (
@@ -329,6 +344,7 @@ const TestPage: NextPage = () => {
               >
                 Claim hypercert
               </Button>
+              <AddWorkscopeModal isOpen={isOpen} onClose={onClose} />
             </form>
           );
         }}
