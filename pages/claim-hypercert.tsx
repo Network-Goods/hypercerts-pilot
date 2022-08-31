@@ -11,7 +11,6 @@ import {
   FormLabel,
   HStack,
   Input,
-  Text,
   Textarea,
   useDisclosure,
   useToast,
@@ -20,12 +19,12 @@ import { Autocomplete, Option } from "chakra-ui-simple-autocomplete";
 import { useState } from "react";
 import { UploadField } from "../components/UploadField";
 import { uploadCertificateToIpfs } from "../utils/ipfsClient";
-import { MetaData } from "../types/MetaData";
 import { useWallet } from "@raidguild/quiver";
 import { useMintHyperCertificate } from "../hooks/mint";
 import { useWorkScopes } from "../hooks/listWorkscopes";
 import * as Yup from "yup";
 import { AddWorkscopeModal } from "../components/AddWorkscopeModal";
+import { FORMAT_VERSION } from "../constants";
 
 const ValidationSchema = Yup.object().shape({
   name: Yup.string()
@@ -40,7 +39,7 @@ const ValidationSchema = Yup.object().shape({
   workScopes: Yup.array().min(1),
 });
 
-const TestPage: NextPage = () => {
+const ClaimHypercertPage: NextPage = () => {
   const { address } = useWallet();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const mintHyperCertificate = useMintHyperCertificate();
@@ -50,11 +49,9 @@ const TestPage: NextPage = () => {
     [];
   const [result, setResult] = useState<Option[]>([]);
   const toast = useToast();
+
   return (
     <>
-      <Text textAlign="center" style={{ fontSize: 30 }}>
-        Claim hypercert
-      </Text>
       <Formik
         validationSchema={ValidationSchema}
         initialValues={{
@@ -63,7 +60,7 @@ const TestPage: NextPage = () => {
           external_link: "",
           image: null as File | null,
 
-          format_version: 0.1,
+          format_version: FORMAT_VERSION,
           prev_hypercert: "",
           creators: [],
           workTimeStart: undefined as string | undefined,
@@ -90,7 +87,7 @@ const TestPage: NextPage = () => {
             status: "info",
           });
           try {
-            const metaData: MetaData = {
+            const metaData = {
               description: val.description,
               external_url: val.external_link,
               format_version: val.format_version,
@@ -146,7 +143,7 @@ const TestPage: NextPage = () => {
             });
           } catch (error) {
             toast({
-              description: "Something went wrong while minting the certifcate",
+              description: "Something went wrong while minting the certificate",
             });
             console.error(error);
           }
@@ -357,4 +354,4 @@ const DisplayError = (message: string) => (
   <span style={{ color: "red" }}>- {message}</span>
 );
 
-export default TestPage;
+export default ClaimHypercertPage;

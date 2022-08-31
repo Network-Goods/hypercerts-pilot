@@ -7,7 +7,7 @@ export const useIpfsMetadata = (uri: string) => {
 
   useEffect(() => {
     if (data || loading) return;
-    const gatewayUri = uri.replace("ipfs://", "https://nftstorage.link/ipfs/");
+    const gatewayUri = formatIpfsUrlToGateway(uri);
     const fetchData = () => setLoading(true);
     fetch(gatewayUri)
       .then(async (result) => {
@@ -26,3 +26,6 @@ export const useIpfsMetadata = (uri: string) => {
     loading,
   };
 };
+
+export const formatIpfsUrlToGateway = (uri: string) =>
+  uri.replace("ipfs://", "https://nftstorage.link/ipfs/");

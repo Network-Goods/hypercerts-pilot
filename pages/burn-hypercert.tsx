@@ -1,25 +1,27 @@
 import React from "react";
 import { gql, useQuery } from "@apollo/client";
 import { useWallet } from "@raidguild/quiver";
-import { Alert, Button, Center, Flex, Spinner, VStack } from "@chakra-ui/react";
+import {
+  Alert,
+  Button,
+  Center,
+  Flex,
+  Spinner,
+  VStack,
+  Text,
+  Image,
+} from "@chakra-ui/react";
 import { useBurnHypercert } from "../hooks/burn";
-import { useIpfsMetadata } from "../hooks/ipfs";
+import { formatIpfsUrlToGateway, useIpfsMetadata } from "../hooks/ipfs";
 
 const GET_MY_CERTIFICATES_QUERY = gql`
-  query GetMyCertificates($contributorId: ID!) {
-    contributor(id: $contributorId) {
-      hypercerts {
-        id
-        uri
-      }
-    }
-
-    hypercertBalances(
-      where: { id: "0x59266d85d94666d037c1e32daa8fac9e95cdafef" }
-    ) {
+  query GetMyCertificates($ownerId: String!) {
+    hypercerts(first: 5, where: { owner: $ownerId }) {
       id
-      amount
-      token {
+      claimHash
+      owner
+      uri
+      contributors {
         id
       }
     }
@@ -40,14 +42,22 @@ const BurnCertificatePageWrapper = () => {
 
 const Content = ({ address }: { address: string }) => {
   const { data, loading } = useQuery<{
-    contributor: { hypercerts: { id: string; uri: string }[] };
+    hypercerts: {
+      id: string;
+      claimHash: string;
+      owner: string;
+      uri: string;
+      contributors: { id: string }[];
+    }[];
   }>(GET_MY_CERTIFICATES_QUERY, {
     variables: {
-      contributorId: address?.toLowerCase()!,
+      ownerId: address?.toLowerCase()!,
     },
+    pollInterval: 3000,
   });
 
   const burnCertificate = useBurnHypercert();
+
   if (loading) {
     return (
       <Center my={3}>
@@ -56,21 +66,19 @@ const Content = ({ address }: { address: string }) => {
     );
   }
 
-  if (!data) {
+  if (!data?.hypercerts.length) {
     return <Alert status="error">No certificates found</Alert>;
   }
-
-  console.log(data);
 
   return (
     <>
       <VStack width="100%" py={3}>
-        {data.contributor.hypercerts.map((x) => (
+        {data.hypercerts.map((hypercert) => (
           <HypercertListItem
-            key={x.id}
-            id={x.id}
-            url={x.uri}
-            burn={(amount) => burnCertificate(x.id, amount)}
+            key={hypercert.id}
+            id={hypercert.id}
+            url={hypercert.uri}
+            burn={(amount) => burnCertificate(hypercert.id, amount)}
           />
         ))}
       </VStack>
@@ -86,8 +94,8 @@ const HypercertListItem = ({
   url: string;
   burn: (value: string) => Promise<void>;
 }) => {
-  console.log("rendering");
   const { data, loading } = useIpfsMetadata(url);
+
   if (loading) return <Spinner />;
 
   if (!data) return <Alert status="error">Ipfs data could not be found</Alert>;
@@ -95,13 +103,20 @@ const HypercertListItem = ({
   return (
     <Flex
       width="100%"
-      px={4}
-      py={4}
+      px={3}
+      py={3}
       boxShadow="md"
       borderRadius="sm"
       alignItems="center"
     >
-      {data.name}
+      <Image
+        src={formatIpfsUrlToGateway(data.image)}
+        alt="NFT token image"
+        height={10}
+        rounded="sm"
+        mr={4}
+      />
+      <Text>{data.name}</Text>
       <Button colorScheme="red" ml="auto" onClick={() => burn("1")}>
         Burn
       </Button>

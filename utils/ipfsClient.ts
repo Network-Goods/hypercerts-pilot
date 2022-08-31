@@ -19,7 +19,7 @@ async function getDefaultImageUrl() {
 }
 
 export const uploadCertificateToIpfs = async (
-  { name, description, external_url, ...rest }: MetaData,
+  { name, description, external_url, ...rest }: Omit<MetaData, "image">,
   image: File | null
 ) => {
   const imageOrExampleImage = image ?? (await getDefaultImageUrl());
