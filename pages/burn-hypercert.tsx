@@ -13,6 +13,7 @@ import {
 } from "@chakra-ui/react";
 import { useBurnHypercert } from "../hooks/burn";
 import { formatIpfsUrlToGateway, useIpfsMetadata } from "../hooks/ipfs";
+import { errors, labels } from "../content/burn-hypercert-content";
 
 const GET_MY_CERTIFICATES_QUERY = gql`
   query GetMyCertificates($ownerId: String!) {
@@ -32,9 +33,7 @@ const BurnCertificatePageWrapper = () => {
   const { address } = useWallet();
 
   if (!address) {
-    return (
-      <Alert status="warning">Connect wallet before viewing certificates</Alert>
-    );
+    return <Alert status="warning">{errors.noWalletConnectedError}</Alert>;
   }
 
   return <Content address={address} />;
@@ -67,7 +66,7 @@ const Content = ({ address }: { address: string }) => {
   }
 
   if (!data?.hypercerts.length) {
-    return <Alert status="error">No certificates found</Alert>;
+    return <Alert status="error">{errors.noCertificatesError}</Alert>;
   }
 
   return (
@@ -98,7 +97,7 @@ const HypercertListItem = ({
 
   if (loading) return <Spinner />;
 
-  if (!data) return <Alert status="error">Ipfs data could not be found</Alert>;
+  if (!data) return <Alert status="error">{errors.noIpfsDataError}</Alert>;
 
   return (
     <Flex
@@ -118,7 +117,7 @@ const HypercertListItem = ({
       />
       <Text>{data.name}</Text>
       <Button colorScheme="red" ml="auto" onClick={() => burn("1")}>
-        Burn
+        {labels.burnButtonLabel}
       </Button>
     </Flex>
   );
