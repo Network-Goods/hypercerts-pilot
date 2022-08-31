@@ -4,6 +4,7 @@ import { useToast } from "@chakra-ui/react";
 import { ethers } from "ethers";
 import { parseBlockchainError } from "../utils/parseBlockchainError";
 import { useHypercertContract } from "./contracts";
+import { mintInteractionLabels } from "../content/chainInteractions";
 
 export const useMintHyperCertificate = () => {
   const { address } = useWallet();
@@ -15,7 +16,7 @@ export const useMintHyperCertificate = () => {
       toast({
         description: parseBlockchainError(
           error,
-          "Something went wrong while minting the certificate"
+          mintInteractionLabels.toastError
         ),
         status: "error",
       });
@@ -23,7 +24,9 @@ export const useMintHyperCertificate = () => {
     },
     onConfirmation: (receipt) => {
       toast({
-        description: `Certificate ${receipt.transactionHash} successfully minted`,
+        description: mintInteractionLabels.toastSuccess(
+          receipt.transactionHash
+        ),
         status: "success",
       });
     },

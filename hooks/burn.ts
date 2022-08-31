@@ -2,6 +2,7 @@ import { useHypercertContract } from "./contracts";
 import { useWallet, useWriteContract } from "@raidguild/quiver";
 import { useToast } from "@chakra-ui/react";
 import { parseBlockchainError } from "../utils/parseBlockchainError";
+import { burnInteractionLabels } from "../content/chainInteractions";
 
 export const useBurnHypercert = () => {
   const contract = useHypercertContract();
@@ -13,7 +14,7 @@ export const useBurnHypercert = () => {
       toast({
         description: parseBlockchainError(
           error,
-          "Something went wrong while burning the certificate"
+          burnInteractionLabels.toastError
         ),
         status: "error",
       });
@@ -21,7 +22,9 @@ export const useBurnHypercert = () => {
     },
     onConfirmation: (receipt) => {
       toast({
-        description: `Certificate ${receipt.transactionHash} successfully burned`,
+        description: burnInteractionLabels.toastSuccess(
+          receipt.transactionHash
+        ),
         status: "success",
       });
     },
