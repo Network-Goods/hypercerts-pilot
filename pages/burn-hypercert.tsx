@@ -16,7 +16,7 @@ import { formatIpfsUrlToGateway, useIpfsMetadata } from "../hooks/ipfs";
 
 const GET_MY_CERTIFICATES_QUERY = gql`
   query GetMyCertificates($ownerId: String!) {
-    hypercerts(first: 5, where: { owner: $ownerId }) {
+    hypercerts(where: { owner: $ownerId }) {
       id
       claimHash
       owner

@@ -17,7 +17,7 @@ import {
 } from "@chakra-ui/react";
 import { Autocomplete, Option } from "chakra-ui-simple-autocomplete";
 import { useState } from "react";
-import { UploadField } from "../components/UploadField";
+import { ImageUploadField } from "../components/ImageUploadField";
 import { uploadCertificateToIpfs } from "../utils/ipfsClient";
 import { useWallet } from "@raidguild/quiver";
 import { useMintHyperCertificate } from "../hooks/mint";
@@ -206,7 +206,7 @@ const ClaimHypercertPage: NextPage = () => {
               </FormControl>
               <FormControl>
                 <FormLabel>Image</FormLabel>
-                <UploadField name="image" setFieldValue={setFieldValue} />
+                <ImageUploadField name="image" setFieldValue={setFieldValue} />
               </FormControl>
               <Divider my={3} />
               <HStack>
