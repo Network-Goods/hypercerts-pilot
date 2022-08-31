@@ -14,6 +14,7 @@ import { useHypercertContract } from "../hooks/contracts";
 import { useWriteContract } from "@raidguild/quiver";
 import { parseBlockchainError } from "../utils/parseBlockchainError";
 import { useState } from "react";
+import { addWorkScopeModal } from "../content/claim-hypercert-content";
 
 export const AddWorkscopeModal = ({
   isOpen,
@@ -25,17 +26,14 @@ export const AddWorkscopeModal = ({
   const { mutate } = useWriteContract(contract, "addWorkScope", {
     onError: (error) => {
       toast({
-        description: parseBlockchainError(
-          error,
-          "Something went wrong while adding the workscope certificate"
-        ),
+        description: parseBlockchainError(error, addWorkScopeModal.toastError),
         status: "error",
       });
       console.error(error);
     },
     onConfirmation: (receipt) => {
       toast({
-        description: `Workscope ${receipt.transactionHash} successfully added`,
+        description: addWorkScopeModal.toastSuccess(receipt.transactionHash),
         status: "success",
       });
     },
@@ -53,12 +51,12 @@ export const AddWorkscopeModal = ({
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Add new work scope</ModalHeader>
+        <ModalHeader>{addWorkScopeModal.title}</ModalHeader>
         <ModalBody>
           <Input
             type="text"
             onChange={(e) => setValue(e.target.value)}
-            placeholder="New workscope name"
+            placeholder={addWorkScopeModal.placeholder}
           />
         </ModalBody>
         <ModalFooter>
@@ -68,9 +66,9 @@ export const AddWorkscopeModal = ({
             onClick={onConfirm}
             disabled={!value}
           >
-            Confirm
+            {addWorkScopeModal.submit}
           </Button>
-          <Button onClick={onClose}>Close</Button>
+          <Button onClick={onClose}>{addWorkScopeModal.close}</Button>
         </ModalFooter>
       </ModalContent>
     </Modal>

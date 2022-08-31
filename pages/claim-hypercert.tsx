@@ -25,6 +25,11 @@ import { useWorkScopes } from "../hooks/listWorkscopes";
 import * as Yup from "yup";
 import { AddWorkscopeModal } from "../components/AddWorkscopeModal";
 import { FORMAT_VERSION } from "../constants";
+import {
+  buttons,
+  placeholders,
+  toastMessages,
+} from "../content/claim-hypercert-content";
 
 const ValidationSchema = Yup.object().shape({
   name: Yup.string()
@@ -83,7 +88,7 @@ const ClaimHypercertPage: NextPage = () => {
           // Upload certificate to ipfs
           let certificateMetadataIpfsId: string | undefined;
           toast({
-            description: "starting certificate metadata upload to ipfs",
+            description: toastMessages.metadataUploadStart,
             status: "info",
           });
           try {
@@ -101,13 +106,14 @@ const ClaimHypercertPage: NextPage = () => {
             );
             certificateMetadataIpfsId = certificateIpfsMetadata.url;
             toast({
-              description: `Certificate uploaded successfully to ipfs, cid: ${certificateMetadataIpfsId}`,
+              description: toastMessages.metadataUploadSuccess(
+                certificateMetadataIpfsId
+              ),
               status: "success",
             });
           } catch (error) {
             toast({
-              description:
-                "Something went wrong while uploading the image file to ipfs",
+              description: toastMessages.metadataUploadError,
               status: "error",
             });
             console.error(error);
@@ -129,7 +135,7 @@ const ClaimHypercertPage: NextPage = () => {
 
           try {
             toast({
-              description: "Minting certificate",
+              description: toastMessages.mintingStart,
               status: "info",
             });
             await mintHyperCertificate({
@@ -143,7 +149,7 @@ const ClaimHypercertPage: NextPage = () => {
             });
           } catch (error) {
             toast({
-              description: "Something went wrong while minting the certificate",
+              description: toastMessages.mintingError,
             });
             console.error(error);
           }
@@ -173,7 +179,7 @@ const ClaimHypercertPage: NextPage = () => {
                   onChange={handleChange}
                   onBlur={handleBlur}
                   value={values.name}
-                  placeholder="Human-readable name for the certificate"
+                  placeholder={placeholders.name}
                 />
               </FormControl>
               <FormControl isRequired>
@@ -186,7 +192,7 @@ const ClaimHypercertPage: NextPage = () => {
                   value={values.description}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  placeholder="Description for the certificate"
+                  placeholder={placeholders.description}
                   size="sm"
                 />
               </FormControl>
@@ -201,7 +207,7 @@ const ClaimHypercertPage: NextPage = () => {
                   onChange={handleChange}
                   onBlur={handleBlur}
                   value={values.external_link}
-                  placeholder="External link with more information"
+                  placeholder={placeholders.external_link}
                 />
               </FormControl>
               <FormControl>
@@ -211,7 +217,7 @@ const ClaimHypercertPage: NextPage = () => {
               <Divider my={3} />
               <HStack>
                 <FormControl>
-                  <FormLabel>Work time start</FormLabel>
+                  <FormLabel>{placeholders.workTimeStartLabel}</FormLabel>
                   <Input
                     type="datetime-local"
                     name="workTimeStart"
@@ -221,14 +227,14 @@ const ClaimHypercertPage: NextPage = () => {
                   />
                   {!errors.workTimeStart ? (
                     <FormHelperText>
-                      The moment at which work started
+                      {placeholders.workTimeStartDescription}
                     </FormHelperText>
                   ) : (
                     <FormErrorMessage>{errors.workTimeStart}</FormErrorMessage>
                   )}
                 </FormControl>
                 <FormControl>
-                  <FormLabel>Work time end</FormLabel>
+                  <FormLabel>{placeholders.workTimeEndLabel}</FormLabel>
                   <Input
                     type="datetime-local"
                     name="workTimeEnd"
@@ -238,7 +244,7 @@ const ClaimHypercertPage: NextPage = () => {
                   />
                   {!errors.workTimeEnd ? (
                     <FormHelperText>
-                      The moment at which work ended
+                      {placeholders.workTimeEndDescription}
                     </FormHelperText>
                   ) : (
                     <FormErrorMessage>{errors.workTimeEnd}</FormErrorMessage>
@@ -248,7 +254,7 @@ const ClaimHypercertPage: NextPage = () => {
               <Divider my={3} />
               <HStack>
                 <FormControl>
-                  <FormLabel>Impact time start</FormLabel>
+                  <FormLabel>{placeholders.impactTimeStartLabel}</FormLabel>
                   <Input
                     type="datetime-local"
                     name="impactTimeStart"
@@ -258,7 +264,7 @@ const ClaimHypercertPage: NextPage = () => {
                   />
                   {!errors.impactTimeStart ? (
                     <FormHelperText>
-                      The moment at which impact started
+                      {placeholders.impactTimeStartDescription}
                     </FormHelperText>
                   ) : (
                     <FormErrorMessage>
@@ -267,7 +273,7 @@ const ClaimHypercertPage: NextPage = () => {
                   )}
                 </FormControl>
                 <FormControl>
-                  <FormLabel>Impact time end</FormLabel>
+                  <FormLabel>{placeholders.impactTimeEndLabel}</FormLabel>
                   <Input
                     type="datetime-local"
                     name="impactTimeEnd"
@@ -277,7 +283,7 @@ const ClaimHypercertPage: NextPage = () => {
                   />
                   {!errors.impactTimeEnd ? (
                     <FormHelperText>
-                      The moment at which impact ended
+                      {placeholders.impactTimeEndLabel}
                     </FormHelperText>
                   ) : (
                     <FormErrorMessage>{errors.impactTimeEnd}</FormErrorMessage>
@@ -288,7 +294,7 @@ const ClaimHypercertPage: NextPage = () => {
               {!workscopesLoading && (
                 <FormControl isRequired>
                   <Flex>
-                    <FormLabel>Work scopes</FormLabel>
+                    <FormLabel>{placeholders.workScopesLabel}</FormLabel>
                     <ErrorMessage name="workScopes" render={DisplayError} />
                   </Flex>
                   <Field name="workScopes">
@@ -311,7 +317,7 @@ const ClaimHypercertPage: NextPage = () => {
                           style={{
                             flexGrow: 1,
                           }}
-                          placeholder="Click to start searching for work scopes"
+                          placeholder={placeholders.workScopes}
                         />
                         <Button
                           colorScheme="green"
@@ -325,8 +331,7 @@ const ClaimHypercertPage: NextPage = () => {
                   </Field>
                   {!errors.workScopes ? (
                     <FormHelperText>
-                      The different scopes that are encapsulated by this
-                      certificate
+                      {placeholders.workScopesDescription}
                     </FormHelperText>
                   ) : (
                     <FormErrorMessage>Workscopes errors</FormErrorMessage>
@@ -339,7 +344,7 @@ const ClaimHypercertPage: NextPage = () => {
                 type="submit"
                 disabled={!isValid || isSubmitting}
               >
-                Claim hypercert
+                {buttons.submit}
               </Button>
               <AddWorkscopeModal isOpen={isOpen} onClose={onClose} />
             </form>
