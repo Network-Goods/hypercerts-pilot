@@ -24,6 +24,7 @@ export const placeholders = {
   workTimeEndDescription: "The moment at which work ended",
   impactTimeStartDescription: "The moment at which impact started",
   impactTimeEndDescription: "The moment at which impact ended",
+  uploadImage: "Drag and drop some files here, or click to select files",
 };
 
 export const buttons = {

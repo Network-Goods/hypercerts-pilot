@@ -4,11 +4,12 @@ import { Box, Center, Container, Flex, HStack, Text } from "@chakra-ui/react";
 import { ConnectWallet } from "./ConnectWallet";
 import { useRouter } from "next/router";
 import { FORMAT_VERSION } from "../constants";
+import { headerLinkLabels } from "../content/layout";
 
 const headerLinks = [
-  { label: "Claim", href: "/claim-hypercert" },
-  { label: "Burn", href: "/burn-hypercert" },
-  { label: "Donate", href: "/donate-hypercert" },
+  { label: headerLinkLabels.claim, href: "/claim-hypercert" },
+  { label: headerLinkLabels.burn, href: "/burn-hypercert" },
+  { label: headerLinkLabels.donate, href: "/donate-hypercert" },
 ];
 
 export const Layout = ({ children }: PropsWithChildren) => {

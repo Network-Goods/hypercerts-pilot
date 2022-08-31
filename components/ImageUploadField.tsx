@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Flex, Image } from "@chakra-ui/react";
 import { CloseIcon } from "@chakra-ui/icons";
+import { placeholders } from "../content/claim-hypercert-content";
 
 export const ImageUploadField = ({
   setFieldValue,
@@ -76,7 +77,7 @@ export const ImageUploadField = ({
             }}
           />
         ) : (
-          <p>Drag and drop some files here, or click to select files</p>
+          <p>{placeholders.uploadImage}</p>
         )}
       </div>
     </Flex>
