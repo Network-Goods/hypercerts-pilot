@@ -16,6 +16,10 @@ export const placeholders = {
   workScopes: "Click to start searching for work scopes",
   workScopesDescription:
     "The different scopes that are encapsulated by this certificate",
+  impactScopesLabel: "Impact scopes",
+  impactScopes: "Click to start searching for impact scopes",
+  impactScopesDescription:
+    "The different scopes that are encapsulated by this certificate",
   workTimeStartLabel: "Work time start",
   workTimeEndLabel: "Work time end",
   impactTimeStartLabel: "Impact time start",
@@ -36,7 +40,17 @@ export const addWorkScopeModal = {
   placeholder: "New workscope name",
   submit: "Confirm",
   close: "Close",
-  toastError: "Something went wrong while adding the workscope certificate",
+  toastError: "Something went wrong while adding the work scope ",
   toastSuccess: (transactionHash: string) =>
-    `Workscope ${transactionHash} successfully added`,
+    `Work scope ${transactionHash} successfully added`,
+};
+
+export const addImpactScopeModal = {
+  title: "Add new impact scope",
+  placeholder: "New impact scope name",
+  submit: "Confirm",
+  close: "Close",
+  toastError: "Something went wrong while adding the impact scope",
+  toastSuccess: (transactionHash: string) =>
+    `Impact scope ${transactionHash} successfully added`,
 };

@@ -1,7 +1,6 @@
 import type { NextPage } from "next";
 import { ErrorMessage, Field, FieldProps, Formik } from "formik";
 import {
-  Badge,
   Button,
   Divider,
   Flex,
@@ -12,24 +11,22 @@ import {
   HStack,
   Input,
   Textarea,
-  useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import { Autocomplete, Option } from "chakra-ui-simple-autocomplete";
-import { useState } from "react";
+import { Option } from "chakra-ui-simple-autocomplete";
 import { ImageUploadField } from "../components/ImageUploadField";
 import { uploadCertificateToIpfs } from "../utils/ipfsClient";
 import { useWallet } from "@raidguild/quiver";
 import { useMintHyperCertificate } from "../hooks/mint";
-import { useWorkScopes } from "../hooks/listWorkscopes";
 import * as Yup from "yup";
-import { AddWorkscopeModal } from "../components/AddWorkscopeModal";
 import { FORMAT_VERSION } from "../constants";
 import {
   buttons,
   placeholders,
   toastMessages,
 } from "../content/claim-hypercert-content";
+import { WorkScopesAutoComplete } from "../components/AutoComplete/WorkScopesAutoComplete";
+import { ImpactScopesAutoComplete } from "../components/AutoComplete/ImpactScopesAutoComplete";
 
 const ValidationSchema = Yup.object().shape({
   name: Yup.string()
@@ -46,13 +43,7 @@ const ValidationSchema = Yup.object().shape({
 
 const ClaimHypercertPage: NextPage = () => {
   const { address } = useWallet();
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const mintHyperCertificate = useMintHyperCertificate();
-  const { data: workscopeData, loading: workscopesLoading } = useWorkScopes();
-  const autocompleteOptions: Option[] =
-    workscopeData?.workScopes.map((w) => ({ label: w.text, value: w.id })) ||
-    [];
-  const [result, setResult] = useState<Option[]>([]);
   const toast = useToast();
 
   return (
@@ -219,7 +210,7 @@ const ClaimHypercertPage: NextPage = () => {
                 <FormControl>
                   <FormLabel>{placeholders.workTimeStartLabel}</FormLabel>
                   <Input
-                    type="datetime-local"
+                    type="date"
                     name="workTimeStart"
                     onChange={handleChange}
                     onBlur={handleBlur}
@@ -236,7 +227,7 @@ const ClaimHypercertPage: NextPage = () => {
                 <FormControl>
                   <FormLabel>{placeholders.workTimeEndLabel}</FormLabel>
                   <Input
-                    type="datetime-local"
+                    type="date"
                     name="workTimeEnd"
                     onChange={handleChange}
                     onBlur={handleBlur}
@@ -256,7 +247,7 @@ const ClaimHypercertPage: NextPage = () => {
                 <FormControl>
                   <FormLabel>{placeholders.impactTimeStartLabel}</FormLabel>
                   <Input
-                    type="datetime-local"
+                    type="date"
                     name="impactTimeStart"
                     onChange={handleChange}
                     onBlur={handleBlur}
@@ -275,7 +266,7 @@ const ClaimHypercertPage: NextPage = () => {
                 <FormControl>
                   <FormLabel>{placeholders.impactTimeEndLabel}</FormLabel>
                   <Input
-                    type="datetime-local"
+                    type="date"
                     name="impactTimeEnd"
                     onChange={handleChange}
                     onBlur={handleBlur}
@@ -291,62 +282,52 @@ const ClaimHypercertPage: NextPage = () => {
                 </FormControl>
               </HStack>
               <Divider my={3} />
-              {!workscopesLoading && (
-                <FormControl isRequired>
-                  <Flex>
-                    <FormLabel>{placeholders.workScopesLabel}</FormLabel>
-                    <ErrorMessage name="workScopes" render={DisplayError} />
-                  </Flex>
-                  <Field name="workScopes">
-                    {({ form }: FieldProps) => (
-                      <Flex>
-                        <Autocomplete
-                          allowCreation={false}
-                          renderBadge={(option) => (
-                            <Badge mr={3} cursor="pointer">
-                              {option.label} <b>x</b>
-                            </Badge>
-                          )}
-                          options={autocompleteOptions}
-                          result={result}
-                          setResult={(options: Option[]) => {
-                            form.setFieldValue("workScopes", options);
-                            setResult(options);
-                          }}
-                          width="100%"
-                          style={{
-                            flexGrow: 1,
-                          }}
-                          placeholder={placeholders.workScopes}
-                        />
-                        <Button
-                          colorScheme="green"
-                          marginLeft="auto"
-                          onClick={onOpen}
-                        >
-                          Add
-                        </Button>
-                      </Flex>
-                    )}
-                  </Field>
-                  {!errors.workScopes ? (
-                    <FormHelperText>
-                      {placeholders.workScopesDescription}
-                    </FormHelperText>
-                  ) : (
-                    <FormErrorMessage>Workscopes errors</FormErrorMessage>
+              <FormControl isRequired>
+                <Flex>
+                  <FormLabel>{placeholders.workScopesLabel}</FormLabel>
+                  <ErrorMessage name="workScopes" render={DisplayError} />
+                </Flex>
+                <Field name="workScopes">
+                  {({ form }: FieldProps) => (
+                    <WorkScopesAutoComplete
+                      onChange={(workScopes) =>
+                        form.setFieldValue("workScopes", workScopes)
+                      }
+                    />
                   )}
-                </FormControl>
-              )}
+                </Field>
+                <FormHelperText>
+                  {placeholders.workScopesDescription}
+                </FormHelperText>
+              </FormControl>
+              <Divider my={3} />
+              <FormControl isRequired>
+                <Flex>
+                  <FormLabel>{placeholders.impactScopesLabel}</FormLabel>
+                  <ErrorMessage name="impactScopes" render={DisplayError} />
+                </Flex>
+                <Field name="impactScopes">
+                  {({ form }: FieldProps) => (
+                    <ImpactScopesAutoComplete
+                      onChange={(impactScopes) =>
+                        form.setFieldValue("impactScopes", impactScopes)
+                      }
+                    />
+                  )}
+                </Field>
+                <FormHelperText>
+                  {placeholders.impactScopesDescription}
+                </FormHelperText>
+              </FormControl>
               <Divider my={3} />
               <Button
                 width="100%"
                 type="submit"
                 disabled={!isValid || isSubmitting}
+                colorScheme="green"
               >
                 {buttons.submit}
               </Button>
-              <AddWorkscopeModal isOpen={isOpen} onClose={onClose} />
             </form>
           );
         }}

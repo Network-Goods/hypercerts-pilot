@@ -51,7 +51,7 @@ export const Layout = ({ children }: PropsWithChildren) => {
           </Box>
         </Flex>
       </Center>
-      <Container as="main" mt={4}>
+      <Container as="main" my={4}>
         {children}
       </Container>
     </Box>
