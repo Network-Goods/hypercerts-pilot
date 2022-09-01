@@ -11,11 +11,11 @@ import ethProvider from "eth-provider";
 // If using wallet connect
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { IProviderOptions } from "web3modal";
-import { Layout } from "../components/Layout";
+import { Layout } from "../components/layout/Layout";
 import Head from "next/head";
-import { requireEnv } from "../utils/requireEnv";
+import { DEFAULT_CHAIN_ID } from "../constants";
 
-const SUPPORTED_NETWORKS: NetworkConfig = {
+export const SUPPORTED_NETWORKS: NetworkConfig = {
   "0x1": {
     chainId: "0x1",
     name: "Mainnet",
@@ -82,11 +82,6 @@ const web3modalOptions = {
   providerOptions,
   theme: "dark",
 };
-
-const DEFAULT_CHAIN_ID = requireEnv(
-  process.env.NEXT_PUBLIC_DEFAULT_CHAIN,
-  "NEXT_PUBLIC_DEFAULT_CHAIN"
-);
 
 const client = new ApolloClient({
   uri: "https://api.thegraph.com/subgraphs/name/bitbeckers/hypercerts-goerli",

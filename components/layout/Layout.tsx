@@ -1,10 +1,11 @@
 import React, { PropsWithChildren } from "react";
 import Link from "next/link";
 import { Box, Center, Container, Flex, HStack, Text } from "@chakra-ui/react";
-import { ConnectWallet } from "./ConnectWallet";
+import { ConnectWallet } from "../ConnectWallet";
 import { useRouter } from "next/router";
-import { FORMAT_VERSION } from "../constants";
-import { headerLinkLabels } from "../content/layout";
+import { FORMAT_VERSION } from "../../constants";
+import { headerLinkLabels } from "../../content/layout";
+import { WrongNetworkBanner } from "./WrongNetworkBanner";
 
 const headerLinks = [
   { label: headerLinkLabels.claim, href: "/claim-hypercert" },
@@ -51,6 +52,7 @@ export const Layout = ({ children }: PropsWithChildren) => {
           </Box>
         </Flex>
       </Center>
+      <WrongNetworkBanner />
       <Container as="main" my={4}>
         {children}
       </Container>
