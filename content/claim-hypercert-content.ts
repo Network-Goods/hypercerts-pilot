@@ -20,6 +20,10 @@ export const placeholders = {
   impactScopes: "Click to start searching for impact scopes",
   impactScopesDescription:
     "The different scopes that are encapsulated by this certificate",
+  rightsLabel: "Rights",
+  rights: "Click to start searching for rights",
+  rightsDescription:
+    "The different rights that are encapsulated by this certificate",
   workTimeStartLabel: "Work time start",
   workTimeEndLabel: "Work time end",
   impactTimeStartLabel: "Impact time start",
@@ -53,4 +57,14 @@ export const addImpactScopeModal = {
   toastError: "Something went wrong while adding the impact scope",
   toastSuccess: (transactionHash: string) =>
     `Impact scope ${transactionHash} successfully added`,
+};
+
+export const addRightModal = {
+  title: "Add new right",
+  placeholder: "New right name",
+  submit: "Confirm",
+  close: "Close",
+  toastError: "Something went wrong while adding the right",
+  toastSuccess: (transactionHash: string) =>
+    `right ${transactionHash} successfully added`,
 };

@@ -27,6 +27,7 @@ import {
 } from "../content/claim-hypercert-content";
 import { WorkScopesAutoComplete } from "../components/AutoComplete/WorkScopesAutoComplete";
 import { ImpactScopesAutoComplete } from "../components/AutoComplete/ImpactScopesAutoComplete";
+import { RightsAutoComplete } from "../components/AutoComplete/RightsAutoComplete";
 
 const ValidationSchema = Yup.object().shape({
   name: Yup.string()
@@ -317,6 +318,25 @@ const ClaimHypercertPage: NextPage = () => {
                 </Field>
                 <FormHelperText>
                   {placeholders.impactScopesDescription}
+                </FormHelperText>
+              </FormControl>
+              <Divider my={3} />
+              <FormControl isRequired>
+                <Flex>
+                  <FormLabel>{placeholders.rightsLabel}</FormLabel>
+                  <ErrorMessage name="rights" render={DisplayError} />
+                </Flex>
+                <Field name="rights">
+                  {({ form }: FieldProps) => (
+                    <RightsAutoComplete
+                      onChange={(rights) =>
+                        form.setFieldValue("rights", rights)
+                      }
+                    />
+                  )}
+                </Field>
+                <FormHelperText>
+                  {placeholders.rightsDescription}
                 </FormHelperText>
               </FormControl>
               <Divider my={3} />
