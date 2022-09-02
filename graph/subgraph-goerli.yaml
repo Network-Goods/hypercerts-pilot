@@ -6,9 +6,9 @@ dataSources:
     name: HypercertMinterV0
     network: goerli
     source:
-      address: "0x126abf1ca4db7389b1f5fd3B8a84b3434313854d"
+      address: "0x5cFBa5a37aD94cd7fad259555a22F1C0c3FC0f74"
       abi: HypercertMinterV0
-      startBlock: 7492774
+      startBlock: 7515859
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -40,7 +40,7 @@ dataSources:
           handler: handleApprovalForAll
         - event: BeaconUpgraded(indexed address)
           handler: handleBeaconUpgraded
-        - event: ImpactClaimed(uint256,bytes32,address[],uint256[2],uint256[2],bytes32[],bytes32[],bytes32[],uint256,string)
+        - event: ImpactClaimed(uint256,address,bytes32,address[],uint64[2],uint64[2],bytes32[],bytes32[],bytes32[],uint64,string)
           handler: handleImpactClaimed
         - event: ImpactScopeAdded(bytes32,string)
           handler: handleImpactScopeAdded

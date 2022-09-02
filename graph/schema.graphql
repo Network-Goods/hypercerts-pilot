@@ -5,6 +5,7 @@ type Contributor @entity {
 
 type Hypercert @entity {
     id: String!
+    minter: String!
     claimHash: Bytes!
     contributors: [Contributor!]!
     impactDateFrom: BigInt!

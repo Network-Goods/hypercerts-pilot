@@ -38,8 +38,8 @@ export const useMintHyperCertificate = () => {
       "uint256[]",
       "uint256[]",
       "uint256[]",
-      "uint256[2]",
-      "uint256[2]",
+      "uint64[2]",
+      "uint64[2]",
       "address[]",
       "string",
     ];

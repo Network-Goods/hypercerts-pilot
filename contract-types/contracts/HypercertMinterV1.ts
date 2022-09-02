@@ -33,6 +33,7 @@ import type {
 export declare namespace HypercertMinterV0 {
   export type ClaimStruct = {
     claimHash: PromiseOrValue<BytesLike>;
+    contributors: PromiseOrValue<string>[];
     workTimeframe: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>];
     impactTimeframe: [
       PromiseOrValue<BigNumberish>,
@@ -41,35 +42,34 @@ export declare namespace HypercertMinterV0 {
     workScopes: PromiseOrValue<BytesLike>[];
     impactScopes: PromiseOrValue<BytesLike>[];
     rights: PromiseOrValue<BytesLike>[];
-    contributors: PromiseOrValue<string>[];
     version: PromiseOrValue<BigNumberish>;
     exists: PromiseOrValue<boolean>;
   };
 
   export type ClaimStructOutput = [
     string,
+    string[],
     [BigNumber, BigNumber],
     [BigNumber, BigNumber],
     string[],
     string[],
     string[],
-    string[],
-    number,
+    BigNumber,
     boolean
   ] & {
     claimHash: string;
+    contributors: string[];
     workTimeframe: [BigNumber, BigNumber];
     impactTimeframe: [BigNumber, BigNumber];
     workScopes: string[];
     impactScopes: string[];
     rights: string[];
-    contributors: string[];
-    version: number;
+    version: BigNumber;
     exists: boolean;
   };
 }
 
-export interface HypercertMinterV0Interface extends utils.Interface {
+export interface HypercertMinterV1Interface extends utils.Interface {
   functions: {
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
     "NAME()": FunctionFragment;
@@ -81,6 +81,8 @@ export interface HypercertMinterV0Interface extends utils.Interface {
     "balanceOfBatch(address[],uint256[])": FunctionFragment;
     "burn(address,uint256,uint256)": FunctionFragment;
     "burnBatch(address,uint256[],uint256[])": FunctionFragment;
+    "contributorImpacts(address,bytes32)": FunctionFragment;
+    "counter()": FunctionFragment;
     "exists(uint256)": FunctionFragment;
     "getImpactCert(uint256)": FunctionFragment;
     "getRoleAdmin(bytes32)": FunctionFragment;
@@ -119,6 +121,8 @@ export interface HypercertMinterV0Interface extends utils.Interface {
       | "balanceOfBatch"
       | "burn"
       | "burnBatch"
+      | "contributorImpacts"
+      | "counter"
       | "exists"
       | "getImpactCert"
       | "getRoleAdmin"
@@ -190,6 +194,11 @@ export interface HypercertMinterV0Interface extends utils.Interface {
       PromiseOrValue<BigNumberish>[]
     ]
   ): string;
+  encodeFunctionData(
+    functionFragment: "contributorImpacts",
+    values: [PromiseOrValue<string>, PromiseOrValue<BytesLike>]
+  ): string;
+  encodeFunctionData(functionFragment: "counter", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "exists",
     values: [PromiseOrValue<BigNumberish>]
@@ -325,6 +334,11 @@ export interface HypercertMinterV0Interface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "burnBatch", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "contributorImpacts",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "counter", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "exists", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getImpactCert",
@@ -393,7 +407,7 @@ export interface HypercertMinterV0Interface extends utils.Interface {
     "AdminChanged(address,address)": EventFragment;
     "ApprovalForAll(address,address,bool)": EventFragment;
     "BeaconUpgraded(address)": EventFragment;
-    "ImpactClaimed(uint256,address,bytes32,address[],uint64[2],uint64[2],bytes32[],bytes32[],bytes32[],uint64,string)": EventFragment;
+    "ImpactClaimed(uint256,bytes32,address[],uint256[2],uint256[2],bytes32[],bytes32[],bytes32[],uint256,string)": EventFragment;
     "ImpactScopeAdded(bytes32,string)": EventFragment;
     "Initialized(uint8)": EventFragment;
     "RightAdded(bytes32,string)": EventFragment;
@@ -459,7 +473,6 @@ export type BeaconUpgradedEventFilter = TypedEventFilter<BeaconUpgradedEvent>;
 
 export interface ImpactClaimedEventObject {
   id: BigNumber;
-  minter: string;
   claimHash: string;
   contributors: string[];
   workTimeframe: [BigNumber, BigNumber];
@@ -473,7 +486,6 @@ export interface ImpactClaimedEventObject {
 export type ImpactClaimedEvent = TypedEvent<
   [
     BigNumber,
-    string,
     string,
     string[],
     [BigNumber, BigNumber],
@@ -610,12 +622,12 @@ export type WorkScopeAddedEvent = TypedEvent<
 
 export type WorkScopeAddedEventFilter = TypedEventFilter<WorkScopeAddedEvent>;
 
-export interface HypercertMinterV0 extends BaseContract {
+export interface HypercertMinterV1 extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: HypercertMinterV0Interface;
+  interface: HypercertMinterV1Interface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
@@ -683,6 +695,14 @@ export interface HypercertMinterV0 extends BaseContract {
       values: PromiseOrValue<BigNumberish>[],
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
+
+    contributorImpacts(
+      arg0: PromiseOrValue<string>,
+      arg1: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
+    counter(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     exists(
       id: PromiseOrValue<BigNumberish>,
@@ -861,6 +881,14 @@ export interface HypercertMinterV0 extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
+  contributorImpacts(
+    arg0: PromiseOrValue<string>,
+    arg1: PromiseOrValue<BytesLike>,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
+  counter(overrides?: CallOverrides): Promise<BigNumber>;
+
   exists(
     id: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
@@ -1038,6 +1066,14 @@ export interface HypercertMinterV0 extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    contributorImpacts(
+      arg0: PromiseOrValue<string>,
+      arg1: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
+    counter(overrides?: CallOverrides): Promise<BigNumber>;
+
     exists(
       id: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -1192,9 +1228,8 @@ export interface HypercertMinterV0 extends BaseContract {
       beacon?: PromiseOrValue<string> | null
     ): BeaconUpgradedEventFilter;
 
-    "ImpactClaimed(uint256,address,bytes32,address[],uint64[2],uint64[2],bytes32[],bytes32[],bytes32[],uint64,string)"(
+    "ImpactClaimed(uint256,bytes32,address[],uint256[2],uint256[2],bytes32[],bytes32[],bytes32[],uint256,string)"(
       id?: null,
-      minter?: null,
       claimHash?: null,
       contributors?: null,
       workTimeframe?: null,
@@ -1207,7 +1242,6 @@ export interface HypercertMinterV0 extends BaseContract {
     ): ImpactClaimedEventFilter;
     ImpactClaimed(
       id?: null,
-      minter?: null,
       claimHash?: null,
       contributors?: null,
       workTimeframe?: null,
@@ -1361,6 +1395,14 @@ export interface HypercertMinterV0 extends BaseContract {
       values: PromiseOrValue<BigNumberish>[],
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
+
+    contributorImpacts(
+      arg0: PromiseOrValue<string>,
+      arg1: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    counter(overrides?: CallOverrides): Promise<BigNumber>;
 
     exists(
       id: PromiseOrValue<BigNumberish>,
@@ -1541,6 +1583,14 @@ export interface HypercertMinterV0 extends BaseContract {
       values: PromiseOrValue<BigNumberish>[],
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
+
+    contributorImpacts(
+      arg0: PromiseOrValue<string>,
+      arg1: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    counter(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     exists(
       id: PromiseOrValue<BigNumberish>,

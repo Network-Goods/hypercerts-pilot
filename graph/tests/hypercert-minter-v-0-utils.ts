@@ -75,6 +75,7 @@ export function createBeaconUpgradedEvent(beacon: Address): BeaconUpgraded {
 
 export function createImpactClaimedEvent(
   id: BigInt,
+  minter: Address,
   claimHash: Bytes,
   contributors: Array<Address>,
   workTimeframe: Array<BigInt>,
@@ -92,6 +93,14 @@ export function createImpactClaimedEvent(
   impactClaimedEvent.parameters.push(
     new ethereum.EventParam("id", ethereum.Value.fromUnsignedBigInt(id))
   );
+
+  impactClaimedEvent.parameters.push(
+    new ethereum.EventParam(
+      "minter",
+      ethereum.Value.fromAddress(minter)
+    )
+  );
+
   impactClaimedEvent.parameters.push(
     new ethereum.EventParam(
       "claimHash",

@@ -7,3 +7,4 @@ import type * as mocks from "./mocks";
 
 export type { mocks };
 export type { HypercertMinterV0 } from "./HypercertMinterV0";
+export type { HypercertMinterV1 } from "./HypercertMinterV1";

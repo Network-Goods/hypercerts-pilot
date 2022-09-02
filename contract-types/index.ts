@@ -46,5 +46,7 @@ export type { IERC165Upgradeable } from "./@openzeppelin/contracts-upgradeable/u
 export { IERC165Upgradeable__factory } from "./factories/@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable__factory";
 export type { HypercertMinterV0 } from "./contracts/HypercertMinterV0";
 export { HypercertMinterV0__factory } from "./factories/contracts/HypercertMinterV0__factory";
+export type { HypercertMinterV1 } from "./contracts/HypercertMinterV1";
+export { HypercertMinterV1__factory } from "./factories/contracts/HypercertMinterV1__factory";
 export type { HypercertMinterUpgrade } from "./contracts/mocks/HypercertMinterUpgrade";
 export { HypercertMinterUpgrade__factory } from "./factories/contracts/mocks/HypercertMinterUpgrade__factory";

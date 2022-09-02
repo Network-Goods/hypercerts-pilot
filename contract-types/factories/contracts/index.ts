@@ -3,3 +3,4 @@
 /* eslint-disable */
 export * as mocks from "./mocks";
 export { HypercertMinterV0__factory } from "./HypercertMinterV0__factory";
+export { HypercertMinterV1__factory } from "./HypercertMinterV1__factory";

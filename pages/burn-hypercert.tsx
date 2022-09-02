@@ -16,11 +16,11 @@ import { formatIpfsUrlToGateway, useIpfsMetadata } from "../hooks/ipfs";
 import { errors, labels } from "../content/burn-hypercert-content";
 
 const GET_MY_CERTIFICATES_QUERY = gql`
-  query GetMyCertificates($ownerId: String!) {
-    hypercerts(where: { owner: $ownerId }) {
+  query GetMyCertificates($minterId: String!) {
+    hypercerts(where: { minter: $minterId }) {
       id
       claimHash
-      owner
+      minter
       uri
       contributors {
         id
@@ -44,13 +44,13 @@ const Content = ({ address }: { address: string }) => {
     hypercerts: {
       id: string;
       claimHash: string;
-      owner: string;
+      minter: string;
       uri: string;
       contributors: { id: string }[];
     }[];
   }>(GET_MY_CERTIFICATES_QUERY, {
     variables: {
-      ownerId: address?.toLowerCase()!,
+      minterId: address?.toLowerCase()!,
     },
     pollInterval: 3000,
   });

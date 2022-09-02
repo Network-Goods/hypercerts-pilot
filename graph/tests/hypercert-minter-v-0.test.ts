@@ -37,6 +37,7 @@ describe(HYPERCERT, () => {
   beforeAll(() => {
     const e = createImpactClaimedEvent(
       BigInt.fromI32(id1),
+      Address.fromString(contributor0),
       Bytes.fromHexString(claimHash),
       [Address.fromString(contributor0)],
       [BigInt.fromI32(workTimeframe0), BigInt.fromI32(workTimeframe1)],

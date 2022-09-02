@@ -100,6 +100,7 @@ export function handleImpactClaimed(event: ImpactClaimed): void {
     }
     contributor.save();
   }
+  entity.minter = event.params.minter.toHex();
   entity.impactDateFrom = event.params.impactTimeframe[0];
   entity.impactDateTo = event.params.impactTimeframe[1];
   entity.impactScopes = event.params.impactScopes;

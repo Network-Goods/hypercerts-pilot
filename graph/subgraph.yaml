@@ -39,7 +39,7 @@ dataSources:
           handler: handleApprovalForAll
         - event: BeaconUpgraded(indexed address)
           handler: handleBeaconUpgraded
-        - event: ImpactClaimed(uint256,bytes32,address[],uint256[2],uint256[2],bytes32[],bytes32[],bytes32[],uint256,string)
+        - event: ImpactClaimed(uint256,address,bytes32,address[],uint64[2],uint64[2],bytes32[],bytes32[],bytes32[],uint64,string)
           handler: handleImpactClaimed
         - event: ImpactScopeAdded(bytes32,string)
           handler: handleImpactScopeAdded
