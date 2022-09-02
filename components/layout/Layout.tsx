@@ -10,7 +10,6 @@ import { WrongNetworkBanner } from "./WrongNetworkBanner";
 const headerLinks = [
   { label: headerLinkLabels.claim, href: "/claim-hypercert" },
   { label: headerLinkLabels.burn, href: "/burn-hypercert" },
-  { label: headerLinkLabels.donate, href: "/donate-hypercert" },
 ];
 
 export const Layout = ({ children }: PropsWithChildren) => {
