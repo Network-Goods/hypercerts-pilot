@@ -65,7 +65,8 @@ const ClaimHypercertPage: NextPage = () => {
           impactTimeStart: undefined as string | undefined,
           impactTimeEnd: undefined as string | undefined,
           workScopes: [] as Option[],
-          rights: [],
+          impactScopes: [] as Option[],
+          rights: [] as Option[],
           uri: "",
         }}
         onSubmit={async (val) => {
@@ -135,9 +136,9 @@ const ClaimHypercertPage: NextPage = () => {
               workTime: [workTimeStart, workTimeEnd],
               impactTime: [impactTimeStart, impactTimeEnd],
               uri: certificateMetadataIpfsId!,
-              rightsIds: val.rights,
               workScopeIds: val.workScopes.map((s) => s.value),
-              impactScopeIds: [],
+              impactScopeIds: val.impactScopes.map((option) => option.value),
+              rightsIds: val.rights.map((right) => right.value),
             });
           } catch (error) {
             toast({
@@ -302,7 +303,7 @@ const ClaimHypercertPage: NextPage = () => {
                 </FormHelperText>
               </FormControl>
               <Divider my={3} />
-              <FormControl isRequired>
+              <FormControl>
                 <Flex>
                   <FormLabel>{placeholders.impactScopesLabel}</FormLabel>
                   <ErrorMessage name="impactScopes" render={DisplayError} />
@@ -321,7 +322,7 @@ const ClaimHypercertPage: NextPage = () => {
                 </FormHelperText>
               </FormControl>
               <Divider my={3} />
-              <FormControl isRequired>
+              <FormControl>
                 <Flex>
                   <FormLabel>{placeholders.rightsLabel}</FormLabel>
                   <ErrorMessage name="rights" render={DisplayError} />
