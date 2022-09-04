@@ -6,7 +6,8 @@ import { placeholders } from "../../content/claim-hypercert-content";
 
 export const ImpactScopesAutoComplete = ({
   onChange,
-}: Pick<AutoCompleteProps, "onChange">) => {
+  disabled,
+}: Pick<AutoCompleteProps, "onChange" | "disabled">) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { data: impactScopeData, loading: impactScopesLoading } =
     useImpactScopes();
@@ -25,6 +26,7 @@ export const ImpactScopesAutoComplete = ({
         loading={impactScopesLoading}
         placeholder={placeholders.impactScopes}
         instanceId="impact-scopes-autocomplete"
+        disabled={disabled}
       />
       <AddImpactScopeModal isOpen={isOpen} onClose={onClose} />
     </>

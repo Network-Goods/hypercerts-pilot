@@ -6,7 +6,8 @@ import { placeholders } from "../../content/claim-hypercert-content";
 
 export const WorkScopesAutoComplete = ({
   onChange,
-}: Pick<AutoCompleteProps, "onChange">) => {
+  disabled,
+}: Pick<AutoCompleteProps, "onChange" | "disabled">) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { data: workscopeData, loading: workscopesLoading } = useWorkScopes();
   const workscopeOptions: Option[] =
@@ -22,6 +23,7 @@ export const WorkScopesAutoComplete = ({
         loading={workscopesLoading}
         placeholder={placeholders.workScopes}
         instanceId="work-scopes-autocomplete"
+        disabled={disabled}
       />
       <AddWorkscopeModal isOpen={isOpen} onClose={onClose} />
     </>

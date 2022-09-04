@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { gql, useQuery } from "@apollo/client";
 import { useWallet } from "@raidguild/quiver";
 import {
@@ -40,7 +40,7 @@ const BurnCertificatePageWrapper = () => {
 };
 
 const Content = ({ address }: { address: string }) => {
-  const { data, loading } = useQuery<{
+  const { data, loading, startPolling } = useQuery<{
     hypercerts: {
       id: string;
       claimHash: string;
@@ -52,8 +52,11 @@ const Content = ({ address }: { address: string }) => {
     variables: {
       minterId: address?.toLowerCase()!,
     },
-    pollInterval: 3000,
   });
+
+  useEffect(() => {
+    startPolling(5000);
+  }, []);
 
   const burnCertificate = useBurnHypercert();
 

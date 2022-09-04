@@ -7,9 +7,11 @@ import { placeholders } from "../content/claim-hypercert-content";
 export const ImageUploadField = ({
   setFieldValue,
   name,
+  disabled,
 }: {
   setFieldValue: any;
   name: string;
+  disabled: boolean;
 }) => {
   const [file, setFile] = useState<(File & { preview: string }) | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -55,14 +57,16 @@ export const ImageUploadField = ({
       p={4}
     >
       <div {...getRootProps({ className: "dropzone" })}>
-        <input ref={inputRef} {...getInputProps()} />
+        <input disabled={disabled} ref={inputRef} {...getInputProps()} />
         {file && (
           <Flex>
             <CloseIcon
               ml="auto"
               onClick={(e) => {
-                e.stopPropagation();
-                reset();
+                if (!disabled) {
+                  e.stopPropagation();
+                  reset();
+                }
               }}
             />
           </Flex>

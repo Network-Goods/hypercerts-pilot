@@ -15,6 +15,7 @@ export interface AutoCompleteProps {
   placeholder: string;
   // Necessary for resolving ssr issues
   instanceId: string;
+  disabled: boolean;
 }
 
 const animatedComponents = makeAnimated();
@@ -26,10 +27,12 @@ export const AutoComplete = ({
   loading,
   placeholder,
   instanceId,
+  disabled,
 }: AutoCompleteProps) => {
   return (
     <Flex>
       <Select
+        isDisabled={disabled}
         instanceId={instanceId}
         options={options}
         isLoading={loading}
@@ -50,6 +53,7 @@ export const AutoComplete = ({
         marginLeft={3}
         onClick={onOpenAddModal}
         height="38px"
+        disabled={disabled}
       >
         Add
       </Button>

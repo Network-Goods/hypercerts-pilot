@@ -1,6 +1,8 @@
 import type { NextPage } from "next";
 import { ErrorMessage, Field, FieldProps, Formik } from "formik";
 import {
+  Alert,
+  AlertIcon,
   Button,
   Divider,
   Flex,
@@ -75,6 +77,7 @@ const ClaimHypercertPage: NextPage = () => {
         }}
         onSubmit={async (val) => {
           console.log("Starting hypercert creation", val);
+          window.scrollTo({ top: 0, behavior: "smooth" });
           /**
            * Steps:
            * 1. (optional) Upload image to IPFS and get the cid for the image
@@ -164,196 +167,222 @@ const ClaimHypercertPage: NextPage = () => {
           /* and other goodies */
         }) => {
           return (
-            <form onSubmit={handleSubmit}>
-              <FormControl isRequired>
-                <Flex>
-                  <FormLabel>Certificate name</FormLabel>
-                  <ErrorMessage name="name" render={DisplayError} />
-                </Flex>
-                <Input
-                  type="text"
-                  name="name"
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  value={values.name}
-                  placeholder={placeholders.name}
-                />
-              </FormControl>
-              <FormControl isRequired>
-                <Flex>
-                  <FormLabel>Description</FormLabel>
-                  <ErrorMessage name="description" render={DisplayError} />
-                </Flex>
-                <Textarea
-                  name="description"
-                  value={values.description}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  placeholder={placeholders.description}
-                  size="sm"
-                />
-              </FormControl>
-              <FormControl isRequired>
-                <Flex>
-                  <FormLabel>External link</FormLabel>
-                  <ErrorMessage name="external_link" render={DisplayError} />
-                </Flex>
-                <Input
-                  type="text"
-                  name="external_link"
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  value={values.external_link}
-                  placeholder={placeholders.external_link}
-                />
-              </FormControl>
-              <FormControl>
-                <FormLabel>Image</FormLabel>
-                <ImageUploadField name="image" setFieldValue={setFieldValue} />
-              </FormControl>
-              <Divider my={3} />
-              <HStack>
-                <FormControl>
-                  <FormLabel>{placeholders.workTimeStartLabel}</FormLabel>
+            <>
+              {isSubmitting && (
+                <Alert status="info" my={4}>
+                  <AlertIcon />
+                  Please wait while your hypercert is being minted
+                </Alert>
+              )}
+              <form onSubmit={handleSubmit}>
+                <FormControl isRequired>
+                  <Flex>
+                    <FormLabel>Certificate name</FormLabel>
+                    <ErrorMessage name="name" render={DisplayError} />
+                  </Flex>
                   <Input
-                    type="date"
-                    name="workTimeStart"
+                    type="text"
+                    name="name"
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    value={values.workTimeStart}
+                    value={values.name}
+                    placeholder={placeholders.name}
+                    disabled={isSubmitting}
                   />
-                  {!errors.workTimeStart ? (
-                    <FormHelperText>
-                      {placeholders.workTimeStartDescription}
-                    </FormHelperText>
-                  ) : (
-                    <FormErrorMessage>{errors.workTimeStart}</FormErrorMessage>
-                  )}
                 </FormControl>
-                <FormControl>
-                  <FormLabel>{placeholders.workTimeEndLabel}</FormLabel>
-                  <Input
-                    type="date"
-                    name="workTimeEnd"
+                <FormControl isRequired>
+                  <Flex>
+                    <FormLabel>Description</FormLabel>
+                    <ErrorMessage name="description" render={DisplayError} />
+                  </Flex>
+                  <Textarea
+                    name="description"
+                    value={values.description}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    value={values.workTimeEnd}
+                    placeholder={placeholders.description}
+                    size="sm"
+                    disabled={isSubmitting}
                   />
-                  {!errors.workTimeEnd ? (
-                    <FormHelperText>
-                      {placeholders.workTimeEndDescription}
-                    </FormHelperText>
-                  ) : (
-                    <FormErrorMessage>{errors.workTimeEnd}</FormErrorMessage>
-                  )}
                 </FormControl>
-              </HStack>
-              <Divider my={3} />
-              <HStack>
-                <FormControl>
-                  <FormLabel>{placeholders.impactTimeStartLabel}</FormLabel>
+                <FormControl isRequired>
+                  <Flex>
+                    <FormLabel>External link</FormLabel>
+                    <ErrorMessage name="external_link" render={DisplayError} />
+                  </Flex>
                   <Input
-                    type="date"
-                    name="impactTimeStart"
+                    type="text"
+                    name="external_link"
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    value={values.impactTimeStart}
+                    value={values.external_link}
+                    placeholder={placeholders.external_link}
+                    disabled={isSubmitting}
                   />
-                  {!errors.impactTimeStart ? (
-                    <FormHelperText>
-                      {placeholders.impactTimeStartDescription}
-                    </FormHelperText>
-                  ) : (
-                    <FormErrorMessage>
-                      {errors.impactTimeStart}
-                    </FormErrorMessage>
-                  )}
                 </FormControl>
                 <FormControl>
-                  <FormLabel>{placeholders.impactTimeEndLabel}</FormLabel>
-                  <Input
-                    type="date"
-                    name="impactTimeEnd"
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    value={values.impactTimeEnd}
+                  <FormLabel>Image</FormLabel>
+                  <ImageUploadField
+                    name="image"
+                    setFieldValue={setFieldValue}
+                    disabled={isSubmitting}
                   />
-                  {!errors.impactTimeEnd ? (
-                    <FormHelperText>
-                      {placeholders.impactTimeEndLabel}
-                    </FormHelperText>
-                  ) : (
-                    <FormErrorMessage>{errors.impactTimeEnd}</FormErrorMessage>
-                  )}
                 </FormControl>
-              </HStack>
-              <Divider my={3} />
-              <FormControl isRequired>
-                <Flex>
-                  <FormLabel>{placeholders.workScopesLabel}</FormLabel>
-                  <ErrorMessage name="workScopes" render={DisplayError} />
-                </Flex>
-                <Field name="workScopes">
-                  {({ form }: FieldProps) => (
-                    <WorkScopesAutoComplete
-                      onChange={(workScopes) =>
-                        form.setFieldValue("workScopes", workScopes)
-                      }
+                <Divider my={3} />
+                <HStack>
+                  <FormControl>
+                    <FormLabel>{placeholders.workTimeStartLabel}</FormLabel>
+                    <Input
+                      type="date"
+                      name="workTimeStart"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.workTimeStart}
+                      disabled={isSubmitting}
                     />
-                  )}
-                </Field>
-                <FormHelperText>
-                  {placeholders.workScopesDescription}
-                </FormHelperText>
-              </FormControl>
-              <Divider my={3} />
-              <FormControl>
-                <Flex>
-                  <FormLabel>{placeholders.impactScopesLabel}</FormLabel>
-                  <ErrorMessage name="impactScopes" render={DisplayError} />
-                </Flex>
-                <Field name="impactScopes">
-                  {({ form }: FieldProps) => (
-                    <ImpactScopesAutoComplete
-                      onChange={(impactScopes) =>
-                        form.setFieldValue("impactScopes", impactScopes)
-                      }
+                    {!errors.workTimeStart ? (
+                      <FormHelperText>
+                        {placeholders.workTimeStartDescription}
+                      </FormHelperText>
+                    ) : (
+                      <FormErrorMessage>
+                        {errors.workTimeStart}
+                      </FormErrorMessage>
+                    )}
+                  </FormControl>
+                  <FormControl>
+                    <FormLabel>{placeholders.workTimeEndLabel}</FormLabel>
+                    <Input
+                      type="date"
+                      name="workTimeEnd"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.workTimeEnd}
+                      disabled={isSubmitting}
                     />
-                  )}
-                </Field>
-                <FormHelperText>
-                  {placeholders.impactScopesDescription}
-                </FormHelperText>
-              </FormControl>
-              <Divider my={3} />
-              <FormControl>
-                <Flex>
-                  <FormLabel>{placeholders.rightsLabel}</FormLabel>
-                  <ErrorMessage name="rights" render={DisplayError} />
-                </Flex>
-                <Field name="rights">
-                  {({ form }: FieldProps) => (
-                    <RightsAutoComplete
-                      onChange={(rights) =>
-                        form.setFieldValue("rights", rights)
-                      }
+                    {!errors.workTimeEnd ? (
+                      <FormHelperText>
+                        {placeholders.workTimeEndDescription}
+                      </FormHelperText>
+                    ) : (
+                      <FormErrorMessage>{errors.workTimeEnd}</FormErrorMessage>
+                    )}
+                  </FormControl>
+                </HStack>
+                <Divider my={3} />
+                <HStack>
+                  <FormControl>
+                    <FormLabel>{placeholders.impactTimeStartLabel}</FormLabel>
+                    <Input
+                      type="date"
+                      name="impactTimeStart"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.impactTimeStart}
+                      disabled={isSubmitting}
                     />
-                  )}
-                </Field>
-                <FormHelperText>
-                  {placeholders.rightsDescription}
-                </FormHelperText>
-              </FormControl>
-              <Divider my={3} />
-              <Button
-                width="100%"
-                type="submit"
-                disabled={!isValid || isSubmitting}
-                colorScheme="green"
-              >
-                {buttons.submit}
-              </Button>
-            </form>
+                    {!errors.impactTimeStart ? (
+                      <FormHelperText>
+                        {placeholders.impactTimeStartDescription}
+                      </FormHelperText>
+                    ) : (
+                      <FormErrorMessage>
+                        {errors.impactTimeStart}
+                      </FormErrorMessage>
+                    )}
+                  </FormControl>
+                  <FormControl>
+                    <FormLabel>{placeholders.impactTimeEndLabel}</FormLabel>
+                    <Input
+                      type="date"
+                      name="impactTimeEnd"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.impactTimeEnd}
+                      disabled={isSubmitting}
+                    />
+                    {!errors.impactTimeEnd ? (
+                      <FormHelperText>
+                        {placeholders.impactTimeEndLabel}
+                      </FormHelperText>
+                    ) : (
+                      <FormErrorMessage>
+                        {errors.impactTimeEnd}
+                      </FormErrorMessage>
+                    )}
+                  </FormControl>
+                </HStack>
+                <Divider my={3} />
+                <FormControl isRequired>
+                  <Flex>
+                    <FormLabel>{placeholders.workScopesLabel}</FormLabel>
+                    <ErrorMessage name="workScopes" render={DisplayError} />
+                  </Flex>
+                  <Field name="workScopes">
+                    {({ form }: FieldProps) => (
+                      <WorkScopesAutoComplete
+                        disabled={isSubmitting}
+                        onChange={(workScopes) =>
+                          form.setFieldValue("workScopes", workScopes)
+                        }
+                      />
+                    )}
+                  </Field>
+                  <FormHelperText>
+                    {placeholders.workScopesDescription}
+                  </FormHelperText>
+                </FormControl>
+                <Divider my={3} />
+                <FormControl>
+                  <Flex>
+                    <FormLabel>{placeholders.impactScopesLabel}</FormLabel>
+                    <ErrorMessage name="impactScopes" render={DisplayError} />
+                  </Flex>
+                  <Field name="impactScopes">
+                    {({ form }: FieldProps) => (
+                      <ImpactScopesAutoComplete
+                        disabled={isSubmitting}
+                        onChange={(impactScopes) =>
+                          form.setFieldValue("impactScopes", impactScopes)
+                        }
+                      />
+                    )}
+                  </Field>
+                  <FormHelperText>
+                    {placeholders.impactScopesDescription}
+                  </FormHelperText>
+                </FormControl>
+                <Divider my={3} />
+                <FormControl>
+                  <Flex>
+                    <FormLabel>{placeholders.rightsLabel}</FormLabel>
+                    <ErrorMessage name="rights" render={DisplayError} />
+                  </Flex>
+                  <Field name="rights">
+                    {({ form }: FieldProps) => (
+                      <RightsAutoComplete
+                        disabled={isSubmitting}
+                        onChange={(rights) =>
+                          form.setFieldValue("rights", rights)
+                        }
+                      />
+                    )}
+                  </Field>
+                  <FormHelperText>
+                    {placeholders.rightsDescription}
+                  </FormHelperText>
+                </FormControl>
+                <Divider my={3} />
+                <Button
+                  width="100%"
+                  type="submit"
+                  disabled={!isValid || isSubmitting}
+                  colorScheme="green"
+                >
+                  {buttons.submit}
+                </Button>
+              </form>
+            </>
           );
         }}
       </Formik>
