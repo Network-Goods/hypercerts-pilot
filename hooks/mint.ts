@@ -6,7 +6,11 @@ import { parseBlockchainError } from "../utils/parseBlockchainError";
 import { useHypercertContract } from "./contracts";
 import { mintInteractionLabels } from "../content/chainInteractions";
 
-export const useMintHyperCertificate = () => {
+export const useMintHyperCertificate = ({
+  onComplete,
+}: {
+  onComplete?: () => void;
+}) => {
   const { address } = useWallet();
   const contract = useHypercertContract();
   const toast = useToast();
@@ -29,6 +33,7 @@ export const useMintHyperCertificate = () => {
         ),
         status: "success",
       });
+      onComplete?.();
     },
   });
 

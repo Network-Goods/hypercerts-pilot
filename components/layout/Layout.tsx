@@ -3,14 +3,8 @@ import Link from "next/link";
 import { Box, Center, Container, Flex, HStack, Text } from "@chakra-ui/react";
 import { ConnectWallet } from "../ConnectWallet";
 import { useRouter } from "next/router";
-import { FORMAT_VERSION } from "../../constants";
-import { headerLinkLabels } from "../../content/layout";
+import { FORMAT_VERSION, urls } from "../../constants";
 import { WrongNetworkBanner } from "./WrongNetworkBanner";
-
-const headerLinks = [
-  { label: headerLinkLabels.claim, href: "/claim-hypercert" },
-  { label: headerLinkLabels.burn, href: "/burn-hypercert" },
-];
 
 export const Layout = ({ children }: PropsWithChildren) => {
   const { pathname } = useRouter();
@@ -35,7 +29,7 @@ export const Layout = ({ children }: PropsWithChildren) => {
             <Text fontSize="xl">HyperCert</Text>
             <Text color="gray.400">v{FORMAT_VERSION}</Text>
             <HStack pl={5}>
-              {headerLinks.map((headerLink) => (
+              {Object.values(urls).map((headerLink) => (
                 <Text
                   key={headerLink.href}
                   fontWeight={headerLink.href === pathname ? 600 : 400}

@@ -18,7 +18,7 @@ import { uploadCertificateToIpfs } from "../utils/ipfsClient";
 import { useWallet } from "@raidguild/quiver";
 import { useMintHyperCertificate } from "../hooks/mint";
 import * as Yup from "yup";
-import { FORMAT_VERSION } from "../constants";
+import { FORMAT_VERSION, urls } from "../constants";
 import {
   buttons,
   placeholders,
@@ -28,6 +28,7 @@ import { WorkScopesAutoComplete } from "../components/AutoComplete/WorkScopesAut
 import { ImpactScopesAutoComplete } from "../components/AutoComplete/ImpactScopesAutoComplete";
 import { RightsAutoComplete } from "../components/AutoComplete/RightsAutoComplete";
 import { Option } from "../components/AutoComplete/AutoComplete";
+import { useRouter } from "next/router";
 
 const ValidationSchema = Yup.object().shape({
   name: Yup.string()
@@ -44,7 +45,10 @@ const ValidationSchema = Yup.object().shape({
 
 const ClaimHypercertPage: NextPage = () => {
   const { address } = useWallet();
-  const mintHyperCertificate = useMintHyperCertificate();
+  const { push } = useRouter();
+  const mintHyperCertificate = useMintHyperCertificate({
+    onComplete: () => push(urls.burn.href),
+  });
   const toast = useToast();
 
   return (
