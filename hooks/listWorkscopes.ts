@@ -11,9 +11,6 @@ const WORK_SCOPES_QUERY = gql`
 
 export const useWorkScopes = () => {
   return useQuery<{ workScopes: { id: string; text: string }[] }>(
-    WORK_SCOPES_QUERY,
-    {
-      pollInterval: 5000,
-    }
+    WORK_SCOPES_QUERY
   );
 };

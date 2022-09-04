@@ -18,6 +18,7 @@ import { parseBlockchainError } from "../../utils/parseBlockchainError";
 import { useState } from "react";
 import { addRightModal } from "../../content/claim-hypercert-content";
 import { formatScope } from "../../utils/formatting";
+import { useRights } from "../../hooks/listRights";
 
 export const AddRightsModal = ({
   isOpen,
@@ -25,6 +26,7 @@ export const AddRightsModal = ({
 }: Omit<ModalProps, "children">) => {
   const contract = useHypercertContract();
   const toast = useToast();
+  const { startPolling } = useRights();
   const [value, setValue] = useState<string>();
   const [addingRight, setAddingRight] = useState(false);
   const { mutate } = useWriteContract(contract, "addRight", {
@@ -53,6 +55,7 @@ export const AddRightsModal = ({
       await mutate(formattedValue);
     }
     setAddingRight(false);
+    startPolling(5000);
   };
 
   return (

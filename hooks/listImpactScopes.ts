@@ -11,9 +11,6 @@ const IMPACT_SCOPES_QUERY = gql`
 
 export const useImpactScopes = () => {
   return useQuery<{ impactScopes: { id: string; text: string }[] }>(
-    IMPACT_SCOPES_QUERY,
-    {
-      pollInterval: 5000,
-    }
+    IMPACT_SCOPES_QUERY
   );
 };

@@ -1,8 +1,8 @@
-import { AutoComplete, AutoCompleteProps } from "./AutoComplete";
-import { Option } from "chakra-ui-simple-autocomplete";
+import { AutoComplete, AutoCompleteProps, Option } from "./AutoComplete";
 import { useDisclosure } from "@chakra-ui/react";
 import { useImpactScopes } from "../../hooks/listImpactScopes";
 import { AddImpactScopeModal } from "../Modals/AddImpactscopeModal";
+import { placeholders } from "../../content/claim-hypercert-content";
 
 export const ImpactScopesAutoComplete = ({
   onChange,
@@ -21,8 +21,10 @@ export const ImpactScopesAutoComplete = ({
       <AutoComplete
         options={impactScopeOption}
         onChange={onChange}
-        onOpen={onOpen}
+        onOpenAddModal={onOpen}
         loading={impactScopesLoading}
+        placeholder={placeholders.impactScopes}
+        instanceId="impact-scopes-autocomplete"
       />
       <AddImpactScopeModal isOpen={isOpen} onClose={onClose} />
     </>

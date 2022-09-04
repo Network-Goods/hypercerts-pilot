@@ -13,7 +13,6 @@ import {
   Textarea,
   useToast,
 } from "@chakra-ui/react";
-import { Option } from "chakra-ui-simple-autocomplete";
 import { ImageUploadField } from "../components/ImageUploadField";
 import { uploadCertificateToIpfs } from "../utils/ipfsClient";
 import { useWallet } from "@raidguild/quiver";
@@ -28,6 +27,7 @@ import {
 import { WorkScopesAutoComplete } from "../components/AutoComplete/WorkScopesAutoComplete";
 import { ImpactScopesAutoComplete } from "../components/AutoComplete/ImpactScopesAutoComplete";
 import { RightsAutoComplete } from "../components/AutoComplete/RightsAutoComplete";
+import { Option } from "../components/AutoComplete/AutoComplete";
 
 const ValidationSchema = Yup.object().shape({
   name: Yup.string()

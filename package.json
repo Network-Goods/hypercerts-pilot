@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.6.9",
+    "@chakra-ui/icons": "^2.0.9",
     "@chakra-ui/react": "^2.2.8",
     "@emotion/react": "^11.10.0",
     "@emotion/styled": "^11.10.0",
@@ -18,7 +19,6 @@
     "@graphprotocol/graph-ts": "^0.27.0",
     "@raidguild/quiver": "^0.10.0",
     "@walletconnect/web3-provider": "^1.8.0",
-    "chakra-ui-simple-autocomplete": "^2.2.0",
     "eth-provider": "^0.12.1",
     "ethers": "^5.6.9",
     "formik": "^2.2.9",
@@ -30,6 +30,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-dropzone": "^14.2.2",
+    "react-select": "^5.4.0",
     "web3modal": "^1.9.8",
     "yup": "^0.32.11"
   },

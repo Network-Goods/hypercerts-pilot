@@ -1,8 +1,8 @@
-import { AutoComplete, AutoCompleteProps } from "./AutoComplete";
+import { AutoComplete, AutoCompleteProps, Option } from "./AutoComplete";
 import { useWorkScopes } from "../../hooks/listWorkscopes";
-import { Option } from "chakra-ui-simple-autocomplete";
 import { useDisclosure } from "@chakra-ui/react";
 import { AddWorkscopeModal } from "../Modals/AddWorkscopeModal";
+import { placeholders } from "../../content/claim-hypercert-content";
 
 export const WorkScopesAutoComplete = ({
   onChange,
@@ -18,8 +18,10 @@ export const WorkScopesAutoComplete = ({
       <AutoComplete
         options={workscopeOptions}
         onChange={onChange}
-        onOpen={onOpen}
+        onOpenAddModal={onOpen}
         loading={workscopesLoading}
+        placeholder={placeholders.workScopes}
+        instanceId="work-scopes-autocomplete"
       />
       <AddWorkscopeModal isOpen={isOpen} onClose={onClose} />
     </>

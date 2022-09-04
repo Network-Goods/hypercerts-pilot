@@ -18,6 +18,7 @@ import { parseBlockchainError } from "../../utils/parseBlockchainError";
 import { useState } from "react";
 import { addWorkScopeModal } from "../../content/claim-hypercert-content";
 import { formatScope } from "../../utils/formatting";
+import { useWorkScopes } from "../../hooks/listWorkscopes";
 
 export const AddWorkscopeModal = ({
   isOpen,
@@ -25,7 +26,8 @@ export const AddWorkscopeModal = ({
 }: Omit<ModalProps, "children">) => {
   const contract = useHypercertContract();
   const toast = useToast();
-  const [value, setValue] = useState<string>();
+  const { startPolling } = useWorkScopes();
+  const [value, setValue] = useState<string>("");
   const [addingScope, setAddingScope] = useState(false);
   const { mutate } = useWriteContract(contract, "addWorkScope", {
     onError: (error) => {
@@ -53,6 +55,7 @@ export const AddWorkscopeModal = ({
       await mutate(formattedValue);
     }
     setAddingScope(false);
+    startPolling(5000);
   };
 
   return (

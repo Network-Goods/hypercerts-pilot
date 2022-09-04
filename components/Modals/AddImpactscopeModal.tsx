@@ -18,6 +18,7 @@ import { parseBlockchainError } from "../../utils/parseBlockchainError";
 import { useState } from "react";
 import { addImpactScopeModal } from "../../content/claim-hypercert-content";
 import { formatScope } from "../../utils/formatting";
+import { useImpactScopes } from "../../hooks/listImpactScopes";
 
 export const AddImpactScopeModal = ({
   isOpen,
@@ -25,6 +26,7 @@ export const AddImpactScopeModal = ({
 }: Omit<ModalProps, "children">) => {
   const contract = useHypercertContract();
   const toast = useToast();
+  const { startPolling } = useImpactScopes();
   const [value, setValue] = useState<string>();
   const [addingScope, setAddingScope] = useState(false);
   const { mutate } = useWriteContract(contract, "addImpactScope", {
@@ -56,6 +58,7 @@ export const AddImpactScopeModal = ({
       await mutate(formattedValue);
     }
     setAddingScope(false);
+    startPolling(5000);
   };
 
   return (
