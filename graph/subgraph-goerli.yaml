@@ -14,9 +14,6 @@ dataSources:
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
-        - AdminChanged
-        - ApprovalForAll
-        - BeaconUpgraded
         - Contributor
         - ImpactClaimed
         - ImpactScope
@@ -25,21 +22,15 @@ dataSources:
         - RoleAdminChanged
         - RoleGranted
         - RoleRevoked
-        - TransferBatch
-        - TransferSingle
-        - URI
+        - Owner
+        - Transfer
+        - TransferValue
         - Upgraded
         - WorkScope
       abis:
         - name: HypercertMinterV0
           file: ./abis/contracts/HypercertMinterV0.sol/HypercertMinterV0.json
       eventHandlers:
-        - event: AdminChanged(address,address)
-          handler: handleAdminChanged
-        - event: ApprovalForAll(indexed address,indexed address,bool)
-          handler: handleApprovalForAll
-        - event: BeaconUpgraded(indexed address)
-          handler: handleBeaconUpgraded
         - event: ImpactClaimed(uint256,address,bytes32,address[],uint64[2],uint64[2],bytes32[],bytes32[],bytes32[],uint64,string)
           handler: handleImpactClaimed
         - event: ImpactScopeAdded(bytes32,string)
@@ -56,12 +47,10 @@ dataSources:
           handler: handleRoleGranted
         - event: RoleRevoked(indexed bytes32,indexed address,indexed address)
           handler: handleRoleRevoked
-        - event: TransferBatch(indexed address,indexed address,indexed address,uint256[],uint256[])
-          handler: handleTransferBatch
-        - event: TransferSingle(indexed address,indexed address,indexed address,uint256,uint256)
-          handler: handleTransferSingle
-        - event: URI(string,indexed uint256)
-          handler: handleURI
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+        - event: TransferValue(indexed uint256,indexed uint256,uint256)
+          handler: handleTransferValue
         - event: Upgraded(indexed address)
           handler: handleUpgraded
       file: ./src/hypercert-minter-v-0.ts

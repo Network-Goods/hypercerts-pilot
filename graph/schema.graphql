@@ -1,44 +1,84 @@
 type Contributor @entity {
-    id: String!
-    hypercerts: [Hypercert!]! @derivedFrom(field: "contributors")
+  "contibutor ID is an Ethereum address"
+  id: String!
+  "hypercert the contributor has contributed to"
+  hypercerts: [Hypercert!]! @derivedFrom(field: "contributors")
+}
+
+type Owner @entity {
+  "owner ID is an Ethereum address"
+  id: String!
 }
 
 type Hypercert @entity {
-    id: String!
-    minter: String!
-    claimHash: Bytes!
-    contributors: [Contributor!]!
-    impactDateFrom: BigInt!
-    impactDateTo: BigInt!
-    impactScopes: [ImpactScope!]!
-    rights: [Right!]!
-    uri: String!
-    version: BigInt!
-    workDateFrom: BigInt!
-    workDateTo: BigInt!
-    workScopes: [WorkScope!]!
+  "hypercert ID maps to the uint256 slotID in the ERC3525 Hypercert Minter"
+  id: String!
+  "fingerprint of the hyperspace claimed by the minter"
+  claimHash: Bytes!
+  "address of the entity claiming the impact"
+  minter: String!
+  "array of know addresses representing contributors to this impact claim"
+  contributors: [Contributor!]!
+  "unix timestamp declaring when impact started"
+  impactDateFrom: BigInt!
+  "unix timestamp declaring when impact ended"
+  impactDateTo: BigInt!
+  "array of impacts declared in claim"
+  impactScopes: [ImpactScope!]!
+  "unix timestamp declaring when work started"
+  workDateFrom: BigInt!
+  "unix timestamp declaring when work ended"
+  workDateTo: BigInt!
+  "array of work declared in claim"
+  workScopes: [WorkScope!]!
+  "array of rights an owner of the impact certificate holds"
+  rights: [Right!]!
+  "SVG image string"
+  image: String!
+  "external reference, usually IPFS CID"
+  uri: String!
+  "total unit of certificate, used for splitting and merging"
+  totalUnits: BigInt!
+  "unix timestamp of last change to entity"
+  lastUpdated: BigInt!
+  "hypercert version"
+  version: BigInt!
 }
 
-type HypercertBalance @entity {
-    id: String!
-    amount: BigInt!
-    token: Hypercert!
+type HypercertFraction @entity {
+  "fraction ID maps to the uint256 tokenID in the ERC3525 Hypercert Minter"
+  id: String!
+  "address of the entity owning the impact"
+  owner: Owner!
+  "units held by the fraction, used for splitting and merging"
+  units: BigInt!
+  "link to hypercert this fraction relates to"
+  hypercert: Hypercert!
 }
 
 type ImpactScope @entity {
-    id: Bytes!
-    text: String!
-    hypercerts: [Hypercert!]! @derivedFrom(field: "impactScopes")
-}
-
-type Right @entity {
-    id: Bytes!
-    text: String!
-    hypercerts: [Hypercert!]! @derivedFrom(field: "rights")
+  "impaceScope ID maps to byts32 input of 'impactScopes' on Hypercert Minter"
+  id: Bytes!
+  "natural language description of impact scope"
+  text: String!
+  "array of hypercerts claiming this type of impact"
+  hypercerts: [Hypercert!]! @derivedFrom(field: "impactScopes")
 }
 
 type WorkScope @entity {
-    id: Bytes!
-    text: String!
-    hypercerts: [Hypercert!]! @derivedFrom(field: "workScopes")
+  "impaceScope ID maps to bytes32 input of 'workScopes' on Hypercert Minter"
+  id: Bytes!
+  "natural language description of work scope"
+  text: String!
+  "array of hypercerts claiming this type of work"
+  hypercerts: [Hypercert!]! @derivedFrom(field: "workScopes")
+}
+
+type Right @entity {
+  "impaceScope ID maps to bytes32 input of 'rights' on Hypercert Minter"
+  id: Bytes!
+  "natural language description of rights the owner holds"
+  text: String!
+  "array of hypercerts claiming these type of rights"
+  hypercerts: [Hypercert!]! @derivedFrom(field: "rights")
 }
