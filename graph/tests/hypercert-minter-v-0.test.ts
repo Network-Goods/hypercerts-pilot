@@ -50,7 +50,6 @@ describe(HYPERCERT, () => {
   const right0 = "0x22726967687420746f20666967687422";
   const right1 = "0x22726967687420746f20706172747922";
   const uri = "http://tempuri.org/foo/bar";
-  const totalUnits = 100000;
   const version = 1;
 
   beforeAll(() => {
@@ -64,8 +63,8 @@ describe(HYPERCERT, () => {
       [Bytes.fromHexString(workScope0)],
       [Bytes.fromHexString(impactScope0), Bytes.fromHexString(impactScope1)],
       [Bytes.fromHexString(right0), Bytes.fromHexString(right1)],
+      [BigInt.fromI32(50), BigInt.fromI32(30), BigInt.fromI32(20)],
       BigInt.fromI32(version),
-      BigInt.fromI32(totalUnits),
       uri
     );
     handleImpactClaimed(e);
@@ -85,11 +84,14 @@ describe(HYPERCERT, () => {
         ethereum.Value.fromI32(1),
         ethereum.Value.fromI32(contributor.hypercerts.length)
       );
-      assert.stringEquals("1", contributor.hypercerts[0]);
+      assert.stringEquals(
+        "0x307861626c6b736a6466736466736466",
+        contributor.hypercerts[0]
+      );
     }
 
     assert.entityCount(HYPERCERT, 1);
-    const idStr = id1.toString();
+    const idStr = "0x307861626c6b736a6466736466736466";
     assert.fieldEquals(HYPERCERT, idStr, "claimHash", claimHash);
     assert.fieldEquals(HYPERCERT, idStr, "uri", uri);
     assert.fieldEquals(HYPERCERT, idStr, "version", version.toString());
@@ -103,7 +105,7 @@ describe(HYPERCERT, () => {
         BigInt.fromI32(workTimeframe0),
         hypercert.workDateFrom
       );
-      assert.bigIntEquals(BigInt.fromI32(totalUnits), hypercert.totalUnits);
+      assert.bigIntEquals(BigInt.fromI32(100), hypercert.totalUnits);
       assert.bigIntEquals(BigInt.fromI32(workTimeframe1), hypercert.workDateTo);
       assert.bigIntEquals(
         BigInt.fromI32(impactTimeframe0),

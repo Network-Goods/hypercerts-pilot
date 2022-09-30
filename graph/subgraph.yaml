@@ -31,7 +31,7 @@ dataSources:
         - name: HypercertMinterV0
           file: ./abis/contracts/HypercertMinterV0.sol/HypercertMinterV0.json
       eventHandlers:
-        - event: ImpactClaimed(uint256,address,bytes32,address[],uint64[2],uint64[2],bytes32[],bytes32[],bytes32[],uint64,string)
+        - event: ImpactClaimed(uint256,address,bytes32,address[],uint64[2],uint64[2],bytes32[],bytes32[],bytes32[],uint8[],uint64,string)
           handler: handleImpactClaimed
         - event: ImpactScopeAdded(bytes32,string)
           handler: handleImpactScopeAdded

@@ -28,11 +28,19 @@ import {
 } from "../generated/schema";
 
 export function handleImpactClaimed(event: ImpactClaimed): void {
-  // TODO id will be slotID
-  const hypercertId = event.params.id.toString();
+  let contract = HypercertMinterV0.bind(event.address);
+  const hypercertId = event.params.claimHash.toHexString();
   let entity = new Hypercert(hypercertId);
   entity.claimHash = event.params.claimHash;
   const contributors = [] as string[];
+  let totalUnits = BigInt.fromI32(0);
+
+  for (let i = 0; i < event.params.fractions.length; i++) {
+    const units = event.params.fractions[i];
+    totalUnits = totalUnits.plus(BigInt.fromI32(units));
+  }
+
+  entity.totalUnits = totalUnits;
 
   for (let i = 0; i < event.params.contributors.length; i++) {
     const address = event.params.contributors[i];
@@ -57,9 +65,6 @@ export function handleImpactClaimed(event: ImpactClaimed): void {
   entity.workDateTo = event.params.workTimeframe[1];
   entity.workScopes = event.params.workScopes;
   entity.rights = event.params.rights;
-
-  //TODO totalUnits from event
-  entity.totalUnits = BigInt.fromString("100000");
 
   //TODO image from SVG contract
   entity.image =

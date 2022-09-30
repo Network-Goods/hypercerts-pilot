@@ -25,8 +25,8 @@ export function createImpactClaimedEvent(
   workScopes: Array<Bytes>,
   impactScopes: Array<Bytes>,
   rights: Array<Bytes>,
+  fractions: Array<BigInt>,
   version: BigInt,
-  totalUnits: BigInt,
   uri: string
 ): ImpactClaimed {
   let impactClaimedEvent = changetype<ImpactClaimed>(newMockEvent());
@@ -85,6 +85,12 @@ export function createImpactClaimedEvent(
   );
   impactClaimedEvent.parameters.push(
     new ethereum.EventParam(
+      "fractions",
+      ethereum.Value.fromUnsignedBigIntArray(fractions)
+    )
+  );
+  impactClaimedEvent.parameters.push(
+    new ethereum.EventParam(
       "version",
       ethereum.Value.fromUnsignedBigInt(version)
     )
@@ -92,13 +98,6 @@ export function createImpactClaimedEvent(
   impactClaimedEvent.parameters.push(
     new ethereum.EventParam("uri", ethereum.Value.fromString(uri))
   );
-  impactClaimedEvent.parameters.push(
-    new ethereum.EventParam(
-      "totalUnits",
-      ethereum.Value.fromUnsignedBigInt(totalUnits)
-    )
-  );
-
   return impactClaimedEvent;
 }
 
