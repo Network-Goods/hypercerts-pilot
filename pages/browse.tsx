@@ -1,8 +1,9 @@
-import { Container, ScaleFade, Select, SimpleGrid } from "@chakra-ui/react";
-import { HypercertTile } from "../components/HypercertTile";
-import { useState } from "react";
+import {Container, Flex, ScaleFade, Select, SimpleGrid, Spinner} from "@chakra-ui/react";
+import {HypercertTile} from "../components/HypercertTile";
+import {useState} from "react";
 import _ from "lodash";
 import Link from "next/link";
+import {useCollections} from "../hooks/listCollections";
 
 export interface Hypercert {
   id: string;
@@ -127,16 +128,12 @@ const hypercerts: Hypercert[] = [
   },
 ];
 
-const collections: Record<string, string[]> = {
-  "OpenAI highlights": ["a", "b", "d"],
-  "Some other collection": ["c", "d", "f"],
-};
-
 const BrowsePage = () => {
   const [filteredHypercerts, setFilteredHypercerts] = useState(hypercerts);
+  const {fetching: fetchingCollections, result: collections} = useCollections();
 
   const onChangeCollectionFilter = (collectionId: string) => {
-    if (collectionId === "all") {
+    if (!collections || collectionId === "all") {
       setFilteredHypercerts(hypercerts);
     } else {
       const filteredIds = _.intersection(
@@ -151,19 +148,23 @@ const BrowsePage = () => {
 
   return (
     <Container maxWidth={800}>
-      <Select
-        mb={8}
-        onChange={(e) => onChangeCollectionFilter(e.target.value)}
-        maxWidth={300}
-      >
-        <option defaultChecked value="all">
-          No collection filter
-        </option>
-        {Object.keys(collections).map((key) => (
-          <option key={key}>{key}</option>
-        ))}
-      </Select>
-      <SimpleGrid columns={{ sm: 2, md: 2 }} spacing={8}>
+      <Flex alignItems="center"
+            mb={8}>
+        <Select
+          onChange={(e) => onChangeCollectionFilter(e.target.value)}
+          maxWidth={300}
+          disabled={fetchingCollections}
+        >
+          <option defaultChecked value="all">
+            No collection filter
+          </option>
+          {collections && Object.keys(collections).map((key) => (
+            <option key={key} value={key}>{key}</option>
+          ))}
+        </Select>
+        {fetchingCollections && <Spinner ml={4}/>}
+      </Flex>
+      <SimpleGrid columns={{sm: 2, md: 2}} spacing={8}>
         {filteredHypercerts.map((cert) => (
           <Link key={cert.id} href={`hypercerts/${cert.id}`}>
             <ScaleFade initialScale={0.9} in>

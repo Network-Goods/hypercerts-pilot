@@ -8,6 +8,11 @@ export const DEFAULT_CHAIN_ID = requireEnv(
   "NEXT_PUBLIC_DEFAULT_CHAIN"
 );
 
+export const SHEET_BEST_ENDPOINT = requireEnv(
+  process.env.NEXT_PUBLIC_SHEET_BEST_ENDPOINT,
+  'NEXT_PUBLIC_SHEET_BEST_ENDPOINT',
+);
+
 export const urls = {
   browse: { label: headerLinkLabels.browse, href: "/browse" },
   claim: { label: headerLinkLabels.claim, href: "/claim-hypercert" },
