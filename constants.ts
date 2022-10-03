@@ -9,6 +9,7 @@ export const DEFAULT_CHAIN_ID = requireEnv(
 );
 
 export const urls = {
+  browse: { label: headerLinkLabels.browse, href: "/browse" },
   claim: { label: headerLinkLabels.claim, href: "/claim-hypercert" },
   burn: { label: headerLinkLabels.burn, href: "/burn-hypercert" },
 };
