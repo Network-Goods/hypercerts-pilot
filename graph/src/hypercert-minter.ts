@@ -14,9 +14,9 @@ import {
   RightAdded,
   WorkScopeAdded,
   ImpactScopeAdded,
-  HypercertMinterV0,
+  HypercertMinter,
   SlotChanged,
-} from "../generated/HypercertMinterV0/HypercertMinterV0";
+} from "../generated/HypercertMinter/HypercertMinter";
 import {
   Contributor,
   Hypercert,
@@ -28,10 +28,13 @@ import {
 } from "../generated/schema";
 
 export function handleImpactClaimed(event: ImpactClaimed): void {
-  let contract = HypercertMinterV0.bind(event.address);
-  const hypercertId = event.params.claimHash.toHexString();
+  let contract = HypercertMinter.bind(event.address);
+
+  let claim = contract.getImpactCert(event.params.id);
+
+  const hypercertId = claim.claimHash.toHexString();
   let entity = new Hypercert(hypercertId);
-  entity.claimHash = event.params.claimHash;
+  entity.claimHash = claim.claimHash;
   const contributors = [] as string[];
   let totalUnits = BigInt.fromI32(0);
 
@@ -42,8 +45,8 @@ export function handleImpactClaimed(event: ImpactClaimed): void {
 
   entity.totalUnits = totalUnits;
 
-  for (let i = 0; i < event.params.contributors.length; i++) {
-    const address = event.params.contributors[i];
+  for (let i = 0; i < claim.contributors.length; i++) {
+    const address = claim.contributors[i];
     contributors.push(address.toHexString());
   }
 
@@ -58,26 +61,38 @@ export function handleImpactClaimed(event: ImpactClaimed): void {
   }
 
   entity.minter = event.params.minter.toHex();
-  entity.impactDateFrom = event.params.impactTimeframe[0];
-  entity.impactDateTo = event.params.impactTimeframe[1];
-  entity.impactScopes = event.params.impactScopes;
-  entity.workDateFrom = event.params.workTimeframe[0];
-  entity.workDateTo = event.params.workTimeframe[1];
-  entity.workScopes = event.params.workScopes;
-  entity.rights = event.params.rights;
+  entity.impactDateFrom = claim.impactTimeframe[0];
+  entity.impactDateTo = claim.impactTimeframe[1];
+
+  for (let i = 0; i < claim.impactScopes.length; i++) {
+    const impactScopeID = claim.impactScopes[i];
+    entity.impactScopes.push(impactScopeID.toHexString());
+  }
+
+  for (let i = 0; i < claim.workScopes.length; i++) {
+    const workScopeID = claim.workScopes[i];
+    entity.workScopes.push(workScopeID.toHexString());
+  }
+
+  for (let i = 0; i < claim.rights.length; i++) {
+    const rightsID = claim.rights[i];
+    entity.rights.push(rightsID.toHexString());
+  }
+  entity.workDateFrom = claim.workTimeframe[0];
+  entity.workDateTo = claim.workTimeframe[1];
 
   //TODO image from SVG contract
   entity.image =
     "https://bafybeig2ea5p2xw2d5c552x3ocxj2xavsb6nglwczv2hyza7yhu2wvny5a.ipfs.dweb.link/";
-  entity.uri = event.params.uri;
-  entity.version = event.params.version;
+  entity.uri = claim.uri;
+  entity.version = BigInt.fromI32(claim.version);
   entity.lastUpdated = event.block.timestamp;
 
   entity.save();
 }
 
 export function handleImpactScopeAdded(event: ImpactScopeAdded): void {
-  let entity = new ImpactScope(event.params.id);
+  let entity = new ImpactScope(event.params.id.toHexString());
   entity.text = event.params.text;
   entity.save();
 }
@@ -91,20 +106,18 @@ export function handleRoleGranted(event: RoleGranted): void {}
 export function handleRoleRevoked(event: RoleRevoked): void {}
 
 export function handleRightAdded(event: RightAdded): void {
-  let entity = new Right(event.params.id);
+  let entity = new Right(event.params.id.toHexString());
   entity.text = event.params.text;
   entity.save();
 }
 
 export function handleWorkScopeAdded(event: WorkScopeAdded): void {
-  let entity = new WorkScope(event.params.id);
+  let entity = new WorkScope(event.params.id.toHexString());
   entity.text = event.params.text;
   entity.save();
 }
 
 export function handleSlotChanged(event: SlotChanged): void {
-  let contract = HypercertMinterV0.bind(event.address);
-
   const fractionID = event.params._tokenId.toHexString();
   const hypercertId = event.params._newSlot.toHexString();
 
@@ -129,7 +142,7 @@ export function handleTransfer(event: Transfer): void {
 }
 
 export function handleTransferValue(event: TransferValue): void {
-  let contract = HypercertMinterV0.bind(event.address);
+  let contract = HypercertMinter.bind(event.address);
 
   const fromTokenID = event.params._fromTokenId.toHexString();
   const toTokenID = event.params._toTokenId.toHexString();

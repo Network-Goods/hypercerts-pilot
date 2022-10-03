@@ -1,18 +1,18 @@
 type Contributor @entity {
   "contibutor ID is an Ethereum address"
-  id: String!
+  id: ID!
   "hypercert the contributor has contributed to"
   hypercerts: [Hypercert!]! @derivedFrom(field: "contributors")
 }
 
 type Owner @entity {
   "owner ID is an Ethereum address"
-  id: String!
+  id: ID!
 }
 
 type Hypercert @entity {
   "hypercert ID maps to the uint256 slotID in the ERC3525 Hypercert Minter"
-  id: String!
+  id: ID!
   "fingerprint of the hyperspace claimed by the minter"
   claimHash: Bytes!
   "address of the entity claiming the impact"
@@ -47,7 +47,7 @@ type Hypercert @entity {
 
 type HypercertFraction @entity {
   "fraction ID maps to the uint256 tokenID in the ERC3525 Hypercert Minter"
-  id: String!
+  id: ID!
   "address of the entity owning the impact"
   owner: Owner!
   "units held by the fraction, used for splitting and merging"
@@ -58,7 +58,7 @@ type HypercertFraction @entity {
 
 type ImpactScope @entity {
   "impaceScope ID maps to byts32 input of 'impactScopes' on Hypercert Minter"
-  id: Bytes!
+  id: ID!
   "natural language description of impact scope"
   text: String!
   "array of hypercerts claiming this type of impact"
@@ -67,7 +67,7 @@ type ImpactScope @entity {
 
 type WorkScope @entity {
   "impaceScope ID maps to bytes32 input of 'workScopes' on Hypercert Minter"
-  id: Bytes!
+  id: ID!
   "natural language description of work scope"
   text: String!
   "array of hypercerts claiming this type of work"
@@ -76,7 +76,7 @@ type WorkScope @entity {
 
 type Right @entity {
   "impaceScope ID maps to bytes32 input of 'rights' on Hypercert Minter"
-  id: Bytes!
+  id: ID!
   "natural language description of rights the owner holds"
   text: String!
   "array of hypercerts claiming these type of rights"

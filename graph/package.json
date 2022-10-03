@@ -5,6 +5,7 @@
     "codegen": "graph codegen",
     "build": "graph build",
     "build-goerli": "graph build subgraph-goerli.yaml",
+    "deploy": "graph deploy --product hosted-service bitbeckers/hypercerts subgraph.yaml",
     "deploy-goerli": "graph deploy --product hosted-service bitbeckers/hypercerts-goerli subgraph-goerli.yaml",
     "create-local": "graph create --node http://localhost:8020/ protocol/hypercerts",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 protocol/hypercerts",
