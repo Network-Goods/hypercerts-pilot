@@ -16,6 +16,7 @@ export const HypercertTile = ({
       paddingY={6}
       backgroundImage="url('hypercerts_tile_background.png')"
       border="1px solid black"
+      maxWidth="300px"
     >
       <Flex
         width="100%"
