@@ -1,4 +1,4 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigInt, crypto, log } from "@graphprotocol/graph-ts";
 import {
   AdminChanged,
   ApprovalForAll,
@@ -32,7 +32,7 @@ export function handleImpactClaimed(event: ImpactClaimed): void {
 
   let claim = contract.getImpactCert(event.params.id);
 
-  const hypercertId = claim.claimHash.toHexString();
+  const hypercertId = event.params.id.toHexString();
   let entity = new Hypercert(hypercertId);
   entity.claimHash = claim.claimHash;
   const contributors = [] as string[];
@@ -63,21 +63,39 @@ export function handleImpactClaimed(event: ImpactClaimed): void {
   entity.minter = event.params.minter.toHex();
   entity.impactDateFrom = claim.impactTimeframe[0];
   entity.impactDateTo = claim.impactTimeframe[1];
+  const impactScopes = [] as string[];
+  const workScopes = [] as string[];
+  const rights = [] as string[];
 
-  for (let i = 0; i < claim.impactScopes.length; i++) {
-    const impactScopeID = claim.impactScopes[i];
-    entity.impactScopes.push(impactScopeID.toHexString());
+  if (claim.impactScopes && claim.impactScopes.length > 0) {
+    for (let i = 0; i < claim.impactScopes.length; i++) {
+      const impactScopeID = claim.impactScopes[i];
+      if (impactScopeID) {
+        impactScopes.push(impactScopeID.toHexString());
+      }
+    }
   }
 
-  for (let i = 0; i < claim.workScopes.length; i++) {
-    const workScopeID = claim.workScopes[i];
-    entity.workScopes.push(workScopeID.toHexString());
+  entity.impactScopes = impactScopes;
+
+  if (claim.workScopes && claim.workScopes.length > 0) {
+    for (let i = 0; i < claim.workScopes.length; i++) {
+      const workScopeID = claim.workScopes[i];
+      workScopes.push(workScopeID.toHexString());
+    }
   }
 
-  for (let i = 0; i < claim.rights.length; i++) {
-    const rightsID = claim.rights[i];
-    entity.rights.push(rightsID.toHexString());
+  entity.workScopes = workScopes;
+
+  if (claim.rights && claim.rights.length > 0) {
+    for (let i = 0; i < claim.rights.length; i++) {
+      const rightsID = claim.rights[i];
+      rights.push(rightsID.toHexString());
+    }
   }
+
+  entity.rights = rights;
+
   entity.workDateFrom = claim.workTimeframe[0];
   entity.workDateTo = claim.workTimeframe[1];
 
@@ -155,11 +173,20 @@ export function handleTransferValue(event: TransferValue): void {
   }
 
   let fractionTo = HypercertFraction.load(toTokenID);
+  let ownerId = contract.ownerOf(event.params._toTokenId).toHexString();
+
+  let owner = Owner.load(ownerId);
+  if(!owner){
+    owner = new Owner(ownerId);
+    owner.save();
+  }
+
   if (!fractionTo) {
     fractionTo = new HypercertFraction(toTokenID);
     fractionTo.hypercert = contract
-      .slotOf(BigInt.fromString(fromTokenID))
+      .slotOf(event.params._toTokenId)
       .toHexString();
+    fractionTo.owner = owner.id;
     fractionTo.units = BigInt.fromI32(0);
   }
 

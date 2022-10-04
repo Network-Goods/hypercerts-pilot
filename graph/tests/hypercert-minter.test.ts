@@ -6,8 +6,9 @@ import {
   clearStore,
   beforeAll,
   afterAll,
+  createMockedFunction,
 } from "matchstick-as/assembly/index";
-import { ImpactClaimed } from "../generated/HypercertMinterV0/HypercertMinterV0";
+import { ImpactClaimed } from "../generated/HypercertMinter/HypercertMinter";
 import { Contributor, Hypercert, HypercertFraction } from "../generated/schema";
 import {
   handleImpactClaimed,
@@ -17,7 +18,7 @@ import {
   handleTransfer,
   handleTransferValue,
   handleWorkScopeAdded,
-} from "../src/hypercert-minter-v-0";
+} from "../src/hypercert-minter";
 import {
   createImpactClaimedEvent,
   createImpactScopeAddedEvent,
@@ -26,7 +27,7 @@ import {
   createTransferEvent,
   createWorkScopeAddedEvent,
   createSlotChangedEvent,
-} from "./hypercert-minter-v-0-utils";
+} from "./hypercert-minter-utils";
 
 const CONTRIBUTOR = "Contributor";
 const OWNER = "Owner";
@@ -56,17 +57,47 @@ describe(HYPERCERT, () => {
     const e = createImpactClaimedEvent(
       BigInt.fromI32(id1),
       Address.fromString(contributor0),
-      Bytes.fromHexString(claimHash),
-      [Address.fromString(contributor0)],
-      [BigInt.fromI32(workTimeframe0), BigInt.fromI32(workTimeframe1)],
-      [BigInt.fromI32(impactTimeframe0), BigInt.fromI32(impactTimeframe1)],
-      [Bytes.fromHexString(workScope0)],
-      [Bytes.fromHexString(impactScope0), Bytes.fromHexString(impactScope1)],
-      [Bytes.fromHexString(right0), Bytes.fromHexString(right1)],
-      [BigInt.fromI32(50), BigInt.fromI32(30), BigInt.fromI32(20)],
-      BigInt.fromI32(version),
-      uri
+      [BigInt.fromI32(50), BigInt.fromI32(30), BigInt.fromI32(20)]
     );
+
+    let contractAddress = Address.fromString(
+      "0x10Bd50f86C9e64d4FE75BEc8fd37CD84CA0C2e33"
+    );
+
+    createMockedFunction(
+      contractAddress,
+      "getImpactCert",
+      "getImpactCert(uint256):((bytes32,uint64[2],uint64[2],bytes32[],bytes32[],bytes32[],address[],uint256,uint16,bool,string,string,string))"
+    )
+      .withArgs([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1))])
+      .returns([
+        ethereum.Value.fromBytes(Bytes.fromHexString(claimHash)),
+        ethereum.Value.fromUnsignedBigIntArray([
+          BigInt.fromI32(workTimeframe0),
+          BigInt.fromI32(workTimeframe1),
+        ]),
+        ethereum.Value.fromUnsignedBigIntArray([
+          BigInt.fromI32(impactTimeframe0),
+          BigInt.fromI32(impactTimeframe1),
+        ]),
+        ethereum.Value.fromFixedBytesArray([Bytes.fromHexString(workScope0)]),
+        ethereum.Value.fromFixedBytesArray([
+          Bytes.fromHexString(impactScope0),
+          Bytes.fromHexString(impactScope1),
+        ]),
+        ethereum.Value.fromFixedBytesArray([
+          Bytes.fromHexString(right0),
+          Bytes.fromHexString(right1),
+        ]),
+        ethereum.Value.fromAddressArray([Address.fromString(contributor0)]),
+        ethereum.Value.fromI32(100),
+        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(version)),
+        ethereum.Value.fromBoolean(true),
+        ethereum.Value.fromString("MockCert"),
+        ethereum.Value.fromString("Mocked Hypercert for Matchstick testing"),
+        ethereum.Value.fromString(uri),
+      ]);
+
     handleImpactClaimed(e);
   });
 
@@ -116,22 +147,13 @@ describe(HYPERCERT, () => {
         hypercert.impactDateTo
       );
       assert.assertTrue(hypercert.workScopes.length === 1);
-      assert.bytesEquals(
-        Bytes.fromHexString(workScope0),
-        hypercert.workScopes[0]
-      );
+      assert.stringEquals(workScope0, hypercert.workScopes[0]);
       assert.assertTrue(hypercert.impactScopes.length === 2);
-      assert.bytesEquals(
-        Bytes.fromHexString(impactScope0),
-        hypercert.impactScopes[0]
-      );
-      assert.bytesEquals(
-        Bytes.fromHexString(impactScope1),
-        hypercert.impactScopes[1]
-      );
+      assert.stringEquals(impactScope0, hypercert.impactScopes[0]);
+      assert.stringEquals(impactScope1, hypercert.impactScopes[1]);
       assert.assertTrue(hypercert.rights.length === 2);
-      assert.bytesEquals(Bytes.fromHexString(right0), hypercert.rights[0]);
-      assert.bytesEquals(Bytes.fromHexString(right1), hypercert.rights[1]);
+      assert.stringEquals(right0, hypercert.rights[0]);
+      assert.stringEquals(right1, hypercert.rights[1]);
 
       // Hypercert data
       const contributor = Contributor.load(contributor0);

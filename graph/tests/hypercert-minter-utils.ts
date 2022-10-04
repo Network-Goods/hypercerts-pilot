@@ -1,4 +1,4 @@
-import { newMockEvent } from "matchstick-as";
+import { newMockEvent, createMockedFunction } from "matchstick-as";
 import { ethereum, Address, BigInt, Bytes } from "@graphprotocol/graph-ts";
 import {
   ImpactClaimed,
@@ -13,21 +13,12 @@ import {
   TransferValue,
   Upgraded,
   WorkScopeAdded,
-} from "../generated/HypercertMinterV0/HypercertMinterV0";
+} from "../generated/HypercertMinter/HypercertMinter";
 
 export function createImpactClaimedEvent(
   id: BigInt,
   minter: Address,
-  claimHash: Bytes,
-  contributors: Array<Address>,
-  workTimeframe: Array<BigInt>,
-  impactTimeframe: Array<BigInt>,
-  workScopes: Array<Bytes>,
-  impactScopes: Array<Bytes>,
-  rights: Array<Bytes>,
-  fractions: Array<BigInt>,
-  version: BigInt,
-  uri: string
+  fractions: Array<BigInt>
 ): ImpactClaimed {
   let impactClaimedEvent = changetype<ImpactClaimed>(newMockEvent());
 
@@ -43,61 +34,11 @@ export function createImpactClaimedEvent(
 
   impactClaimedEvent.parameters.push(
     new ethereum.EventParam(
-      "claimHash",
-      ethereum.Value.fromFixedBytes(claimHash)
-    )
-  );
-  impactClaimedEvent.parameters.push(
-    new ethereum.EventParam(
-      "contributors",
-      ethereum.Value.fromAddressArray(contributors)
-    )
-  );
-  impactClaimedEvent.parameters.push(
-    new ethereum.EventParam(
-      "workTimeframe",
-      ethereum.Value.fromUnsignedBigIntArray(workTimeframe)
-    )
-  );
-  impactClaimedEvent.parameters.push(
-    new ethereum.EventParam(
-      "impactTimeframe",
-      ethereum.Value.fromUnsignedBigIntArray(impactTimeframe)
-    )
-  );
-  impactClaimedEvent.parameters.push(
-    new ethereum.EventParam(
-      "workScopes",
-      ethereum.Value.fromFixedBytesArray(workScopes)
-    )
-  );
-  impactClaimedEvent.parameters.push(
-    new ethereum.EventParam(
-      "impactScopes",
-      ethereum.Value.fromFixedBytesArray(impactScopes)
-    )
-  );
-  impactClaimedEvent.parameters.push(
-    new ethereum.EventParam(
-      "rights",
-      ethereum.Value.fromFixedBytesArray(rights)
-    )
-  );
-  impactClaimedEvent.parameters.push(
-    new ethereum.EventParam(
       "fractions",
       ethereum.Value.fromUnsignedBigIntArray(fractions)
     )
   );
-  impactClaimedEvent.parameters.push(
-    new ethereum.EventParam(
-      "version",
-      ethereum.Value.fromUnsignedBigInt(version)
-    )
-  );
-  impactClaimedEvent.parameters.push(
-    new ethereum.EventParam("uri", ethereum.Value.fromString(uri))
-  );
+
   return impactClaimedEvent;
 }
 
