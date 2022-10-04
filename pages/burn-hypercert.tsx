@@ -10,6 +10,7 @@ import {
   VStack,
   Text,
   Image,
+  Container,
 } from "@chakra-ui/react";
 import { useBurnHypercert } from "../hooks/burn";
 import { formatIpfsUrlToGateway, useIpfsMetadata } from "../hooks/ipfs";
@@ -33,10 +34,18 @@ const BurnCertificatePageWrapper = () => {
   const { address } = useWallet();
 
   if (!address) {
-    return <Alert status="warning">{errors.noWalletConnectedError}</Alert>;
+    return (
+      <Container>
+        <Alert status="warning">{errors.noWalletConnectedError}</Alert>
+      </Container>
+    );
   }
 
-  return <Content address={address} />;
+  return (
+    <Container>
+      <Content address={address} />
+    </Container>
+  );
 };
 
 const Content = ({ address }: { address: string }) => {
@@ -80,7 +89,7 @@ const Content = ({ address }: { address: string }) => {
             key={hypercert.id}
             id={hypercert.id}
             url={hypercert.uri}
-            burn={(amount) => burnCertificate(hypercert.id, amount)}
+            burn={() => burnCertificate(hypercert.id)}
           />
         ))}
       </VStack>

@@ -18,11 +18,13 @@ async function getDefaultImageUrl() {
   return r.blob();
 }
 
-export const uploadCertificateToIpfs = async (
-  { name, description, external_url, ...rest }: Omit<MetaData, "image">,
-  image: File | null
-) => {
-  const imageOrExampleImage = image ?? (await getDefaultImageUrl());
+export const uploadCertificateToIpfs = async ({
+  name,
+  description,
+  external_url,
+  ...rest
+}: Omit<MetaData, "image">) => {
+  const imageOrExampleImage = await getDefaultImageUrl();
   const metadata = await client.store({
     name,
     description,
