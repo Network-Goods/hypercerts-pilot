@@ -1,12 +1,11 @@
 import { useHypercertContract } from "./contracts";
-import { useWallet, useWriteContract } from "@raidguild/quiver";
+import { useWriteContract } from "@raidguild/quiver";
 import { useToast } from "@chakra-ui/react";
 import { parseBlockchainError } from "../utils/parseBlockchainError";
 import { burnInteractionLabels } from "../content/chainInteractions";
 
 export const useBurnHypercert = () => {
   const contract = useHypercertContract();
-  const { address } = useWallet();
   const toast = useToast();
 
   const { mutate } = useWriteContract(contract, "burn", {
@@ -30,5 +29,5 @@ export const useBurnHypercert = () => {
     },
   });
 
-  return async (id: string, amount: string) => mutate(address!, id, amount);
+  return async (id: string) => mutate(id);
 };

@@ -1,5 +1,8 @@
 export interface MintCertificateData {
-  creators: string[];
+  name: string;
+  description: string;
+  contributors: string[];
+
   workTime: [number, number];
   impactTime: [number, number];
   uri: string;
@@ -7,4 +10,6 @@ export interface MintCertificateData {
   workScopeIds: string[];
   impactScopeIds: string[];
   rightsIds: string[];
+
+  fractions: number[];
 }

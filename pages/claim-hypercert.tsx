@@ -140,13 +140,16 @@ const ClaimHypercertPage: NextPage = () => {
               status: "info",
             });
             await mintHyperCertificate({
-              creators: [address!],
+              contributors: [address!],
               workTime: [workTimeStart, workTimeEnd],
               impactTime: [impactTimeStart, impactTimeEnd],
               uri: certificateMetadataIpfsId!,
               workScopeIds: val.workScopes.map((s) => s.value),
               impactScopeIds: val.impactScopes.map((option) => option.value),
               rightsIds: val.rights.map((right) => right.value),
+              name: val.name,
+              description: val.description,
+              fractions: [1],
             });
           } catch (error) {
             toast({

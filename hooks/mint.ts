@@ -54,11 +54,15 @@ export const useMintHyperCertificate = ({
       data.impactScopeIds,
       data.workTime,
       data.impactTime,
-      data.creators,
+      data.contributors,
       data.uri,
+      data.name,
+      data.description,
+      data.uri,
+      data.fractions,
     ];
     return abiCoder.encode(types, values);
   };
 
-  return (data: MintCertificateData) => mutate(address!, 1, encodeData(data));
+  return (data: MintCertificateData) => mutate(address!, encodeData(data));
 };

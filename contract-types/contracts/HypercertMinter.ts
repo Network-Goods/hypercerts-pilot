@@ -9,7 +9,7 @@ import type {
   TypedListener,
   OnEvent,
   PromiseOrValue,
-} from "../../common";
+} from "../common";
 import type {
   FunctionFragment,
   Result,
@@ -81,7 +81,7 @@ export declare namespace HypercertMinter {
   };
 }
 
-export interface HypercertMinterUpgradeInterface extends utils.Interface {
+export interface HypercertMinterInterface extends utils.Interface {
   functions: {
     "DECIMALS()": FunctionFragment;
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
@@ -121,7 +121,6 @@ export interface HypercertMinterUpgradeInterface extends utils.Interface {
     "slotCount()": FunctionFragment;
     "slotOf(uint256)": FunctionFragment;
     "slotURI(uint256)": FunctionFragment;
-    "split(uint256)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "symbol()": FunctionFragment;
     "tokenByIndex(uint256)": FunctionFragment;
@@ -181,7 +180,6 @@ export interface HypercertMinterUpgradeInterface extends utils.Interface {
       | "slotCount"
       | "slotOf"
       | "slotURI"
-      | "split"
       | "supportsInterface"
       | "symbol"
       | "tokenByIndex"
@@ -357,10 +355,6 @@ export interface HypercertMinterUpgradeInterface extends utils.Interface {
     values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
-    functionFragment: "split",
-    values: [PromiseOrValue<BigNumberish>]
-  ): string;
-  encodeFunctionData(
     functionFragment: "supportsInterface",
     values: [PromiseOrValue<BytesLike>]
   ): string;
@@ -533,7 +527,6 @@ export interface HypercertMinterUpgradeInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "slotCount", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "slotOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "slotURI", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "split", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "supportsInterface",
     data: BytesLike
@@ -602,7 +595,6 @@ export interface HypercertMinterUpgradeInterface extends utils.Interface {
     "RoleGranted(bytes32,address,address)": EventFragment;
     "RoleRevoked(bytes32,address,address)": EventFragment;
     "SlotChanged(uint256,uint256,uint256)": EventFragment;
-    "Split(uint256,uint256[])": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
     "TransferValue(uint256,uint256,uint256)": EventFragment;
     "Upgraded(address)": EventFragment;
@@ -622,7 +614,6 @@ export interface HypercertMinterUpgradeInterface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "RoleGranted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleRevoked"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SlotChanged"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Split"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TransferValue"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Upgraded"): EventFragment;
@@ -777,14 +768,6 @@ export type SlotChangedEvent = TypedEvent<
 
 export type SlotChangedEventFilter = TypedEventFilter<SlotChangedEvent>;
 
-export interface SplitEventObject {
-  fromID: BigNumber;
-  toID: BigNumber[];
-}
-export type SplitEvent = TypedEvent<[BigNumber, BigNumber[]], SplitEventObject>;
-
-export type SplitEventFilter = TypedEventFilter<SplitEvent>;
-
 export interface TransferEventObject {
   from: string;
   to: string;
@@ -827,12 +810,12 @@ export type WorkScopeAddedEvent = TypedEvent<
 
 export type WorkScopeAddedEventFilter = TypedEventFilter<WorkScopeAddedEvent>;
 
-export interface HypercertMinterUpgrade extends BaseContract {
+export interface HypercertMinter extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: HypercertMinterUpgradeInterface;
+  interface: HypercertMinterInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
@@ -1041,11 +1024,6 @@ export interface HypercertMinterUpgrade extends BaseContract {
       slotId_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[string]>;
-
-    split(
-      id: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
 
     supportsInterface(
       interfaceId: PromiseOrValue<BytesLike>,
@@ -1317,11 +1295,6 @@ export interface HypercertMinterUpgrade extends BaseContract {
     overrides?: CallOverrides
   ): Promise<string>;
 
-  split(
-    id: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
   supportsInterface(
     interfaceId: PromiseOrValue<BytesLike>,
     overrides?: CallOverrides
@@ -1592,11 +1565,6 @@ export interface HypercertMinterUpgrade extends BaseContract {
       overrides?: CallOverrides
     ): Promise<string>;
 
-    split(
-      id: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     supportsInterface(
       interfaceId: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
@@ -1793,9 +1761,6 @@ export interface HypercertMinterUpgrade extends BaseContract {
       _oldSlot?: PromiseOrValue<BigNumberish> | null,
       _newSlot?: PromiseOrValue<BigNumberish> | null
     ): SlotChangedEventFilter;
-
-    "Split(uint256,uint256[])"(fromID?: null, toID?: null): SplitEventFilter;
-    Split(fromID?: null, toID?: null): SplitEventFilter;
 
     "Transfer(address,address,uint256)"(
       from?: PromiseOrValue<string> | null,
@@ -2020,11 +1985,6 @@ export interface HypercertMinterUpgrade extends BaseContract {
     slotURI(
       slotId_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    split(
-      id: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     supportsInterface(
@@ -2298,11 +2258,6 @@ export interface HypercertMinterUpgrade extends BaseContract {
     slotURI(
       slotId_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    split(
-      id: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     supportsInterface(

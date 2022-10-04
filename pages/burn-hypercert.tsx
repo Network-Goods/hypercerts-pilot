@@ -89,7 +89,7 @@ const Content = ({ address }: { address: string }) => {
             key={hypercert.id}
             id={hypercert.id}
             url={hypercert.uri}
-            burn={(amount) => burnCertificate(hypercert.id, amount)}
+            burn={() => burnCertificate(hypercert.id)}
           />
         ))}
       </VStack>

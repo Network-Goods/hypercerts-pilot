@@ -3,8 +3,14 @@
 /* tslint:disable */
 
 /* eslint-disable */
+import type * as hypercertMetadataSol from "./HypercertMetadata.sol";
+import type * as interfaces from "./interfaces";
 import type * as mocks from "./mocks";
 
+export type { hypercertMetadataSol };
+
+export type { interfaces };
+
 export type { mocks };
-export type { HypercertMinterV0 } from "./HypercertMinterV0";
-export type { HypercertMinterV1 } from "./HypercertMinterV1";
+export type { ERC3525Upgradeable } from "./ERC3525Upgradeable";
+export type { HypercertMinter } from "./HypercertMinter";
