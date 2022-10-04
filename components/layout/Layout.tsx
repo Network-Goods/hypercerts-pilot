@@ -1,6 +1,6 @@
 import React, { PropsWithChildren } from "react";
 import Link from "next/link";
-import { Box, Center, Container, Flex, HStack, Text } from "@chakra-ui/react";
+import { Box, Center, Flex, HStack, Text } from "@chakra-ui/react";
 import { ConnectWallet } from "../ConnectWallet";
 import { useRouter } from "next/router";
 import { FORMAT_VERSION, urls } from "../../constants";
@@ -46,9 +46,7 @@ export const Layout = ({ children }: PropsWithChildren) => {
         </Flex>
       </Center>
       <WrongNetworkBanner />
-      <Container as="main" my={4}>
-        {children}
-      </Container>
+      <main style={{ marginTop: 24, marginBottom: 8 }}>{children}</main>
     </Box>
   );
 };

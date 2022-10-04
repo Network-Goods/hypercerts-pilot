@@ -4,6 +4,7 @@ import {
   Alert,
   AlertIcon,
   Button,
+  Container,
   Divider,
   Flex,
   FormControl,
@@ -54,7 +55,7 @@ const ClaimHypercertPage: NextPage = () => {
   const toast = useToast();
 
   return (
-    <>
+    <Container>
       <Formik
         validationSchema={ValidationSchema}
         initialValues={{
@@ -386,7 +387,7 @@ const ClaimHypercertPage: NextPage = () => {
           );
         }}
       </Formik>
-    </>
+    </Container>
   );
 };
 
