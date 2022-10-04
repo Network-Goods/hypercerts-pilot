@@ -47,6 +47,9 @@ export const useMintHyperCertificate = ({
       "uint64[2]",
       "address[]",
       "string",
+      "string",
+      "string",
+      "uint8[]",
     ];
     const values = [
       data.rightsIds,
@@ -55,12 +58,12 @@ export const useMintHyperCertificate = ({
       data.workTime,
       data.impactTime,
       data.contributors,
-      data.uri,
       data.name,
       data.description,
       data.uri,
       data.fractions,
     ];
+
     return abiCoder.encode(types, values);
   };
 

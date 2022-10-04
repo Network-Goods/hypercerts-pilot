@@ -1,45 +1,52 @@
-import { Container, Flex, ScaleFade, Select, SimpleGrid, Spinner } from "@chakra-ui/react";
+import {
+  Container,
+  Flex,
+  ScaleFade,
+  Select,
+  SimpleGrid,
+  Spinner,
+} from "@chakra-ui/react";
 import { HypercertTile } from "../components/HypercertTile";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import _ from "lodash";
 import Link from "next/link";
 import { useCollections } from "../hooks/listCollections";
-import { hypercerts } from "../constants";
-
-export interface Hypercert {
-  id: string;
-  name: string;
-  contributors: string[];
-  image: string;
-  fractions: {
-    ownerId: string;
-    percentage: number;
-    owner: string;
-  }[];
-}
+import { useListAllHypercerts } from "../hooks/listHypercerts";
+import { Hypercert } from "../hooks/useHypercert";
 
 const BrowsePage = () => {
-  const [filteredHypercerts, setFilteredHypercerts] = useState(hypercerts);
-  const { fetching: fetchingCollections, result: collections } = useCollections();
+  const { data: hypercertsResult, loading: loadingHypercerts } =
+    useListAllHypercerts();
+  const [filteredHypercerts, setFilteredHypercerts] = useState<Hypercert[]>([]);
+  const { fetching: fetchingCollections, result: collections } =
+    useCollections();
+
+  useEffect(() => {
+    if (hypercertsResult) {
+      setFilteredHypercerts(hypercertsResult.hypercerts);
+    }
+  }, [loadingHypercerts]);
 
   const onChangeCollectionFilter = (collectionId: string) => {
+    if (!hypercertsResult) {
+      return;
+    }
     if (!collections || collectionId === "all") {
-      setFilteredHypercerts(hypercerts);
+      setFilteredHypercerts(hypercertsResult.hypercerts);
     } else {
       const filteredIds = _.intersection(
-        hypercerts.map((x) => x.id),
+        hypercertsResult.hypercerts.map((x) => x.id),
         collections[collectionId]
       );
       setFilteredHypercerts(
-        hypercerts.filter((x) => filteredIds.includes(x.id))
+        hypercertsResult.hypercerts.filter((x) => filteredIds.includes(x.id))
       );
     }
   };
 
   return (
     <Container maxWidth={800}>
-      <Flex alignItems="center"
-            mb={8}>
+      <Flex alignItems="center" mb={8}>
         <Select
           onChange={(e) => onChangeCollectionFilter(e.target.value)}
           maxWidth={300}
@@ -48,9 +55,12 @@ const BrowsePage = () => {
           <option defaultChecked value="all">
             No collection filter
           </option>
-          {collections && Object.keys(collections).map((key) => (
-            <option key={key} value={key}>{key}</option>
-          ))}
+          {collections &&
+            Object.keys(collections).map((key) => (
+              <option key={key} value={key}>
+                {key}
+              </option>
+            ))}
         </Select>
         {fetchingCollections && <Spinner ml={4} />}
       </Flex>

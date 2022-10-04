@@ -12,6 +12,7 @@ export const placeholders = {
   name: "Human-readable name for the certificate",
   description: "Description for the certificate",
   external_link: "External link with more information",
+  fractions: "Proportion and amount of fractions",
   workScopesLabel: "Work scopes",
   workScopes: "Click to start searching for work scopes",
   workScopesDescription:

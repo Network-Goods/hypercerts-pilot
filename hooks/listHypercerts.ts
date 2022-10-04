@@ -1,4 +1,5 @@
 import { gql, useQuery } from "@apollo/client";
+import { Hypercert } from "./useHypercert";
 
 const GET_ALL_CERTIFICATES_QUERY = gql`
   query GetAllCertificates {
@@ -14,5 +15,7 @@ const GET_ALL_CERTIFICATES_QUERY = gql`
   }
 `;
 export const useListAllHypercerts = () => {
-  return useQuery(GET_ALL_CERTIFICATES_QUERY);
+  return useQuery<{
+    hypercerts: Hypercert[];
+  }>(GET_ALL_CERTIFICATES_QUERY);
 };

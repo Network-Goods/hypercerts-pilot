@@ -1,6 +1,8 @@
 import { useRouter } from "next/router";
 import {
   Alert,
+  AlertIcon,
+  AlertTitle,
   Box,
   Button,
   Center,
@@ -15,14 +17,19 @@ import {
 import {
   useHyperCertById,
   useHypercertFractions,
+  useHypercertInfo,
 } from "../../hooks/useHypercert";
 import { useWallet } from "@raidguild/quiver";
-import { formatContributors } from "../../utils/formatting";
+import {
+  formatContributors,
+  formatFractionPercentage,
+} from "../../utils/formatting";
+import { HypercertTile } from "../../components/HypercertTile";
+import React from "react";
 
 const HypercertPageWrapper = () => {
   const { query } = useRouter();
   const hypercertId = query["hypercertId"];
-  console.log(query);
 
   if (!hypercertId) {
     return (
@@ -47,18 +54,30 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
   const { address } = useWallet();
 
   if (hypercertLoading || fractionsLoading) {
-    return <Spinner />;
+    return (
+      <Center height="100">
+        <Spinner />
+        <Heading fontSize="lg" ml={4}>
+          Loading hypercert info
+        </Heading>
+      </Center>
+    );
   }
 
   if (!hypercert || !fractions) {
-    return <Alert status="error">No hypercert id provided</Alert>;
+    return (
+      <Alert status="error">
+        <AlertIcon />
+        <AlertTitle>Incomplete hypercert data</AlertTitle>
+      </Alert>
+    );
   }
 
   const ownedFractions = fractions.hypercertFractions.filter(
-    (fraction) => fraction.owner.id === address
+    (fraction) => fraction.owner.id === address?.toLowerCase()
   );
   const otherFractions = fractions.hypercertFractions.filter(
-    (fraction) => fraction.owner.id !== address
+    (fraction) => fraction.owner.id !== address?.toLowerCase()
   );
 
   return (
@@ -66,7 +85,9 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
       <Flex flexDirection="column">
         <Box mb={6}>
           <Heading mb={2}>{hypercert.id}</Heading>
-          <Center>{/*<HypercertTile {...hypercert} />*/}</Center>
+          <Center>
+            <HypercertTile id={hypercertId} />
+          </Center>
         </Box>
 
         <Box mb={6}>
@@ -86,6 +107,10 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
         </Box>
 
         <Box mb={6}>
+          <HypercertInfoBox hypercertId={hypercertId} />
+        </Box>
+
+        <Box mb={6}>
           <Heading mb={2}>Contributors</Heading>
           {formatContributors(
             hypercert.contributors?.map((contributor) => contributor.id) || []
@@ -97,25 +122,54 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
           <UnorderedList ml={0} spacing={4}>
             {ownedFractions.map((fraction) => (
               <FractionLine
-                key={fraction.owner.id}
+                key={fraction.id}
                 address={address}
                 ownerId={fraction.owner.id}
-                percentage={fraction.units}
+                percentage={formatFractionPercentage(
+                  fraction.units,
+                  fraction.hypercert.totalUnits
+                )}
               />
             ))}
             {otherFractions.map((fraction) => (
               <FractionLine
-                key={fraction.owner.id}
+                key={fraction.id}
                 address={address}
                 ownerId={fraction.owner.id}
-                percentage={fraction.units}
+                percentage={formatFractionPercentage(
+                  fraction.units,
+                  fraction.hypercert.totalUnits
+                )}
               />
             ))}
           </UnorderedList>
-          {/*{ownsFractions && <Button>Merge all my fractions</Button>}*/}
+          {ownedFractions.length > 1 && <Button>Merge all my fractions</Button>}
         </Box>
       </Flex>
     </>
+  );
+};
+
+const HypercertInfoBox = ({ hypercertId }: { hypercertId: string }) => {
+  const { loading, data } = useHypercertInfo(hypercertId);
+
+  if (loading) {
+    return <Spinner />;
+  }
+
+  if (!data) {
+    return (
+      <Alert status="error">
+        <AlertIcon />
+        <AlertTitle>Could not load hypercert info</AlertTitle>
+      </Alert>
+    );
+  }
+
+  return (
+    <Box>
+      <Text fontSize="xs">Time of work</Text>
+    </Box>
   );
 };
 
@@ -126,13 +180,13 @@ const FractionLine = ({
 }: {
   address?: string | null;
   ownerId: string;
-  percentage: number;
+  percentage: string;
 }) => {
   return (
     <ListItem display="flex" alignItems="center">
       <Flex flexDirection="column">
         <Text fontSize="xs" opacity={0.7}>
-          {percentage}%
+          {percentage}
         </Text>
         <Text fontSize="md">{ownerId}</Text>
       </Flex>

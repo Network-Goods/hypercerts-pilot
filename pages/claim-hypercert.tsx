@@ -16,7 +16,6 @@ import {
   Textarea,
   useToast,
 } from "@chakra-ui/react";
-import { ImageUploadField } from "../components/ImageUploadField";
 import { uploadCertificateToIpfs } from "../utils/ipfsClient";
 import { useWallet } from "@raidguild/quiver";
 import { useMintHyperCertificate } from "../hooks/mint";
@@ -45,6 +44,26 @@ const ValidationSchema = Yup.object().shape({
   external_link: Yup.string().url().required("Required"),
   workScopes: Yup.array().min(1),
 });
+
+const testValues = {
+  name: "Fraction test 1",
+  description: "Fraction description 1",
+  external_link: "https://example.com",
+
+  prev_hypercert: "a",
+
+  format_version: FORMAT_VERSION,
+  fractions: "100, 50, 20",
+  workTimeStart: "2022-05-10",
+  workTimeEnd: "2022-05-10",
+  impactTimeStart: "2022-05-10",
+  impactTimeEnd: "2022-05-10",
+
+  workScopes: [] as Option[],
+  impactScopes: [] as Option[],
+  rights: [] as Option[],
+  uri: "",
+};
 
 const ClaimHypercertPage: NextPage = () => {
   const { address } = useWallet();
@@ -75,6 +94,7 @@ const ClaimHypercertPage: NextPage = () => {
           impactScopes: [] as Option[],
           rights: [] as Option[],
           uri: "",
+          fractions: "1000",
         }}
         onSubmit={async (val) => {
           console.log("Starting hypercert creation", val);
@@ -102,8 +122,7 @@ const ClaimHypercertPage: NextPage = () => {
               refs: [],
             };
             const certificateIpfsMetadata = await uploadCertificateToIpfs(
-              metaData,
-              val.image
+              metaData
             );
             certificateMetadataIpfsId = certificateIpfsMetadata.url;
             toast({
@@ -149,7 +168,7 @@ const ClaimHypercertPage: NextPage = () => {
               rightsIds: val.rights.map((right) => right.value),
               name: val.name,
               description: val.description,
-              fractions: [1],
+              fractions: val.fractions.split(",").map((x) => parseInt(x, 10)),
             });
           } catch (error) {
             toast({
@@ -165,7 +184,6 @@ const ClaimHypercertPage: NextPage = () => {
           handleChange,
           handleBlur,
           handleSubmit,
-          setFieldValue,
           isValid,
           isSubmitting,
           /* and other goodies */
@@ -224,11 +242,18 @@ const ClaimHypercertPage: NextPage = () => {
                     disabled={isSubmitting}
                   />
                 </FormControl>
-                <FormControl>
-                  <FormLabel>Image</FormLabel>
-                  <ImageUploadField
-                    name="image"
-                    setFieldValue={setFieldValue}
+                <FormControl isRequired>
+                  <Flex>
+                    <FormLabel>Fractions</FormLabel>
+                    <ErrorMessage name="fractions" render={DisplayError} />
+                  </Flex>
+                  <Input
+                    type="text"
+                    name="fractions"
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    value={values.fractions}
+                    placeholder={placeholders.external_link}
                     disabled={isSubmitting}
                   />
                 </FormControl>
@@ -275,7 +300,7 @@ const ClaimHypercertPage: NextPage = () => {
                 </HStack>
                 <Divider my={3} />
                 <HStack>
-                  <FormControl>
+                  <FormControl isRequired>
                     <FormLabel>{placeholders.impactTimeStartLabel}</FormLabel>
                     <Input
                       type="date"
