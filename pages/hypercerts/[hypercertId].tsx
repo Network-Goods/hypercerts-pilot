@@ -8,10 +8,14 @@ import {
   Flex,
   Heading,
   ListItem,
+  Spinner,
   Text,
   UnorderedList,
 } from "@chakra-ui/react";
-import { useHyperCertById } from "../../hooks/useHypercert";
+import {
+  useHyperCertById,
+  useHypercertFractions,
+} from "../../hooks/useHypercert";
 import { HypercertTile } from "../../components/HypercertTile";
 import { useWallet } from "@raidguild/quiver";
 import { formatContributors } from "../../utils/formatting";
@@ -19,6 +23,7 @@ import { formatContributors } from "../../utils/formatting";
 const HypercertPageWrapper = () => {
   const { query } = useRouter();
   const hypercertId = query["hypercertId"];
+  console.log(query);
 
   if (!hypercertId) {
     return (
@@ -36,30 +41,33 @@ const HypercertPageWrapper = () => {
 };
 
 const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
-  const hypercert = useHyperCertById(hypercertId);
+  const { data: hypercert, loading: hypercertLoading } =
+    useHyperCertById(hypercertId);
+  const { data: fractions, loading: fractionsLoading } =
+    useHypercertFractions(hypercertId);
   const { address } = useWallet();
 
-  if (!hypercert) return <Alert status="error">No hypercert id provided</Alert>;
+  if (hypercertLoading || fractionsLoading) {
+    return <Spinner />;
+  }
 
-  const ownsFractions = hypercert.fractions.some(
-    (fraction) => fraction.ownerId === address
-  );
+  if (!hypercert || !fractions) {
+    return <Alert status="error">No hypercert id provided</Alert>;
+  }
 
-  const ownedFractions = hypercert.fractions.filter(
-    (fraction) => fraction.ownerId === address
+  const ownedFractions = fractions.hypercertFractions.filter(
+    (fraction) => fraction.owner.id === address
   );
-  const otherFractions = hypercert.fractions.filter(
-    (fraction) => fraction.ownerId !== address
+  const otherFractions = fractions.hypercertFractions.filter(
+    (fraction) => fraction.owner.id !== address
   );
 
   return (
     <>
       <Flex flexDirection="column">
         <Box mb={6}>
-          <Heading mb={2}>{hypercert.name}</Heading>
-          <Center>
-            <HypercertTile {...hypercert} />
-          </Center>
+          <Heading mb={2}>{hypercert.id}</Heading>
+          <Center>{/*<HypercertTile {...hypercert} />*/}</Center>
         </Box>
 
         <Box mb={6}>
@@ -80,7 +88,9 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
 
         <Box mb={6}>
           <Heading mb={2}>Contributors</Heading>
-          {formatContributors(hypercert.contributors)}
+          {formatContributors(
+            hypercert.contributors?.map((contributor) => contributor.id) || []
+          )}
         </Box>
 
         <Box mb={6}>
@@ -88,20 +98,22 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
           <UnorderedList ml={0} spacing={4}>
             {ownedFractions.map((fraction) => (
               <FractionLine
-                key={fraction.ownerId}
+                key={fraction.owner.id}
                 address={address}
-                fraction={fraction}
+                ownerId={fraction.owner.id}
+                percentage={fraction.units}
               />
             ))}
             {otherFractions.map((fraction) => (
               <FractionLine
-                key={fraction.ownerId}
+                key={fraction.owner.id}
                 address={address}
-                fraction={fraction}
+                ownerId={fraction.owner.id}
+                percentage={fraction.units}
               />
             ))}
           </UnorderedList>
-          {ownsFractions && <Button>Merge all my fractions</Button>}
+          {/*{ownsFractions && <Button>Merge all my fractions</Button>}*/}
         </Box>
       </Flex>
     </>
@@ -109,22 +121,24 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
 };
 
 const FractionLine = ({
-  fraction,
   address,
+  ownerId,
+  percentage,
 }: {
   address?: string | null;
-  fraction: { owner: string; ownerId: string; percentage: number };
+  ownerId: string;
+  percentage: number;
 }) => {
   return (
     <ListItem display="flex" alignItems="center">
       <Flex flexDirection="column">
         <Text fontSize="xs" opacity={0.7}>
-          {fraction.percentage}%
+          {percentage}%
         </Text>
-        <Text fontSize="md">{fraction.owner}</Text>
+        <Text fontSize="md">{ownerId}</Text>
       </Flex>
       <Button ml="auto">Show on OpenSea</Button>
-      {fraction.ownerId === address && <Button ml={4}>Split</Button>}
+      {ownerId === address && <Button ml={4}>Split</Button>}
     </ListItem>
   );
 };
