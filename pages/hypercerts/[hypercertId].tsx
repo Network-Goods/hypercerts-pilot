@@ -16,7 +16,6 @@ import {
   useHyperCertById,
   useHypercertFractions,
 } from "../../hooks/useHypercert";
-import { HypercertTile } from "../../components/HypercertTile";
 import { useWallet } from "@raidguild/quiver";
 import { formatContributors } from "../../utils/formatting";
 
