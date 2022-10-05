@@ -111,7 +111,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           }}
         >
           <Head>
-            <title>HyperCert v0.1</title>
+            <title>HyperCert v0.2</title>
           </Head>
           <Layout>
             <Component {...pageProps} />

@@ -17,3 +17,20 @@ export const formatContributors = (contributors: string[]) => {
 
   return `${initial.join(", ")} & ${last}`;
 };
+
+export const formatFractionPercentage = (
+  fractionUnits: string,
+  totalUnits: string
+) => {
+  const totalUnitsParsed = parseInt(totalUnits, 10);
+  if (totalUnitsParsed === 0) {
+    return "0%";
+  }
+
+  const fractionUnitsParsed = parseInt(fractionUnits, 10);
+
+  const fraction = fractionUnitsParsed / totalUnitsParsed;
+  const percentage = fraction * 100;
+
+  return `${percentage.toFixed(0)}%`;
+};
