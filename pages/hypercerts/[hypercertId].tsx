@@ -52,8 +52,10 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
   const { data: fractions, loading: fractionsLoading } =
     useHypercertFractions(hypercertId);
   const { address } = useWallet();
+  const { data: hypercertInfo, loading: hypercertInfoLoading } =
+    useHypercertInfo(hypercertId);
 
-  if (hypercertLoading || fractionsLoading) {
+  if (hypercertLoading || fractionsLoading || hypercertInfoLoading) {
     return (
       <Center height="100">
         <Spinner />
@@ -90,21 +92,12 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
           </Center>
         </Box>
 
-        <Box mb={6}>
-          <Heading mb={2}>Description</Heading>
-          <Text>
-            Abstract of the Paper Lorem ipsum dolor sit amet, consetetur
-            sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore
-            et dolore magna aliquyam erat, sed diam voluptua. At vero eos et
-            accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren,
-            no sea takimata sanctus est Lorem ipsum dolor sit amet.  About TU
-            München Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
-            diam nonumy eirmod tempor invidunt ut labore et dolore magna
-            aliquyam erat, sed diam voluptua. At vero eos et accusam et justo
-            duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata
-            sanctus est Lorem ipsum dolor sit amet.
-          </Text>
-        </Box>
+        {hypercertInfo && (
+          <Box mb={6}>
+            <Heading mb={2}>Description</Heading>
+            <Text>{hypercertInfo.description}</Text>
+          </Box>
+        )}
 
         <Box mb={6}>
           <HypercertInfoBox hypercertId={hypercertId} />
