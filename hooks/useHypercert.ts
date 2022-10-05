@@ -77,12 +77,7 @@ export const useHypercertFractions = (id: string) => {
 interface HypercertInfo {
   name: string;
   description: string;
-  properties: {
-    name: string;
-    description: string;
-    value: string;
-    is_intrinsic: boolean;
-  }[];
+  image: string;
 }
 
 export const useHypercertInfo = (hypercertId: string) => {
@@ -96,10 +91,14 @@ export const useHypercertInfo = (hypercertId: string) => {
     return { data: undefined, loading };
   }
 
-  const responseWithoutPrefix = response.replace("data:application/json;", "");
   try {
+    const responseWithoutPrefix = response.replace(
+      "data:application/json;base64,",
+      ""
+    );
+    const decodedB64Json = atob(responseWithoutPrefix);
     return {
-      data: JSON.parse(responseWithoutPrefix) as HypercertInfo,
+      data: JSON.parse(decodedB64Json) as HypercertInfo,
       loading,
     };
   } catch (error) {

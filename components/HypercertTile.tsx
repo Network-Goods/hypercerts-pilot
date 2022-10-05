@@ -13,8 +13,7 @@ export const HypercertTile = ({ id }: Pick<Hypercert, "id">) => {
     );
   }
 
-  const imgSrc = data.properties.find((x) => x.name === "image")?.value;
-  console.log(imgSrc);
+  const imgSrc = data.image;
 
   return (
     <Flex>
