@@ -26,6 +26,7 @@ import {
 } from "../../utils/formatting";
 import { HypercertTile } from "../../components/HypercertTile";
 import React from "react";
+import { MergeAllFractionsModal } from "../../components/Modals/MergeAllFractionsModal";
 
 const HypercertPageWrapper = () => {
   const { query } = useRouter();
@@ -136,7 +137,12 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
               />
             ))}
           </UnorderedList>
-          {ownedFractions.length > 1 && <Button>Merge all my fractions</Button>}
+
+          <MergeAllFractionsModal
+            render={({ onClick }) => (
+              <Button onClick={onClick}>Merge all my fractions</Button>
+            )}
+          />
         </Box>
       </Flex>
     </>
