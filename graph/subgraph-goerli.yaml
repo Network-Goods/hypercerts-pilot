@@ -6,7 +6,7 @@ dataSources:
     name: HypercertMinter
     network: goerli
     source:
-      address: "0x81eF83E26a19C0532a0DF80D84525bfCaCF2E4C4"
+      address: "0xc9997Bf3D85ef279C2671Fccc4E7Fa4ef092450B"
       abi: HypercertMinter
       startBlock: 7705809
     mapping:

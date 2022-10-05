@@ -45,3 +45,5 @@ generated
 hardhat
 .bin
 .latest.json
+
+.env
