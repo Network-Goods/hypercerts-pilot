@@ -67,7 +67,7 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
     );
   }
 
-  if (!hypercert || !fractions) {
+  if (!hypercert?.hypercert || !fractions) {
     return (
       <Alert status="error">
         <AlertIcon />
@@ -83,11 +83,12 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
     (fraction) => fraction.owner.id !== address?.toLowerCase()
   );
 
+  console.log(hypercert);
   return (
     <>
       <Flex flexDirection="column">
         <Box mb={6}>
-          <Heading mb={2}>{hypercert.id}</Heading>
+          <Heading mb={2}>{hypercert.hypercert.id}</Heading>
           <Center>
             <HypercertTile id={hypercertId} />
           </Center>
@@ -107,7 +108,9 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
         <Box mb={6}>
           <Heading mb={2}>Contributors</Heading>
           {formatContributors(
-            hypercert.contributors?.map((contributor) => contributor.id) || []
+            hypercert?.hypercert.contributors?.map(
+              (contributor) => contributor.id
+            ) || []
           )}
         </Box>
 
