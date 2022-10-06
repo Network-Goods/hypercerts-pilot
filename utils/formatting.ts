@@ -34,3 +34,7 @@ export const formatFractionPercentage = (
 
   return `${percentage.toFixed(0)}%`;
 };
+
+export const formatTime = (startTime: number, endTime: number) => {
+  return `${startTime} - ${endTime}`;
+};

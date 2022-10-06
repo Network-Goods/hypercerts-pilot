@@ -13,6 +13,7 @@ import {
   Spinner,
   Text,
   UnorderedList,
+  VStack,
 } from "@chakra-ui/react";
 import {
   useHyperCertById,
@@ -23,10 +24,12 @@ import { useWallet } from "@raidguild/quiver";
 import {
   formatContributors,
   formatFractionPercentage,
+  formatTime,
 } from "../../utils/formatting";
 import { HypercertTile } from "../../components/HypercertTile";
 import React from "react";
 import { MergeAllFractionsModal } from "../../components/Modals/MergeAllFractionsModal";
+import { GetHypercertByIdQuery } from "../../gql/graphql";
 
 const HypercertPageWrapper = () => {
   const { query } = useRouter();
@@ -83,7 +86,6 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
     (fraction) => fraction.owner.id !== address?.toLowerCase()
   );
 
-  console.log(hypercert);
   return (
     <>
       <Flex flexDirection="column">
@@ -102,7 +104,7 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
         )}
 
         <Box mb={6}>
-          <HypercertInfoBox hypercertId={hypercertId} />
+          <HypercertInfoBox hypercert={hypercert.hypercert} />
         </Box>
 
         <Box mb={6}>
@@ -158,28 +160,59 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
   );
 };
 
-const HypercertInfoBox = ({ hypercertId }: { hypercertId: string }) => {
-  const { loading, data } = useHypercertInfo(hypercertId);
-
-  if (loading) {
-    return <Spinner />;
-  }
-
-  if (!data) {
+const HypercertInfoBox = ({
+  hypercert,
+}: {
+  hypercert: GetHypercertByIdQuery["hypercert"];
+}) => {
+  if (!hypercert) {
     return (
       <Alert status="error">
         <AlertIcon />
-        <AlertTitle>Could not load hypercert info</AlertTitle>
+        <AlertTitle>HyperCert info incomplete</AlertTitle>
       </Alert>
     );
   }
 
   return (
-    <Box>
-      <Text fontSize="xs">Time of work</Text>
-    </Box>
+    <VStack spacing={4}>
+      <InfoBoxLine
+        title="Time of Work"
+        text={formatTime(hypercert.workDateFrom, hypercert.workDateTo)}
+      />
+      {hypercert.workScopes && (
+        <InfoBoxLine
+          title="Scope of Work"
+          text={hypercert.workScopes.map((w) => w.text).join(", ")}
+        />
+      )}
+      <InfoBoxLine
+        title="Time of Impact"
+        text={formatTime(hypercert.impactDateFrom, hypercert.impactDateTo)}
+      />
+      {hypercert.impactScopes && (
+        <InfoBoxLine
+          title="Scope of Work"
+          text={hypercert.impactScopes.map((i) => i.text).join(", ")}
+        />
+      )}
+      {hypercert.rights && (
+        <InfoBoxLine
+          title="Scope of Work"
+          text={hypercert.rights.map((r) => r.text).join(", ")}
+        />
+      )}
+      <InfoBoxLine title="External Link" text={hypercert.uri} />
+    </VStack>
   );
 };
+
+const InfoBoxLine = ({ title, text }: { title: string; text: string }) => (
+  <Box>
+    <Text>{title}</Text>
+    <Heading>{text}</Heading>
+  </Box>
+);
 
 const FractionLine = ({
   address,
