@@ -20,5 +20,4 @@ export const urls = {
     label: headerLinkLabels.myHypercerts,
     href: "/my-hypercerts",
   },
-  burn: { label: headerLinkLabels.burn, href: "/burn-hypercert" },
 };

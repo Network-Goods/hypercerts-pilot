@@ -5,10 +5,15 @@ import {
   AlertTitle,
   Center,
   Container,
+  Heading,
+  SimpleGrid,
   Spinner,
+  Text,
 } from "@chakra-ui/react";
 import { useFractionsListForUser } from "../hooks/fractions";
-import { HypercertTile } from "../components/HypercertTile";
+import { TokenTile } from "../components/TokenTile";
+import { myHypercertsContent } from "../content/my-hypercerts-content";
+import { ethers } from "ethers";
 
 const MyHypercertsPageWrapper = () => {
   const { address } = useWallet();
@@ -38,11 +43,32 @@ const MyHypercertsPage = ({ userAddress }: { userAddress: string }) => {
     );
   }
 
+  const fractions = data.hypercertFractions.filter(
+    (f) => f.owner.id !== ethers.constants.AddressZero
+  );
+  const burnedFractions = data.hypercertFractions.filter(
+    (f) => f.owner.id === ethers.constants.AddressZero
+  );
+
   return (
-    <Container>
-      {data.hypercertFractions.map((f) => (
-        <HypercertTile id={f.id} />
-      ))}
+    <Container maxWidth={1000}>
+      <Heading mb={4}>{myHypercertsContent.myHypercertsHeader}</Heading>
+      <SimpleGrid columns={[2, 2, 3]} spacing={4}>
+        {fractions.map((f) => (
+          <TokenTile key={f.id} id={f.id} />
+        ))}
+      </SimpleGrid>
+      {!!burnedFractions.length && (
+        <>
+          <Heading my={4}>{myHypercertsContent.burnedHypercertsHeader}</Heading>
+          <Text>{myHypercertsContent.burnedHypercertsText}</Text>
+          <SimpleGrid columns={[2, 2, 3]} spacing={4}>
+            {burnedFractions.map((f) => (
+              <TokenTile key={f.id} id={f.id} />
+            ))}
+          </SimpleGrid>
+        </>
+      )}
     </Container>
   );
 };

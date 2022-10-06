@@ -1,6 +1,5 @@
 export const headerLinkLabels = {
   claim: "Claim",
-  burn: "Burn",
   donate: "Donate",
   browse: "Browse",
   myHypercerts: "My HyperCerts",

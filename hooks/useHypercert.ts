@@ -106,3 +106,30 @@ export const useHypercertInfo = (hypercertId: string) => {
     return { data: undefined, loading };
   }
 };
+
+export const useFractionInfo = (fractionId: string) => {
+  const contract = useHypercertContract();
+
+  const { response, loading } = useReadContract(contract, "tokenURI", [
+    fractionId,
+  ]);
+
+  if (!response) {
+    return { data: undefined, loading };
+  }
+
+  try {
+    const responseWithoutPrefix = response.replace(
+      "data:application/json;base64,",
+      ""
+    );
+    const decodedB64Json = atob(responseWithoutPrefix);
+    return {
+      data: JSON.parse(decodedB64Json) as HypercertInfo,
+      loading,
+    };
+  } catch (error) {
+    console.error(error);
+    return { data: undefined, loading };
+  }
+};
