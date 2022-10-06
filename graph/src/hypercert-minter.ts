@@ -137,13 +137,25 @@ export function handleSlotChanged(event: SlotChanged): void {
 
   const fractionID = event.params._tokenId.toHexString();
   const hypercertId = event.params._newSlot.toHexString();
-
   let fraction = HypercertFraction.load(fractionID);
-  let ownerID = contract.ownerOf(event.params._tokenId).toHexString();
-  let owner = Owner.load(ownerID);
+
+  // Handle burn
+  if (fraction && event.params._newSlot.toI32() == 0) {
+    fraction.units = BigInt.fromI32(0);
+    fraction.owner = Address.zero().toHexString();
+    fraction.save();
+    return;
+  }
+
+  let ownerAddress = contract.try_ownerOf(event.params._tokenId);
+  if (ownerAddress.reverted) {
+    log.info("ownerOf reverted", []);
+    return;
+  }
+  let owner = Owner.load(ownerAddress.value.toHexString());
 
   if (!owner) {
-    owner = new Owner(ownerID);
+    owner = new Owner(ownerAddress.value.toHexString());
     owner.save();
   }
 
@@ -154,6 +166,7 @@ export function handleSlotChanged(event: SlotChanged): void {
     fraction.hypercert = hypercertId;
   } else {
     fraction.hypercert = hypercertId;
+    fraction.owner = owner.id;
   }
   fraction.save();
 }
