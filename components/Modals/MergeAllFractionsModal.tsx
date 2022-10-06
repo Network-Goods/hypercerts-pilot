@@ -15,6 +15,7 @@ import {
 } from "@chakra-ui/react";
 import { mergeHypercertModalContent } from "../../content/merge-hypercert-content";
 import { useMergeFractions } from "../../hooks/merge";
+import { BigNumber } from "ethers";
 
 type C = (args: { onClick: () => void }) => JSX.Element;
 
@@ -45,9 +46,12 @@ export const MergeAllFractionsModal = ({
   };
 
   const onConfirm = async () => {
-    console.log("Merging", fractionIds);
+    const parsedFractions = fractionIds.map((x) =>
+      BigNumber.from(x).toNumber()
+    );
+    console.log("Merging tokens with id", parsedFractions);
     setStep("merging");
-    await merge(fractionIds);
+    await merge(parsedFractions);
   };
 
   return (
