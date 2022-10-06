@@ -14,6 +14,9 @@ import { IProviderOptions } from "web3modal";
 import { Layout } from "../components/layout/Layout";
 import Head from "next/head";
 import { DEFAULT_CHAIN_ID } from "../constants";
+import { QueryClient } from "@tanstack/query-core";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 export const SUPPORTED_NETWORKS: NetworkConfig = {
   "0x1": {
@@ -83,42 +86,47 @@ const web3modalOptions = {
   theme: "dark",
 };
 
-const client = new ApolloClient({
+const apolloClient = new ApolloClient({
   uri: "https://api.thegraph.com/subgraphs/name/bitbeckers/hypercerts-goerli",
   cache: new InMemoryCache(),
   connectToDevTools: true,
 });
 
+const queryClient = new QueryClient({});
+
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <ApolloProvider client={client}>
-      <ChakraProvider
-        toastOptions={{
-          defaultOptions: {
-            position: "top-left",
-          },
-        }}
-      >
-        <WalletProvider
-          web3modalOptions={web3modalOptions}
-          networks={SUPPORTED_NETWORKS}
-          // Optional if you want to auto switch the network
-          defaultChainId={DEFAULT_CHAIN_ID}
-          // Optional but useful to handle events.
-          handleModalEvents={(eventName, error) => {
-            console.error(error);
-            console.log(eventName);
+    <QueryClientProvider client={queryClient}>
+      <ApolloProvider client={apolloClient}>
+        <ChakraProvider
+          toastOptions={{
+            defaultOptions: {
+              position: "top-left",
+            },
           }}
         >
-          <Head>
-            <title>HyperCert v0.2</title>
-          </Head>
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
-        </WalletProvider>
-      </ChakraProvider>
-    </ApolloProvider>
+          <WalletProvider
+            web3modalOptions={web3modalOptions}
+            networks={SUPPORTED_NETWORKS}
+            // Optional if you want to auto switch the network
+            defaultChainId={DEFAULT_CHAIN_ID}
+            // Optional but useful to handle events.
+            handleModalEvents={(eventName, error) => {
+              console.error(error);
+              console.log(eventName);
+            }}
+          >
+            <Head>
+              <title>HyperCert v0.2</title>
+            </Head>
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
+          </WalletProvider>
+        </ChakraProvider>
+      </ApolloProvider>
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
   );
 }
 

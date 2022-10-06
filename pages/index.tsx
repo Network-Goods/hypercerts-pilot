@@ -10,7 +10,7 @@ import { HypercertTile } from "../components/HypercertTile";
 import { useEffect, useState } from "react";
 import _ from "lodash";
 import Link from "next/link";
-import { useCollections } from "../hooks/listCollections";
+import { useCollections } from "../hooks/useCollections";
 import { useListAllHypercerts } from "../hooks/listHypercerts";
 import { GetAllHypercertsQuery } from "../gql/graphql";
 

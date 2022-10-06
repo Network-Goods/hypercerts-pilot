@@ -21,15 +21,12 @@ import {
   useHypercertInfo,
 } from "../../hooks/useHypercert";
 import { useWallet } from "@raidguild/quiver";
-import {
-  formatContributors,
-  formatFractionPercentage,
-  formatTime,
-} from "../../utils/formatting";
+import { formatFractionPercentage, formatTime } from "../../utils/formatting";
 import { HypercertTile } from "../../components/HypercertTile";
 import React from "react";
 import { MergeAllFractionsModal } from "../../components/Modals/MergeAllFractionsModal";
 import { GetHypercertByIdQuery } from "../../gql/graphql";
+import { UserInfo } from "../../components/UserInfo";
 
 const HypercertPageWrapper = () => {
   const { query } = useRouter();
@@ -90,7 +87,7 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
     <>
       <Flex flexDirection="column">
         <Box mb={6}>
-          <Heading mb={2}>{hypercertInfo?.name}</Heading>
+          <Heading mb={6}>{hypercertInfo?.name}</Heading>
           <Center>
             <HypercertTile id={hypercertId} />
           </Center>
@@ -109,11 +106,12 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
 
         <Box mb={6}>
           <Heading mb={2}>Contributors</Heading>
-          {formatContributors(
-            hypercert?.hypercert.contributors?.map(
-              (contributor) => contributor.id
-            ) || []
-          )}
+          <VStack spacing={2} alignItems="flex-start">
+            {hypercert?.hypercert.contributors?.map((x) => (
+              <UserInfo address={x.id} />
+            ))}
+            <UserInfo address="aaa" />
+          </VStack>
         </Box>
 
         <Box mb={6}>
