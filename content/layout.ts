@@ -3,6 +3,7 @@ export const headerLinkLabels = {
   burn: "Burn",
   donate: "Donate",
   browse: "Browse",
+  myHypercerts: "My HyperCerts",
 };
 
 export const connectButtonLabels = {
