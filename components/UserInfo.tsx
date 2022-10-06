@@ -5,7 +5,13 @@ import React from "react";
 import { ethers } from "ethers";
 
 export const UserInfo = ({ address }: { address: string }) => {
-  const { loading: loadingENS, avatar, ens } = useENS({ address });
+  const {
+    loading: loadingENS,
+    avatar,
+    ens,
+  } = useENS({
+    address: ethers.utils.isAddress(address) ? address : undefined,
+  });
   const { isLoading: loadingUserInfoFallBacks, data: fallbackData } =
     useUserInfoFallbacks();
 

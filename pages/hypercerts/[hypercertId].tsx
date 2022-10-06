@@ -27,6 +27,7 @@ import React from "react";
 import { MergeAllFractionsModal } from "../../components/Modals/MergeAllFractionsModal";
 import { GetHypercertByIdQuery } from "../../gql/graphql";
 import { UserInfo } from "../../components/UserInfo";
+import { hypercertDetailContent } from "../../content/hypercert-detail-content";
 
 const HypercertPageWrapper = () => {
   const { query } = useRouter();
@@ -48,7 +49,7 @@ const HypercertPageWrapper = () => {
 };
 
 const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
-  const { data: hypercert, loading: hypercertLoading } =
+  const { data: hypercertData, loading: hypercertLoading } =
     useHyperCertById(hypercertId);
   const { data: fractions, loading: fractionsLoading } =
     useHypercertFractions(hypercertId);
@@ -67,7 +68,9 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
     );
   }
 
-  if (!hypercert?.hypercert || !fractions) {
+  const hypercert = hypercertData?.hypercert;
+
+  if (!hypercert || !fractions) {
     return (
       <Alert status="error">
         <AlertIcon />
@@ -89,7 +92,7 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
         <Box mb={6}>
           <Flex alignItems="center" mb={6}>
             <Heading flexGrow={1}>{hypercertInfo?.name}</Heading>
-            <Button>View HyperCert on OpenSea</Button>
+            <Button>{hypercertDetailContent.viewHyperCertOnOpenSea}</Button>
           </Flex>
           <Center>
             <HypercertTile id={hypercertId} />
@@ -98,19 +101,19 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
 
         {hypercertInfo && (
           <Box mb={6}>
-            <Heading mb={2}>Description</Heading>
+            <Heading mb={2}>{hypercertDetailContent.description}</Heading>
             <Text>{hypercertInfo.description}</Text>
           </Box>
         )}
 
         <Box mb={6}>
-          <HypercertInfoBox hypercert={hypercert.hypercert} />
+          <HypercertInfoBox hypercert={hypercert} />
         </Box>
 
         <Box mb={6}>
-          <Heading mb={2}>Contributors</Heading>
+          <Heading mb={2}>{hypercertDetailContent.contributors}</Heading>
           <VStack spacing={2} alignItems="flex-start">
-            {hypercert?.hypercert.contributors?.map((x) => (
+            {hypercert.contributors?.map((x) => (
               <UserInfo key={x.id} address={x.id} />
             ))}
             <UserInfo address="aaa" />
@@ -118,7 +121,7 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
         </Box>
 
         <Box mb={6}>
-          <Heading mb={2}>Owners</Heading>
+          <Heading mb={2}>{hypercertDetailContent.owners}</Heading>
           <UnorderedList ml={0} spacing={4}>
             {ownedFractions.map((fraction) => (
               <FractionLine
@@ -183,39 +186,44 @@ const HypercertInfoBox = ({
       backgroundColor="lightgoldenrodyellow"
     >
       <InfoBoxLine
-        title="Time of Work"
+        title={hypercertDetailContent.infoBox.timeOfWork}
         text={formatTime(hypercert.workDateFrom, hypercert.workDateTo)}
       />
       {hypercert.workScopes && (
         <InfoBoxLine
-          title="Scope of Work"
+          title={hypercertDetailContent.infoBox.scopeOfWork}
           text={hypercert.workScopes.map((w) => w.text).join(", ")}
         />
       )}
       <InfoBoxLine
-        title="Time of Impact"
+        title={hypercertDetailContent.infoBox.timeOfImpact}
         text={formatTime(hypercert.impactDateFrom, hypercert.impactDateTo)}
       />
       {hypercert.impactScopes && (
         <InfoBoxLine
-          title="Scope of Work"
+          title={hypercertDetailContent.infoBox.scopeOfImpact}
           text={hypercert.impactScopes.map((i) => i.text).join(", ")}
         />
       )}
       {hypercert.rights && (
         <InfoBoxLine
-          title="Scope of Work"
+          title={hypercertDetailContent.infoBox.rights}
           text={hypercert.rights.map((r) => r.text).join(", ")}
         />
       )}
-      <InfoBoxLine title="External Link" text={hypercert.uri} />
+      <InfoBoxLine
+        title={hypercertDetailContent.infoBox.externalLink}
+        text={hypercert.uri}
+      />
     </VStack>
   );
 };
 
 const InfoBoxLine = ({ title, text }: { title: string; text: string }) => (
   <Box>
-    <Text>{title}</Text>
+    <Text fontSize="small" fontWeight={500}>
+      {title}
+    </Text>
     <Heading fontSize="md" textOverflow="ellipsis">
       {text}
     </Heading>
