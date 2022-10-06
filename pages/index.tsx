@@ -20,8 +20,7 @@ const BrowsePage = () => {
   const [filteredHypercerts, setFilteredHypercerts] = useState<
     GetAllHypercertsQuery["hypercerts"]
   >([]);
-  const { fetching: fetchingCollections, result: collections } =
-    useCollections();
+  const { isLoading: loadingCollections, data: collections } = useCollections();
 
   useEffect(() => {
     if (hypercertsResult) {
@@ -52,7 +51,7 @@ const BrowsePage = () => {
         <Select
           onChange={(e) => onChangeCollectionFilter(e.target.value)}
           maxWidth={300}
-          disabled={fetchingCollections}
+          disabled={loadingCollections}
         >
           <option defaultChecked value="all">
             No collection filter
@@ -64,7 +63,7 @@ const BrowsePage = () => {
               </option>
             ))}
         </Select>
-        {fetchingCollections && <Spinner ml={4} />}
+        {loadingCollections && <Spinner ml={4} />}
       </Flex>
       <SimpleGrid columns={{ sm: 2, md: 2 }} spacing={8}>
         {filteredHypercerts.map((cert) => (

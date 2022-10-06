@@ -87,7 +87,10 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
     <>
       <Flex flexDirection="column">
         <Box mb={6}>
-          <Heading mb={6}>{hypercertInfo?.name}</Heading>
+          <Flex alignItems="center" mb={6}>
+            <Heading flexGrow={1}>{hypercertInfo?.name}</Heading>
+            <Button>View HyperCert on OpenSea</Button>
+          </Flex>
           <Center>
             <HypercertTile id={hypercertId} />
           </Center>
