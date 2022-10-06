@@ -69,7 +69,7 @@ const ClaimHypercertPage: NextPage = () => {
   const { address } = useWallet();
   const { push } = useRouter();
   const mintHyperCertificate = useMintHyperCertificate({
-    onComplete: () => push(urls.burn.href),
+    onComplete: () => push(urls.myHypercerts.href),
   });
   const toast = useToast();
 
