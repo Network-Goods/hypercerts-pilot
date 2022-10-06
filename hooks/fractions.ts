@@ -24,7 +24,7 @@ export const useFractionsListForUser = (address: string) => {
       units: number;
       owner: {
         id: string;
-      }[];
+      };
       hypercert: {
         id: string;
         totalUnits: number;

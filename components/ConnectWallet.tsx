@@ -2,10 +2,17 @@ import React from "react";
 import { formatAddress, useWallet } from "@raidguild/quiver";
 import { Button } from "@chakra-ui/react";
 import { connectButtonLabels } from "../content/layout";
+import { useRouter } from "next/router";
+import { urls } from "../constants";
 
 export const ConnectWallet = () => {
+  const { push } = useRouter();
   const { connectWallet, isConnecting, isConnected, disconnect, address } =
     useWallet();
+  const onClickDisconnect = async () => {
+    disconnect();
+    await push(urls.browse.href);
+  };
   return (
     <>
       {!isConnected && (
@@ -21,14 +28,9 @@ export const ConnectWallet = () => {
         </Button>
       )}
       {isConnected && (
-        <>
-          <h4 style={{ display: "inline" }}>
-            {connectButtonLabels.connectedAs(formatAddress(address))}
-          </h4>
-          <Button ml={3} onClick={() => disconnect()}>
-            {connectButtonLabels.disconnect}
-          </Button>
-        </>
+        <Button ml={3} onClick={onClickDisconnect}>
+          {connectButtonLabels.disconnect(formatAddress(address))}
+        </Button>
       )}
     </>
   );

@@ -5,9 +5,11 @@ import { ConnectWallet } from "../ConnectWallet";
 import { useRouter } from "next/router";
 import { FORMAT_VERSION, urls } from "../../constants";
 import { WrongNetworkBanner } from "./WrongNetworkBanner";
+import { useWallet } from "@raidguild/quiver";
 
 export const Layout = ({ children }: PropsWithChildren) => {
   const { pathname } = useRouter();
+  const { isConnected } = useWallet();
   return (
     <Box position="relative">
       <Center
@@ -26,18 +28,29 @@ export const Layout = ({ children }: PropsWithChildren) => {
           justifyContent="center"
         >
           <HStack justifyContent="start">
-            <Text fontSize="xl">HyperCert</Text>
-            <Text color="gray.400">v{FORMAT_VERSION}</Text>
-            <HStack pl={5}>
-              {Object.values(urls).map((headerLink) => (
-                <Text
-                  key={headerLink.href}
-                  fontWeight={headerLink.href === pathname ? 600 : 400}
-                  color={headerLink.href === pathname ? "green" : "black"}
-                >
-                  <Link href={headerLink.href}>{headerLink.label}</Link>
+            <Link href={urls.browse.href}>
+              <Flex alignItems="flex-end" as="a" cursor="pointer">
+                <Text fontSize="xl">HyperCert</Text>
+                <Text ml={2} mb={0.5} color="gray.400">
+                  v{FORMAT_VERSION}
                 </Text>
-              ))}
+              </Flex>
+            </Link>
+            <HStack pl={5} spacing={4}>
+              {Object.values(urls).map((headerLink) => {
+                if (headerLink.showOnlyWhenConnected && !isConnected) {
+                  return null;
+                }
+                return (
+                  <Text
+                    key={headerLink.href}
+                    fontWeight={headerLink.href === pathname ? 600 : 400}
+                    color={headerLink.href === pathname ? "green" : "black"}
+                  >
+                    <Link href={headerLink.href}>{headerLink.label}</Link>
+                  </Text>
+                );
+              })}
             </HStack>
           </HStack>
           <Box marginLeft="auto">

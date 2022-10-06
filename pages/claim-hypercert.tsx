@@ -69,7 +69,7 @@ const ClaimHypercertPage: NextPage = () => {
   const { address } = useWallet();
   const { push } = useRouter();
   const mintHyperCertificate = useMintHyperCertificate({
-    onComplete: () => push(urls.burn.href),
+    onComplete: () => push(urls.myHypercerts.href),
   });
   const toast = useToast();
 
@@ -77,25 +77,26 @@ const ClaimHypercertPage: NextPage = () => {
     <Container>
       <Formik
         validationSchema={ValidationSchema}
-        initialValues={{
-          name: "",
-          description: "",
-          external_link: "",
-          image: null as File | null,
-
-          format_version: FORMAT_VERSION,
-          prev_hypercert: "",
-          creators: [],
-          workTimeStart: undefined as string | undefined,
-          workTimeEnd: undefined as string | undefined,
-          impactTimeStart: undefined as string | undefined,
-          impactTimeEnd: undefined as string | undefined,
-          workScopes: [] as Option[],
-          impactScopes: [] as Option[],
-          rights: [] as Option[],
-          uri: "",
-          fractions: "1000",
-        }}
+        initialValues={testValues}
+        // initialValues={{
+        //   name: "",
+        //   description: "",
+        //   external_link: "",
+        //   image: null as File | null,
+        //
+        //   format_version: FORMAT_VERSION,
+        //   prev_hypercert: "",
+        //   creators: [],
+        //   workTimeStart: undefined as string | undefined,
+        //   workTimeEnd: undefined as string | undefined,
+        //   impactTimeStart: undefined as string | undefined,
+        //   impactTimeEnd: undefined as string | undefined,
+        //   workScopes: [] as Option[],
+        //   impactScopes: [] as Option[],
+        //   rights: [] as Option[],
+        //   uri: "",
+        //   fractions: "1000",
+        // }}
         onSubmit={async (val) => {
           console.log("Starting hypercert creation", val);
           window.scrollTo({ top: 0, behavior: "smooth" });
@@ -197,7 +198,7 @@ const ClaimHypercertPage: NextPage = () => {
                 </Alert>
               )}
               <form onSubmit={handleSubmit}>
-                <FormControl isRequired>
+                <FormControl mb={3} isRequired>
                   <Flex>
                     <FormLabel>Certificate name</FormLabel>
                     <ErrorMessage name="name" render={DisplayError} />
@@ -212,7 +213,7 @@ const ClaimHypercertPage: NextPage = () => {
                     disabled={isSubmitting}
                   />
                 </FormControl>
-                <FormControl isRequired>
+                <FormControl mb={3} isRequired>
                   <Flex>
                     <FormLabel>Description</FormLabel>
                     <ErrorMessage name="description" render={DisplayError} />
@@ -227,7 +228,7 @@ const ClaimHypercertPage: NextPage = () => {
                     disabled={isSubmitting}
                   />
                 </FormControl>
-                <FormControl isRequired>
+                <FormControl mb={3} isRequired>
                   <Flex>
                     <FormLabel>External link</FormLabel>
                     <ErrorMessage name="external_link" render={DisplayError} />
@@ -242,7 +243,7 @@ const ClaimHypercertPage: NextPage = () => {
                     disabled={isSubmitting}
                   />
                 </FormControl>
-                <FormControl isRequired>
+                <FormControl mb={3} isRequired>
                   <Flex>
                     <FormLabel>Fractions</FormLabel>
                     <ErrorMessage name="fractions" render={DisplayError} />
