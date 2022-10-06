@@ -1,16 +1,15 @@
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
+import { graphql } from "../gql";
 
-const WORK_SCOPES_QUERY = gql`
-  query getWorkScopes {
+const WORK_SCOPES_QUERY = graphql(`
+  query GetWorkScopes {
     workScopes {
       id
       text
     }
   }
-`;
+`);
 
 export const useWorkScopes = () => {
-  return useQuery<{ workScopes: { id: string; text: string }[] }>(
-    WORK_SCOPES_QUERY
-  );
+  return useQuery(WORK_SCOPES_QUERY);
 };

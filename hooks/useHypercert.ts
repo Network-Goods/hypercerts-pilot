@@ -1,6 +1,7 @@
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { useHypercertContract } from "./contracts";
 import { useReadContract } from "@raidguild/quiver";
+import { graphql } from "../gql";
 
 export interface Hypercert {
   id: string;
@@ -14,64 +15,48 @@ export interface Hypercert {
 }
 
 export const useHyperCertById = (id: string) => {
-  return useQuery<Hypercert>(
-    gql`
-      query GetHypercertById($id: ID!) {
-        hypercert(id: $id) {
+  const query = graphql(`
+    query GetHypercertById($id: ID!) {
+      hypercert(id: $id) {
+        id
+        claimHash
+        totalUnits
+        minter
+        uri
+        contributors {
           id
-          claimHash
-          totalUnits
-          minter
-          uri
-          contributors {
-            id
-          }
         }
       }
-    `,
-    {
-      variables: {
-        id,
-      },
     }
-  );
+  `);
+  return useQuery(query, {
+    variables: {
+      id,
+    },
+  });
 };
 
-interface HypercertFraction {
-  id: string;
-  owner: { id: string };
-  hypercert: {
-    id: string;
-    totalUnits: string;
-  };
-  units: string;
-}
-
 export const useHypercertFractions = (id: string) => {
-  return useQuery<{
-    hypercertFractions: HypercertFraction[];
-  }>(
-    gql`
-      query GetHypercertFractions($hypercertId: String!) {
-        hypercertFractions(where: { hypercert: $hypercertId }) {
+  const query = graphql(`
+    query GetHypercertFractions($hypercertId: String!) {
+      hypercertFractions(where: { hypercert: $hypercertId }) {
+        id
+        hypercert {
           id
-          hypercert {
-            id
-            totalUnits
-          }
-          owner {
-            id
-          }
-          units
+          totalUnits
         }
+        owner {
+          id
+        }
+        units
       }
-    `,
-    {
-      variables: {
-        hypercertId: id.toLowerCase(),
-      },
     }
-  );
+  `);
+  return useQuery(query, {
+    variables: {
+      hypercertId: id.toLowerCase(),
+    },
+  });
 };
 
 interface HypercertInfo {
