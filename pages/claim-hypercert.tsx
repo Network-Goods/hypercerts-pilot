@@ -16,7 +16,6 @@ import {
   Textarea,
   useToast,
 } from "@chakra-ui/react";
-import { uploadCertificateToIpfs } from "../utils/ipfsClient";
 import { useWallet } from "@raidguild/quiver";
 import { useMintHyperCertificate } from "../hooks/mint";
 import * as Yup from "yup";

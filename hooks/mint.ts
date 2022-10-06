@@ -67,5 +67,10 @@ export const useMintHyperCertificate = ({
     return abiCoder.encode(types, values);
   };
 
-  return (data: MintCertificateData) => mutate(address!, encodeData(data));
+  return (data: MintCertificateData) => {
+    console.log(data);
+    const encodedData = encodeData(data);
+    console.log(encodedData);
+    mutate(address!, encodeData(data));
+  };
 };
