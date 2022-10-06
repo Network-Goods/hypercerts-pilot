@@ -20,6 +20,9 @@ export const useUserInfoFallbacks = () => {
       fetch(url).then(async (res) => (await res.json()) as UserInfoFallback[]),
     {
       cacheTime: Infinity,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+      keepPreviousData: true,
       onError: () => {
         toast({
           status: "error",

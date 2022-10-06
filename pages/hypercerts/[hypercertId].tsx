@@ -108,7 +108,7 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
           <Heading mb={2}>Contributors</Heading>
           <VStack spacing={2} alignItems="flex-start">
             {hypercert?.hypercert.contributors?.map((x) => (
-              <UserInfo address={x.id} />
+              <UserInfo key={x.id} address={x.id} />
             ))}
             <UserInfo address="aaa" />
           </VStack>
