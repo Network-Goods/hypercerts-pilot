@@ -138,12 +138,14 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
             ))}
           </UnorderedList>
 
-          <MergeAllFractionsModal
-            fractionIds={ownedFractions.map((f) => f.id)}
-            render={({ onClick }) => (
-              <Button onClick={onClick}>Merge all my fractions</Button>
-            )}
-          />
+          {!!ownedFractions.length && (
+            <MergeAllFractionsModal
+              fractionIds={ownedFractions.map((f) => f.id)}
+              render={({ onClick }) => (
+                <Button onClick={onClick}>Merge all my fractions</Button>
+              )}
+            />
+          )}
         </Box>
       </Flex>
     </>
