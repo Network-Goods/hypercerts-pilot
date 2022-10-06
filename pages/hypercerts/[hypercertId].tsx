@@ -90,7 +90,7 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
     <>
       <Flex flexDirection="column">
         <Box mb={6}>
-          <Heading mb={2}>{hypercert.hypercert.id}</Heading>
+          <Heading mb={2}>{hypercertInfo?.name}</Heading>
           <Center>
             <HypercertTile id={hypercertId} />
           </Center>

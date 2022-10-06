@@ -36,5 +36,7 @@ export const formatFractionPercentage = (
 };
 
 export const formatTime = (startTime: number, endTime: number) => {
-  return `${startTime} - ${endTime}`;
+  return `${new Date(startTime).toDateString()} - ${new Date(
+    endTime
+  ).toDateString()}`;
 };

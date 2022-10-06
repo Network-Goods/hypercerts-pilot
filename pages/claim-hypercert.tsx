@@ -141,16 +141,16 @@ const ClaimHypercertPage: NextPage = () => {
 
           // Mint certificate using contract
           const workTimeStart = val.workTimeStart
-            ? new Date(val.workTimeStart).getTime()
+            ? new Date(val.workTimeStart).getTime() / 1000
             : 0;
           const workTimeEnd = val.workTimeEnd
-            ? new Date(val.workTimeEnd).getTime()
+            ? new Date(val.workTimeEnd).getTime() / 1000
             : 0;
           const impactTimeStart = val.impactTimeStart
-            ? new Date(val.impactTimeStart).getTime()
+            ? new Date(val.impactTimeStart).getTime() / 1000
             : 0;
           const impactTimeEnd = val.impactTimeEnd
-            ? new Date(val.impactTimeEnd).getTime()
+            ? new Date(val.impactTimeEnd).getTime() / 1000
             : 0;
 
           try {
