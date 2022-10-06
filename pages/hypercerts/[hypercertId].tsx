@@ -175,7 +175,12 @@ const HypercertInfoBox = ({
   }
 
   return (
-    <VStack spacing={4}>
+    <VStack
+      spacing={4}
+      alignItems="flex-start"
+      padding={4}
+      backgroundColor="lightgoldenrodyellow"
+    >
       <InfoBoxLine
         title="Time of Work"
         text={formatTime(hypercert.workDateFrom, hypercert.workDateTo)}
@@ -210,7 +215,9 @@ const HypercertInfoBox = ({
 const InfoBoxLine = ({ title, text }: { title: string; text: string }) => (
   <Box>
     <Text>{title}</Text>
-    <Heading>{text}</Heading>
+    <Heading fontSize="md" textOverflow="ellipsis">
+      {text}
+    </Heading>
   </Box>
 );
 

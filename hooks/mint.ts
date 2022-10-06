@@ -49,7 +49,7 @@ export const useMintHyperCertificate = ({
       "string",
       "string",
       "string",
-      "uint8[]",
+      "uint256[]",
     ];
     const values = [
       data.rightsIds,
