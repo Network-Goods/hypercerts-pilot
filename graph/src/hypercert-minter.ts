@@ -133,18 +133,28 @@ export function handleWorkScopeAdded(event: WorkScopeAdded): void {
 }
 
 export function handleSlotChanged(event: SlotChanged): void {
+  let contract = HyperCertMinter.bind(event.address);
+
   const fractionID = event.params._tokenId.toHexString();
   const hypercertId = event.params._newSlot.toHexString();
 
   let fraction = HypercertFraction.load(fractionID);
+  let ownerID = contract.ownerOf(event.params._tokenId).toHexString();
+  let owner = Owner.load(ownerID);
+
+  if (!owner) {
+    owner = new Owner(ownerID);
+    owner.save();
+  }
 
   if (!fraction) {
     fraction = new HypercertFraction(fractionID);
     fraction.units = BigInt.fromI32(0);
-    fraction.owner = event.transaction.from.toHexString();
+    fraction.owner = owner.id;
+    fraction.hypercert = hypercertId;
+  } else {
+    fraction.hypercert = hypercertId;
   }
-  fraction.hypercert = hypercertId;
-
   fraction.save();
 }
 
@@ -163,23 +173,49 @@ export function handleTransferValue(event: TransferValue): void {
   const toTokenID = event.params._toTokenId.toHexString();
   const value = event.params._value;
 
-  // From
-  const fractionFrom = HypercertFraction.load(fromTokenID);
+  let hypercertID = contract.try_slotOf(event.params._toTokenId);
+
+  if (hypercertID.reverted) {
+    log.info("slotOf reverted", []);
+    return;
+  }
+  let hypercert = Hypercert.load(hypercertID.value.toHexString());
+
+  if (!hypercert) {
+    return;
+  }
+
+  let fractionFrom = HypercertFraction.load(fromTokenID);
   if (fractionFrom) {
     fractionFrom.units = fractionFrom.units.minus(value);
     fractionFrom.save();
   }
 
   // To
+  const ownerAddress = contract.try_ownerOf(event.params._toTokenId);
+  if (ownerAddress.reverted) {
+    return;
+  }
+
+  let owner = Owner.load(ownerAddress.value.toHexString());
+  if (!owner) {
+    owner = new Owner(ownerAddress.value.toHexString());
+    owner.save();
+  }
+
   let fractionTo = HypercertFraction.load(toTokenID);
   if (fractionTo) {
-    fractionTo = new HypercertFraction(toTokenID);
-    fractionTo.hypercert = contract
-      .slotOf(event.params._toTokenId)
-      .toHexString();
     fractionTo.units = fractionTo.units.plus(value);
-    fractionTo.save();
   }
+
+  if (!fractionTo) {
+    fractionTo = new HypercertFraction(toTokenID);
+    fractionTo.units = value;
+    fractionTo.hypercert = hypercert.id;
+    fractionTo.owner = owner.id;
+  }
+
+  fractionTo.save();
 }
 
 export function handleUpgraded(event: Upgraded): void {}
