@@ -9,6 +9,5 @@ export const connectButtonLabels = {
   connecting: "Connecting...",
   connected: "Connected",
   connect: "Connect Wallet",
-  disconnect: "Disconnect",
-  connectedAs: (address: string) => `Connected as: ${address}`,
+  disconnect: (address: string) => `Disconnect ${address}`,
 };

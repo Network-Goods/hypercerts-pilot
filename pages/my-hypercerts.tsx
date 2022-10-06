@@ -52,12 +52,22 @@ const MyHypercertsPage = ({ userAddress }: { userAddress: string }) => {
 
   return (
     <Container maxWidth={1000}>
-      <Heading mb={4}>{myHypercertsContent.myHypercertsHeader}</Heading>
-      <SimpleGrid columns={[2, 2, 3]} spacing={4}>
-        {fractions.map((f) => (
-          <TokenTile key={f.id} id={f.id} />
-        ))}
-      </SimpleGrid>
+      {!fractions.length && !burnedFractions.length && (
+        <Alert status="info">
+          <AlertIcon />
+          <AlertTitle>{myHypercertsContent.noHypercertsOwned}</AlertTitle>
+        </Alert>
+      )}
+      {!!fractions.length && (
+        <>
+          <Heading mb={4}>{myHypercertsContent.myHypercertsHeader}</Heading>
+          <SimpleGrid columns={[2, 2, 3]} spacing={4}>
+            {fractions.map((f) => (
+              <TokenTile key={f.id} id={f.id} />
+            ))}
+          </SimpleGrid>
+        </>
+      )}
       {!!burnedFractions.length && (
         <>
           <Heading my={4}>{myHypercertsContent.burnedHypercertsHeader}</Heading>

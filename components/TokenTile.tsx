@@ -1,4 +1,4 @@
-import { Fade, Image, SlideFade } from "@chakra-ui/react";
+import { Image, SlideFade } from "@chakra-ui/react";
 import { Hypercert, useFractionInfo } from "../hooks/useHypercert";
 
 export const TokenTile = ({ id }: Pick<Hypercert, "id">) => {
@@ -10,16 +10,14 @@ export const TokenTile = ({ id }: Pick<Hypercert, "id">) => {
 
   return (
     <SlideFade in offsetY="20px">
-      <Fade in>
-        <Image
-          cursor="pointer"
-          borderRadius={16}
-          boxShadow="2xl"
-          src={data.image}
-          alt="image"
-          maxHeight={450}
-        />
-      </Fade>
+      <Image
+        cursor="pointer"
+        borderRadius={16}
+        boxShadow="2xl"
+        src={data.image}
+        alt="image"
+        maxHeight={450}
+      />
     </SlideFade>
   );
 };

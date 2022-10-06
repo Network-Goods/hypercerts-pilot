@@ -21,14 +21,9 @@ export const ConnectWallet = () => {
         </Button>
       )}
       {isConnected && (
-        <>
-          <h4 style={{ display: "inline" }}>
-            {connectButtonLabels.connectedAs(formatAddress(address))}
-          </h4>
-          <Button ml={3} onClick={() => disconnect()}>
-            {connectButtonLabels.disconnect}
-          </Button>
-        </>
+        <Button ml={3} onClick={() => disconnect()}>
+          {connectButtonLabels.disconnect(formatAddress(address))}
+        </Button>
       )}
     </>
   );
