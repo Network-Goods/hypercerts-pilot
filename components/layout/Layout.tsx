@@ -28,9 +28,15 @@ export const Layout = ({ children }: PropsWithChildren) => {
           justifyContent="center"
         >
           <HStack justifyContent="start">
-            <Text fontSize="xl">HyperCert</Text>
-            <Text color="gray.400">v{FORMAT_VERSION}</Text>
-            <HStack pl={5}>
+            <Link href={urls.browse.href}>
+              <Flex alignItems="flex-end" as="a" cursor="pointer">
+                <Text fontSize="xl">HyperCert</Text>
+                <Text ml={2} mb={0.5} color="gray.400">
+                  v{FORMAT_VERSION}
+                </Text>
+              </Flex>
+            </Link>
+            <HStack pl={5} spacing={4}>
               {Object.values(urls).map((headerLink) => {
                 if (headerLink.showOnlyWhenConnected && !isConnected) {
                   return null;
