@@ -143,9 +143,12 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
 
           {!!ownedFractions.length && (
             <MergeAllFractionsModal
+              hypercertId={hypercertId}
               fractionIds={ownedFractions.map((f) => f.id)}
               render={({ onClick }) => (
-                <Button onClick={onClick}>Merge all my fractions</Button>
+                <Button mt={6} onClick={onClick}>
+                  Merge all my fractions
+                </Button>
               )}
             />
           )}
