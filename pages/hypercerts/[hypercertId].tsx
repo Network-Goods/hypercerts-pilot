@@ -255,7 +255,13 @@ const FractionLine = ({
         </Text>
         <Text fontSize="md">{ownerId}</Text>
       </Flex>
-      <Button as="a" href={getOpenSeaFractionUrl(tokenId)} ml="auto">
+      <Button
+        as="a"
+        target="_blank"
+        rel="noreferrer noopener"
+        href={getOpenSeaFractionUrl(tokenId)}
+        ml="auto"
+      >
         Show on OpenSea
       </Button>
       {ownerId === address && <Button ml={4}>Split</Button>}
