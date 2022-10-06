@@ -32,6 +32,8 @@ import { MergeAllFractionsModal } from "../../components/Modals/MergeAllFraction
 import { GetHypercertByIdQuery } from "../../gql/graphql";
 import { UserInfo } from "../../components/UserInfo";
 import { hypercertDetailContent } from "../../content/hypercert-detail-content";
+import { useIpfsMetadata } from "../../hooks/ipfs";
+import { MetaDataResponse } from "../../types/MetaData";
 
 const HypercertPageWrapper = () => {
   const { query } = useRouter();
@@ -61,7 +63,16 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
   const { data: hypercertInfo, loading: hypercertInfoLoading } =
     useHypercertInfo(hypercertId);
 
-  if (hypercertLoading || fractionsLoading || hypercertInfoLoading) {
+  const { data: ipfsData, isLoading: ipfsDataLoading } = useIpfsMetadata(
+    hypercertData?.hypercert?.uri
+  );
+
+  if (
+    hypercertLoading ||
+    fractionsLoading ||
+    hypercertInfoLoading ||
+    ipfsDataLoading
+  ) {
     return (
       <Center height="100">
         <Spinner />
@@ -74,7 +85,7 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
 
   const hypercert = hypercertData?.hypercert;
 
-  if (!hypercert || !fractions) {
+  if (!hypercert || !fractions || !ipfsData) {
     return (
       <Alert status="error">
         <AlertIcon />
@@ -111,7 +122,7 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
         )}
 
         <Box mb={6}>
-          <HypercertInfoBox hypercert={hypercert} />
+          <HypercertInfoBox ipfsData={ipfsData} hypercert={hypercert} />
         </Box>
 
         <Box mb={6}>
@@ -120,7 +131,9 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
             {hypercert.contributors?.map((x) => (
               <UserInfo key={x.id} address={x.id} />
             ))}
-            <UserInfo address="aaa" />
+            {ipfsData.properties.contributor_names.map((x) => (
+              <UserInfo key={x} address={x} />
+            ))}
           </VStack>
         </Box>
 
@@ -172,8 +185,10 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
 
 const HypercertInfoBox = ({
   hypercert,
+  ipfsData,
 }: {
   hypercert: GetHypercertByIdQuery["hypercert"];
+  ipfsData: MetaDataResponse;
 }) => {
   if (!hypercert) {
     return (
@@ -191,47 +206,50 @@ const HypercertInfoBox = ({
       padding={4}
       backgroundColor="lightgoldenrodyellow"
     >
-      <InfoBoxLine
-        title={hypercertDetailContent.infoBox.timeOfWork}
-        text={formatTime(hypercert.workDateFrom, hypercert.workDateTo)}
-      />
+      <InfoBoxLine title={hypercertDetailContent.infoBox.timeOfWork}>
+        {formatTime(hypercert.workDateFrom, hypercert.workDateTo)}
+      </InfoBoxLine>
       {hypercert.workScopes && (
-        <InfoBoxLine
-          title={hypercertDetailContent.infoBox.scopeOfWork}
-          text={hypercert.workScopes.map((w) => w.text).join(", ")}
-        />
+        <InfoBoxLine title={hypercertDetailContent.infoBox.scopeOfWork}>
+          {hypercert.workScopes.map((w) => w.text).join(", ")}
+        </InfoBoxLine>
       )}
-      <InfoBoxLine
-        title={hypercertDetailContent.infoBox.timeOfImpact}
-        text={formatTime(hypercert.impactDateFrom, hypercert.impactDateTo)}
-      />
+      <InfoBoxLine title={hypercertDetailContent.infoBox.timeOfImpact}>
+        {formatTime(hypercert.impactDateFrom, hypercert.impactDateTo)}
+      </InfoBoxLine>
       {hypercert.impactScopes && (
-        <InfoBoxLine
-          title={hypercertDetailContent.infoBox.scopeOfImpact}
-          text={hypercert.impactScopes.map((i) => i.text).join(", ")}
-        />
+        <InfoBoxLine title={hypercertDetailContent.infoBox.scopeOfImpact}>
+          {hypercert.impactScopes.map((i) => i.text).join(", ")}
+        </InfoBoxLine>
       )}
       {hypercert.rights && (
-        <InfoBoxLine
-          title={hypercertDetailContent.infoBox.rights}
-          text={hypercert.rights.map((r) => r.text).join(", ")}
-        />
+        <InfoBoxLine title={hypercertDetailContent.infoBox.rights}>
+          {hypercert.rights.map((r) => r.text).join(", ")}
+        </InfoBoxLine>
       )}
-      <InfoBoxLine
-        title={hypercertDetailContent.infoBox.externalLink}
-        text={hypercert.uri}
-      />
+      <InfoBoxLine title={hypercertDetailContent.infoBox.externalLink}>
+        <a
+          href={ipfsData.properties.external_url}
+          target="_blank"
+          rel="noreferrer noopener"
+        >
+          {ipfsData.properties.external_url}
+        </a>
+      </InfoBoxLine>
     </VStack>
   );
 };
 
-const InfoBoxLine = ({ title, text }: { title: string; text: string }) => (
+const InfoBoxLine = ({
+  title,
+  children,
+}: React.PropsWithChildren<{ title: string }>) => (
   <Box>
     <Text fontSize="small" fontWeight={500}>
       {title}
     </Text>
     <Heading fontSize="md" textOverflow="ellipsis">
-      {text}
+      {children}
     </Heading>
   </Box>
 );

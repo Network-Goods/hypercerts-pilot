@@ -31,6 +31,11 @@ import { ImpactScopesAutoComplete } from "../components/AutoComplete/ImpactScope
 import { RightsAutoComplete } from "../components/AutoComplete/RightsAutoComplete";
 import { Option } from "../components/AutoComplete/AutoComplete";
 import { useRouter } from "next/router";
+import qs from "qs";
+import { useEffect, useState } from "react";
+import _ from "lodash";
+import { isAddress } from "ethers/lib/utils";
+import { uploadCertificateToIpfs } from "../utils/ipfsClient";
 
 const ValidationSchema = Yup.object().shape({
   name: Yup.string()
@@ -65,19 +70,61 @@ const testValues = {
   uri: "",
 };
 
+const defaultValues = {
+  name: "",
+  description: "",
+  external_link: "",
+  image: null as File | null,
+  contributors: "",
+
+  format_version: FORMAT_VERSION,
+  prev_hypercert: "",
+  creators: [],
+  workTimeStart: undefined as string | undefined,
+  workTimeEnd: undefined as string | undefined,
+  impactTimeStart: undefined as string | undefined,
+  impactTimeEnd: undefined as string | undefined,
+  workScopes: [] as Option[],
+  impactScopes: [] as Option[],
+  rights: [] as Option[],
+  uri: "",
+  fractions: "1000",
+};
+
 const ClaimHypercertPage: NextPage = () => {
   const { address } = useWallet();
-  const { push } = useRouter();
+  const { push, query } = useRouter();
   const mintHyperCertificate = useMintHyperCertificate({
     onComplete: () => push(urls.myHypercerts.href),
   });
   const toast = useToast();
+  const [currentQuery] = useState(qs.stringify(query));
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && currentQuery !== "") {
+      push({ query: currentQuery });
+    }
+  }, [currentQuery]);
+
+  // const updateQueryString = (values: Record<string, unknown>) => {
+  //   const filteredValues = _.pickBy(values);
+  //   const formattedQueryString = qs.stringify(filteredValues);
+  //   if (formattedQueryString !== currentQuery) {
+  //     console.log("Setting it", currentQuery);
+  //     setCurrentQueryString(formattedQueryString);
+  //   }
+  // };
 
   return (
     <Container>
       <Formik
         validationSchema={ValidationSchema}
-        initialValues={testValues}
+        initialValues={{
+          ...defaultValues,
+          ...query,
+          ...testValues,
+        }}
+        enableReinitialize
         // initialValues={{
         //   name: "",
         //   description: "",
@@ -107,38 +154,49 @@ const ClaimHypercertPage: NextPage = () => {
            * 3. Call the mint function on the contract with the required parameters, including the cid for the metadata json.
            */
 
-          // Upload certificate to ipfs
-          // let certificateMetadataIpfsId: string | undefined;
-          // toast({
-          //   description: toastMessages.metadataUploadStart,
-          //   status: "info",
-          // });
-          // try {
-          //   const metaData = {
-          //     description: val.description,
-          //     external_url: val.external_link,
-          //     format_version: val.format_version,
-          //     name: val.name,
-          //     prev_hypercert: val.prev_hypercert,
-          //     refs: [],
-          //   };
-          //   const certificateIpfsMetadata = await uploadCertificateToIpfs(
-          //     metaData
-          //   );
-          //   certificateMetadataIpfsId = certificateIpfsMetadata.url;
-          //   toast({
-          //     description: toastMessages.metadataUploadSuccess(
-          //       certificateMetadataIpfsId
-          //     ),
-          //     status: "success",
-          //   });
-          // } catch (error) {
-          //   toast({
-          //     description: toastMessages.metadataUploadError,
-          //     status: "error",
-          //   });
-          //   console.error(error);
-          // }
+          const contributorNamesAndAddresses = val.contributors
+            .split(",")
+            .map((name) => name.trim());
+          const contributorNames = contributorNamesAndAddresses.filter(
+            (x) => !isAddress(x)
+          );
+          const contributorAddresses = contributorNamesAndAddresses.filter(
+            (x) => isAddress(x)
+          );
+
+          // Upload certificate metadata to ipfs
+          let certificateMetadataIpfsUrl: string | undefined;
+          toast({
+            description: toastMessages.metadataUploadStart,
+            status: "info",
+          });
+          try {
+            const metaData = {
+              name: val.name,
+              description: val.description,
+              contributor_names: contributorNames,
+              external_url: val.external_link,
+              format_version: val.format_version,
+              prev_hypercert: val.prev_hypercert,
+              refs: [],
+            };
+            const certificateIpfsMetadata = await uploadCertificateToIpfs(
+              metaData
+            );
+            certificateMetadataIpfsUrl = certificateIpfsMetadata.url;
+            toast({
+              description: toastMessages.metadataUploadSuccess(
+                certificateMetadataIpfsUrl!
+              ),
+              status: "success",
+            });
+          } catch (error) {
+            toast({
+              description: toastMessages.metadataUploadError,
+              status: "error",
+            });
+            console.error(error);
+          }
 
           // Mint certificate using contract
           const workTimeStart = val.workTimeStart
@@ -160,10 +218,10 @@ const ClaimHypercertPage: NextPage = () => {
               status: "info",
             });
             await mintHyperCertificate({
-              contributors: [address!],
+              contributors: _.uniq([address!, ...contributorAddresses]),
               workTime: [workTimeStart, workTimeEnd],
               impactTime: [impactTimeStart, impactTimeEnd],
-              uri: "a",
+              uri: certificateMetadataIpfsUrl!,
               workScopeIds: val.workScopes.map((s) => s.value),
               impactScopeIds: val.impactScopes.map((option) => option.value),
               rightsIds: val.rights.map((right) => right.value),
@@ -189,6 +247,7 @@ const ClaimHypercertPage: NextPage = () => {
           isSubmitting,
           /* and other goodies */
         }) => {
+          // updateQueryString(values);
           return (
             <>
               {isSubmitting && (
@@ -197,7 +256,7 @@ const ClaimHypercertPage: NextPage = () => {
                   Please wait while your hypercert is being minted
                 </Alert>
               )}
-              <form onSubmit={handleSubmit} onChange={(e) => console.log(e)}>
+              <form onSubmit={handleSubmit}>
                 <VStack spacing={3}>
                   <FormControl isRequired>
                     <Flex>
@@ -228,6 +287,24 @@ const ClaimHypercertPage: NextPage = () => {
                       size="sm"
                       disabled={isSubmitting}
                     />
+                  </FormControl>
+                  <FormControl isRequired>
+                    <Flex>
+                      <FormLabel>Contributors</FormLabel>
+                      <ErrorMessage name="description" render={DisplayError} />
+                    </Flex>
+                    <Textarea
+                      name="contributors"
+                      value={values.contributors}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      placeholder={placeholders.description}
+                      size="sm"
+                      disabled={isSubmitting}
+                    />
+                    <FormHelperText>
+                      Names and/or addresses of contributors
+                    </FormHelperText>
                   </FormControl>
                   <FormControl isRequired>
                     <Flex>

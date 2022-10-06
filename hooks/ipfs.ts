@@ -1,30 +1,27 @@
-import { useEffect, useState } from "react";
-import { MetaData } from "../types/MetaData";
+import { useQuery } from "@tanstack/react-query";
+import { useToast } from "@chakra-ui/react";
+import { MetaDataResponse } from "../types/MetaData";
 
-export const useIpfsMetadata = (uri: string) => {
-  const [data, setData] = useState<MetaData | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (data || loading) return;
-    const gatewayUri = formatIpfsUrlToGateway(uri);
-    const fetchData = () => setLoading(true);
-    fetch(gatewayUri)
-      .then(async (result) => {
-        setLoading(false);
-        setData((await result.json()) as MetaData);
-      })
-      .catch((e) => {
-        setLoading(false);
-        throw e;
-      });
-    fetchData();
-  }, []);
-
-  return {
-    data,
-    loading,
-  };
+export const useIpfsMetadata = (uri?: string) => {
+  const toast = useToast();
+  return useQuery(
+    [uri],
+    () =>
+      uri
+        ? fetch(formatIpfsUrlToGateway(uri))
+            .then(async (res) => (await res.json()) as MetaDataResponse)
+            .catch(null)
+        : null,
+    {
+      cacheTime: Infinity,
+      onError: () => {
+        toast({
+          status: "error",
+          description: "Could not fetch ipfs data",
+        });
+      },
+    }
+  );
 };
 
 export const formatIpfsUrlToGateway = (uri: string) =>

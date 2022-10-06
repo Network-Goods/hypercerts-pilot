@@ -49,7 +49,7 @@ export const useMintHyperCertificate = ({
       "string",
       "string",
       "string",
-      "uint256[]",
+      "uint64[]",
     ];
     const values = [
       data.rightsIds,
@@ -68,7 +68,6 @@ export const useMintHyperCertificate = ({
   };
 
   return (data: MintCertificateData) => {
-    console.log(data);
     return mutate(address!, encodeData(data));
   };
 };

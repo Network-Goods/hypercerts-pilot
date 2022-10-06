@@ -20,18 +20,18 @@ async function getDefaultImageUrl() {
 
 export const uploadCertificateToIpfs = async ({
   name,
-  description,
   external_url,
+  description = "a",
   ...rest
-}: Omit<MetaData, "image">) => {
+}: MetaData) => {
   const imageOrExampleImage = await getDefaultImageUrl();
   const metadata = await client.store({
     name,
     description,
     image: imageOrExampleImage,
-    external_url,
     properties: {
       ...rest,
+      external_url,
     },
   });
   console.log("Uploaded to IPFS", metadata);
