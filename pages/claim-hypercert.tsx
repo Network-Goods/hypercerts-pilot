@@ -77,25 +77,26 @@ const ClaimHypercertPage: NextPage = () => {
     <Container>
       <Formik
         validationSchema={ValidationSchema}
-        initialValues={{
-          name: "",
-          description: "",
-          external_link: "",
-          image: null as File | null,
-
-          format_version: FORMAT_VERSION,
-          prev_hypercert: "",
-          creators: [],
-          workTimeStart: undefined as string | undefined,
-          workTimeEnd: undefined as string | undefined,
-          impactTimeStart: undefined as string | undefined,
-          impactTimeEnd: undefined as string | undefined,
-          workScopes: [] as Option[],
-          impactScopes: [] as Option[],
-          rights: [] as Option[],
-          uri: "",
-          fractions: "1000",
-        }}
+        initialValues={testValues}
+        // initialValues={{
+        //   name: "",
+        //   description: "",
+        //   external_link: "",
+        //   image: null as File | null,
+        //
+        //   format_version: FORMAT_VERSION,
+        //   prev_hypercert: "",
+        //   creators: [],
+        //   workTimeStart: undefined as string | undefined,
+        //   workTimeEnd: undefined as string | undefined,
+        //   impactTimeStart: undefined as string | undefined,
+        //   impactTimeEnd: undefined as string | undefined,
+        //   workScopes: [] as Option[],
+        //   impactScopes: [] as Option[],
+        //   rights: [] as Option[],
+        //   uri: "",
+        //   fractions: "1000",
+        // }}
         onSubmit={async (val) => {
           console.log("Starting hypercert creation", val);
           window.scrollTo({ top: 0, behavior: "smooth" });
