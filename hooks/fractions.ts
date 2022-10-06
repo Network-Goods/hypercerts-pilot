@@ -1,7 +1,8 @@
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
+import { graphql } from "../gql";
 
 export const useFractionsListForUser = (address: string) => {
-  const FRACTIONS_LIST_FOR_USER_QUERY = gql`
+  const FRACTIONS_LIST_FOR_USER_QUERY = graphql(`
     query ListFractionsForUsers($userId: String!) {
       hypercertFractions(where: { owner: $userId }) {
         id
@@ -15,7 +16,7 @@ export const useFractionsListForUser = (address: string) => {
         }
       }
     }
-  `;
+  `);
 
   return useQuery<{
     hypercertFractions: {

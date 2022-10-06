@@ -1,14 +1,15 @@
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
+import { graphql } from "../gql";
 
-const RIGHTS_QUERY = gql`
+const RIGHTS_QUERY = graphql(`
   query getRights {
     rights {
       id
       text
     }
   }
-`;
+`);
 
 export const useRights = () => {
-  return useQuery<{ rights: { id: string; text: string }[] }>(RIGHTS_QUERY);
+  return useQuery(RIGHTS_QUERY);
 };

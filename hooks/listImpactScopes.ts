@@ -1,16 +1,15 @@
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
+import { graphql } from "../gql";
 
-const IMPACT_SCOPES_QUERY = gql`
+const IMPACT_SCOPES_QUERY = graphql(`
   query getImpactScopes {
     impactScopes {
       id
       text
     }
   }
-`;
+`);
 
 export const useImpactScopes = () => {
-  return useQuery<{ impactScopes: { id: string; text: string }[] }>(
-    IMPACT_SCOPES_QUERY
-  );
+  return useQuery(IMPACT_SCOPES_QUERY);
 };
