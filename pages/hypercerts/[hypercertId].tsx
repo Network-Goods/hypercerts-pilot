@@ -21,7 +21,11 @@ import {
   useHypercertInfo,
 } from "../../hooks/useHypercert";
 import { useWallet } from "@raidguild/quiver";
-import { formatFractionPercentage, formatTime } from "../../utils/formatting";
+import {
+  formatFractionPercentage,
+  formatTime,
+  getOpenSeaFractionUrl,
+} from "../../utils/formatting";
 import { HypercertTile } from "../../components/HypercertTile";
 import React from "react";
 import { MergeAllFractionsModal } from "../../components/Modals/MergeAllFractionsModal";
@@ -128,6 +132,7 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
                 key={fraction.id}
                 address={address}
                 ownerId={fraction.owner.id}
+                tokenId={fraction.id}
                 percentage={formatFractionPercentage(
                   fraction.units,
                   fraction.hypercert.totalUnits
@@ -139,6 +144,7 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
                 key={fraction.id}
                 address={address}
                 ownerId={fraction.owner.id}
+                tokenId={fraction.id}
                 percentage={formatFractionPercentage(
                   fraction.units,
                   fraction.hypercert.totalUnits
@@ -234,10 +240,12 @@ const FractionLine = ({
   address,
   ownerId,
   percentage,
+  tokenId,
 }: {
   address?: string | null;
   ownerId: string;
   percentage: string;
+  tokenId: string;
 }) => {
   return (
     <ListItem display="flex" alignItems="center">
@@ -247,7 +255,9 @@ const FractionLine = ({
         </Text>
         <Text fontSize="md">{ownerId}</Text>
       </Flex>
-      <Button ml="auto">Show on OpenSea</Button>
+      <Button as="a" href={getOpenSeaFractionUrl(tokenId)} ml="auto">
+        Show on OpenSea
+      </Button>
       {ownerId === address && <Button ml={4}>Split</Button>}
     </ListItem>
   );

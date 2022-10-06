@@ -13,6 +13,11 @@ export const SHEET_BEST_ENDPOINT = requireEnv(
   "NEXT_PUBLIC_SHEET_BEST_ENDPOINT"
 );
 
+export const CONTRACT_ADDRESS = requireEnv(
+  process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
+  "NEXT_PUBLIC_CONTRACT_ADDRESS"
+);
+
 export const urls = {
   browse: {
     label: headerLinkLabels.browse,

@@ -1,4 +1,6 @@
 import _ from "lodash";
+import { CONTRACT_ADDRESS } from "../constants";
+import { BigNumber } from "ethers";
 
 export const formatScope = (scopeLabel: string) =>
   scopeLabel.toLowerCase().replaceAll(/\s+/g, "-").trim();
@@ -39,4 +41,10 @@ export const formatTime = (startTime: number, endTime: number) => {
   return `${new Date(startTime).toDateString()} - ${new Date(
     endTime
   ).toDateString()}`;
+};
+
+export const getOpenSeaFractionUrl = (tokenId: string) => {
+  return `https://testnets.opensea.io/assets/goerli/${CONTRACT_ADDRESS}/${BigNumber.from(
+    tokenId
+  ).toNumber()}`;
 };
