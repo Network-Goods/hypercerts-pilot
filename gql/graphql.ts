@@ -73,8 +73,6 @@ export type Hypercert = {
   fractions: Array<HypercertFraction>;
   /** hypercert ID maps to the uint256 slotID in the ERC3525 Hypercert Minter */
   id: Scalars['ID'];
-  /** SVG image string */
-  image: Scalars['String'];
   /** unix timestamp declaring when impact started */
   impactDateFrom: Scalars['BigInt'];
   /** unix timestamp declaring when impact ended */
@@ -253,26 +251,6 @@ export type Hypercert_Filter = {
   id_lte?: InputMaybe<Scalars['ID']>;
   id_not?: InputMaybe<Scalars['ID']>;
   id_not_in?: InputMaybe<Array<Scalars['ID']>>;
-  image?: InputMaybe<Scalars['String']>;
-  image_contains?: InputMaybe<Scalars['String']>;
-  image_contains_nocase?: InputMaybe<Scalars['String']>;
-  image_ends_with?: InputMaybe<Scalars['String']>;
-  image_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  image_gt?: InputMaybe<Scalars['String']>;
-  image_gte?: InputMaybe<Scalars['String']>;
-  image_in?: InputMaybe<Array<Scalars['String']>>;
-  image_lt?: InputMaybe<Scalars['String']>;
-  image_lte?: InputMaybe<Scalars['String']>;
-  image_not?: InputMaybe<Scalars['String']>;
-  image_not_contains?: InputMaybe<Scalars['String']>;
-  image_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  image_not_ends_with?: InputMaybe<Scalars['String']>;
-  image_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  image_not_in?: InputMaybe<Array<Scalars['String']>>;
-  image_not_starts_with?: InputMaybe<Scalars['String']>;
-  image_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  image_starts_with?: InputMaybe<Scalars['String']>;
-  image_starts_with_nocase?: InputMaybe<Scalars['String']>;
   impactDateFrom?: InputMaybe<Scalars['BigInt']>;
   impactDateFrom_gt?: InputMaybe<Scalars['BigInt']>;
   impactDateFrom_gte?: InputMaybe<Scalars['BigInt']>;
@@ -397,7 +375,6 @@ export enum Hypercert_OrderBy {
   Contributors = 'contributors',
   Fractions = 'fractions',
   Id = 'id',
-  Image = 'image',
   ImpactDateFrom = 'impactDateFrom',
   ImpactDateTo = 'impactDateTo',
   ImpactScopes = 'impactScopes',
@@ -961,10 +938,10 @@ export type ListFractionsForUsersQueryVariables = Exact<{
 
 export type ListFractionsForUsersQuery = { __typename?: 'Query', hypercertFractions: Array<{ __typename?: 'HypercertFraction', id: string, units: any, owner: { __typename?: 'Owner', id: string }, hypercert: { __typename?: 'Hypercert', id: string, totalUnits: any } }> };
 
-export type GetAllCertificatesQueryVariables = Exact<{ [key: string]: never; }>;
+export type GetAllHypercertsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAllCertificatesQuery = { __typename?: 'Query', hypercerts: Array<{ __typename?: 'Hypercert', id: string, claimHash: any, minter: string, uri: string, contributors: Array<{ __typename?: 'Contributor', id: string }> }> };
+export type GetAllHypercertsQuery = { __typename?: 'Query', hypercerts: Array<{ __typename?: 'Hypercert', id: string, claimHash: any, minter: string, uri: string, contributors: Array<{ __typename?: 'Contributor', id: string }> }> };
 
 export type GetImpactScopesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -997,7 +974,7 @@ export type GetHypercertFractionsQuery = { __typename?: 'Query', hypercertFracti
 
 
 export const ListFractionsForUsersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ListFractionsForUsers"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"userId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hypercertFractions"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"owner"},"value":{"kind":"Variable","name":{"kind":"Name","value":"userId"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"units"}},{"kind":"Field","name":{"kind":"Name","value":"owner"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"hypercert"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"totalUnits"}}]}}]}}]}}]} as unknown as DocumentNode<ListFractionsForUsersQuery, ListFractionsForUsersQueryVariables>;
-export const GetAllCertificatesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAllCertificates"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hypercerts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"claimHash"}},{"kind":"Field","name":{"kind":"Name","value":"minter"}},{"kind":"Field","name":{"kind":"Name","value":"uri"}},{"kind":"Field","name":{"kind":"Name","value":"contributors"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<GetAllCertificatesQuery, GetAllCertificatesQueryVariables>;
+export const GetAllHypercertsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAllHypercerts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hypercerts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"claimHash"}},{"kind":"Field","name":{"kind":"Name","value":"minter"}},{"kind":"Field","name":{"kind":"Name","value":"uri"}},{"kind":"Field","name":{"kind":"Name","value":"contributors"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<GetAllHypercertsQuery, GetAllHypercertsQueryVariables>;
 export const GetImpactScopesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getImpactScopes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"impactScopes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"text"}}]}}]}}]} as unknown as DocumentNode<GetImpactScopesQuery, GetImpactScopesQueryVariables>;
 export const GetRightsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getRights"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"rights"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"text"}}]}}]}}]} as unknown as DocumentNode<GetRightsQuery, GetRightsQueryVariables>;
 export const GetWorkScopesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetWorkScopes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"workScopes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"text"}}]}}]}}]} as unknown as DocumentNode<GetWorkScopesQuery, GetWorkScopesQueryVariables>;

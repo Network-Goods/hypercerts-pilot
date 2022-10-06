@@ -4,7 +4,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
 
 const documents = {
     "\n    query ListFractionsForUsers($userId: String!) {\n      hypercertFractions(where: { owner: $userId }) {\n        id\n        units\n        owner {\n          id\n        }\n        hypercert {\n          id\n          totalUnits\n        }\n      }\n    }\n  ": types.ListFractionsForUsersDocument,
-    "\n  query GetAllCertificates {\n    hypercerts {\n      id\n      claimHash\n      minter\n      uri\n      contributors {\n        id\n      }\n    }\n  }\n": types.GetAllCertificatesDocument,
+    "\n  query GetAllHypercerts {\n    hypercerts {\n      id\n      claimHash\n      minter\n      uri\n      contributors {\n        id\n      }\n    }\n  }\n": types.GetAllHypercertsDocument,
     "\n  query getImpactScopes {\n    impactScopes {\n      id\n      text\n    }\n  }\n": types.GetImpactScopesDocument,
     "\n  query getRights {\n    rights {\n      id\n      text\n    }\n  }\n": types.GetRightsDocument,
     "\n  query GetWorkScopes {\n    workScopes {\n      id\n      text\n    }\n  }\n": types.GetWorkScopesDocument,
@@ -13,7 +13,7 @@ const documents = {
 };
 
 export function graphql(source: "\n    query ListFractionsForUsers($userId: String!) {\n      hypercertFractions(where: { owner: $userId }) {\n        id\n        units\n        owner {\n          id\n        }\n        hypercert {\n          id\n          totalUnits\n        }\n      }\n    }\n  "): (typeof documents)["\n    query ListFractionsForUsers($userId: String!) {\n      hypercertFractions(where: { owner: $userId }) {\n        id\n        units\n        owner {\n          id\n        }\n        hypercert {\n          id\n          totalUnits\n        }\n      }\n    }\n  "];
-export function graphql(source: "\n  query GetAllCertificates {\n    hypercerts {\n      id\n      claimHash\n      minter\n      uri\n      contributors {\n        id\n      }\n    }\n  }\n"): (typeof documents)["\n  query GetAllCertificates {\n    hypercerts {\n      id\n      claimHash\n      minter\n      uri\n      contributors {\n        id\n      }\n    }\n  }\n"];
+export function graphql(source: "\n  query GetAllHypercerts {\n    hypercerts {\n      id\n      claimHash\n      minter\n      uri\n      contributors {\n        id\n      }\n    }\n  }\n"): (typeof documents)["\n  query GetAllHypercerts {\n    hypercerts {\n      id\n      claimHash\n      minter\n      uri\n      contributors {\n        id\n      }\n    }\n  }\n"];
 export function graphql(source: "\n  query getImpactScopes {\n    impactScopes {\n      id\n      text\n    }\n  }\n"): (typeof documents)["\n  query getImpactScopes {\n    impactScopes {\n      id\n      text\n    }\n  }\n"];
 export function graphql(source: "\n  query getRights {\n    rights {\n      id\n      text\n    }\n  }\n"): (typeof documents)["\n  query getRights {\n    rights {\n      id\n      text\n    }\n  }\n"];
 export function graphql(source: "\n  query GetWorkScopes {\n    workScopes {\n      id\n      text\n    }\n  }\n"): (typeof documents)["\n  query GetWorkScopes {\n    workScopes {\n      id\n      text\n    }\n  }\n"];

@@ -12,12 +12,14 @@ import _ from "lodash";
 import Link from "next/link";
 import { useCollections } from "../hooks/listCollections";
 import { useListAllHypercerts } from "../hooks/listHypercerts";
-import { Hypercert } from "../hooks/useHypercert";
+import { GetAllHypercertsQuery } from "../gql/graphql";
 
 const BrowsePage = () => {
   const { data: hypercertsResult, loading: loadingHypercerts } =
     useListAllHypercerts();
-  const [filteredHypercerts, setFilteredHypercerts] = useState<Hypercert[]>([]);
+  const [filteredHypercerts, setFilteredHypercerts] = useState<
+    GetAllHypercertsQuery["hypercerts"]
+  >([]);
   const { fetching: fetchingCollections, result: collections } =
     useCollections();
 
