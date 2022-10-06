@@ -70,7 +70,7 @@ const BrowsePage = () => {
         {filteredHypercerts.map((cert) => (
           <Link key={cert.id} href={`hypercerts/${cert.id}`}>
             <ScaleFade initialScale={0.9} in>
-              <HypercertTile {...cert} />
+              <HypercertTile {...cert} hoverEffect />
             </ScaleFade>
           </Link>
         ))}

@@ -69,8 +69,6 @@ export const useMintHyperCertificate = ({
 
   return (data: MintCertificateData) => {
     console.log(data);
-    const encodedData = encodeData(data);
-    console.log(encodedData);
-    mutate(address!, encodeData(data));
+    return mutate(address!, encodeData(data));
   };
 };

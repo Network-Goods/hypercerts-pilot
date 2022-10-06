@@ -1,6 +1,12 @@
 import { Image, SlideFade } from "@chakra-ui/react";
 
-export const Tile = ({ src }: { src: string }) => (
+export const Tile = ({
+  src,
+  hoverEffect = false,
+}: {
+  src: string;
+  hoverEffect?: boolean;
+}) => (
   <SlideFade in offsetY="20px">
     <Image
       cursor="pointer"
@@ -9,12 +15,20 @@ export const Tile = ({ src }: { src: string }) => (
       src={src}
       alt="image"
       maxHeight={450}
-      sx={{
-        transition: "all .2s ease-in-out",
-      }}
-      _hover={{
-        transform: "scale(1.05)",
-      }}
+      sx={
+        hoverEffect
+          ? {
+              transition: "all .2s ease-in-out",
+            }
+          : {}
+      }
+      _hover={
+        hoverEffect
+          ? {
+              transform: "scale(1.05)",
+            }
+          : {}
+      }
     />
   </SlideFade>
 );

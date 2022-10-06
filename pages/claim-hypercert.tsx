@@ -15,6 +15,7 @@ import {
   Input,
   Textarea,
   useToast,
+  VStack,
 } from "@chakra-ui/react";
 import { useWallet } from "@raidguild/quiver";
 import { useMintHyperCertificate } from "../hooks/mint";
@@ -197,66 +198,71 @@ const ClaimHypercertPage: NextPage = () => {
                 </Alert>
               )}
               <form onSubmit={handleSubmit} onChange={(e) => console.log(e)}>
-                <FormControl mb={3} isRequired>
-                  <Flex>
-                    <FormLabel>Certificate name</FormLabel>
-                    <ErrorMessage name="name" render={DisplayError} />
-                  </Flex>
-                  <Input
-                    type="text"
-                    name="name"
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    value={values.name}
-                    placeholder={placeholders.name}
-                    disabled={isSubmitting}
-                  />
-                </FormControl>
-                <FormControl mb={3} isRequired>
-                  <Flex>
-                    <FormLabel>Description</FormLabel>
-                    <ErrorMessage name="description" render={DisplayError} />
-                  </Flex>
-                  <Textarea
-                    name="description"
-                    value={values.description}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    placeholder={placeholders.description}
-                    size="sm"
-                    disabled={isSubmitting}
-                  />
-                </FormControl>
-                <FormControl mb={3} isRequired>
-                  <Flex>
-                    <FormLabel>External link</FormLabel>
-                    <ErrorMessage name="external_link" render={DisplayError} />
-                  </Flex>
-                  <Input
-                    type="text"
-                    name="external_link"
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    value={values.external_link}
-                    placeholder={placeholders.external_link}
-                    disabled={isSubmitting}
-                  />
-                </FormControl>
-                <FormControl mb={3} isRequired>
-                  <Flex>
-                    <FormLabel>Fractions</FormLabel>
-                    <ErrorMessage name="fractions" render={DisplayError} />
-                  </Flex>
-                  <Input
-                    type="text"
-                    name="fractions"
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    value={values.fractions}
-                    placeholder={placeholders.external_link}
-                    disabled={isSubmitting}
-                  />
-                </FormControl>
+                <VStack spacing={3}>
+                  <FormControl isRequired>
+                    <Flex>
+                      <FormLabel>Certificate name</FormLabel>
+                      <ErrorMessage name="name" render={DisplayError} />
+                    </Flex>
+                    <Input
+                      type="text"
+                      name="name"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.name}
+                      placeholder={placeholders.name}
+                      disabled={isSubmitting}
+                    />
+                  </FormControl>
+                  <FormControl isRequired>
+                    <Flex>
+                      <FormLabel>Description</FormLabel>
+                      <ErrorMessage name="description" render={DisplayError} />
+                    </Flex>
+                    <Textarea
+                      name="description"
+                      value={values.description}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      placeholder={placeholders.description}
+                      size="sm"
+                      disabled={isSubmitting}
+                    />
+                  </FormControl>
+                  <FormControl isRequired>
+                    <Flex>
+                      <FormLabel>External link</FormLabel>
+                      <ErrorMessage
+                        name="external_link"
+                        render={DisplayError}
+                      />
+                    </Flex>
+                    <Input
+                      type="text"
+                      name="external_link"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.external_link}
+                      placeholder={placeholders.external_link}
+                      disabled={isSubmitting}
+                    />
+                  </FormControl>
+                  <FormControl isRequired>
+                    <Flex>
+                      <FormLabel>Fractions</FormLabel>
+                      <ErrorMessage name="fractions" render={DisplayError} />
+                    </Flex>
+                    <Input
+                      type="text"
+                      name="fractions"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.fractions}
+                      placeholder={placeholders.external_link}
+                      disabled={isSubmitting}
+                    />
+                  </FormControl>
+                </VStack>
                 <Divider my={3} />
                 <HStack>
                   <FormControl>
