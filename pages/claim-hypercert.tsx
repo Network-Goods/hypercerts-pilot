@@ -108,37 +108,37 @@ const ClaimHypercertPage: NextPage = () => {
            */
 
           // Upload certificate to ipfs
-          let certificateMetadataIpfsId: string | undefined;
-          toast({
-            description: toastMessages.metadataUploadStart,
-            status: "info",
-          });
-          try {
-            const metaData = {
-              description: val.description,
-              external_url: val.external_link,
-              format_version: val.format_version,
-              name: val.name,
-              prev_hypercert: val.prev_hypercert,
-              refs: [],
-            };
-            const certificateIpfsMetadata = await uploadCertificateToIpfs(
-              metaData
-            );
-            certificateMetadataIpfsId = certificateIpfsMetadata.url;
-            toast({
-              description: toastMessages.metadataUploadSuccess(
-                certificateMetadataIpfsId
-              ),
-              status: "success",
-            });
-          } catch (error) {
-            toast({
-              description: toastMessages.metadataUploadError,
-              status: "error",
-            });
-            console.error(error);
-          }
+          // let certificateMetadataIpfsId: string | undefined;
+          // toast({
+          //   description: toastMessages.metadataUploadStart,
+          //   status: "info",
+          // });
+          // try {
+          //   const metaData = {
+          //     description: val.description,
+          //     external_url: val.external_link,
+          //     format_version: val.format_version,
+          //     name: val.name,
+          //     prev_hypercert: val.prev_hypercert,
+          //     refs: [],
+          //   };
+          //   const certificateIpfsMetadata = await uploadCertificateToIpfs(
+          //     metaData
+          //   );
+          //   certificateMetadataIpfsId = certificateIpfsMetadata.url;
+          //   toast({
+          //     description: toastMessages.metadataUploadSuccess(
+          //       certificateMetadataIpfsId
+          //     ),
+          //     status: "success",
+          //   });
+          // } catch (error) {
+          //   toast({
+          //     description: toastMessages.metadataUploadError,
+          //     status: "error",
+          //   });
+          //   console.error(error);
+          // }
 
           // Mint certificate using contract
           const workTimeStart = val.workTimeStart
@@ -163,7 +163,7 @@ const ClaimHypercertPage: NextPage = () => {
               contributors: [address!],
               workTime: [workTimeStart, workTimeEnd],
               impactTime: [impactTimeStart, impactTimeEnd],
-              uri: certificateMetadataIpfsId!,
+              uri: "a",
               workScopeIds: val.workScopes.map((s) => s.value),
               impactScopeIds: val.impactScopes.map((option) => option.value),
               rightsIds: val.rights.map((right) => right.value),
