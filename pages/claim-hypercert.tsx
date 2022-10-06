@@ -197,7 +197,7 @@ const ClaimHypercertPage: NextPage = () => {
                   Please wait while your hypercert is being minted
                 </Alert>
               )}
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={handleSubmit} onChange={(e) => console.log(e)}>
                 <FormControl mb={3} isRequired>
                   <Flex>
                     <FormLabel>Certificate name</FormLabel>

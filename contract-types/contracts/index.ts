@@ -14,3 +14,4 @@ export type { interfaces };
 export type { mocks };
 export type { ERC3525Upgradeable } from "./ERC3525Upgradeable";
 export type { HypercertMinter } from "./HypercertMinter";
+export type { HypercertSVG } from "./HypercertSVG";

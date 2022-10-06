@@ -66,8 +66,12 @@ export type { HypercertMetadata } from "./contracts/HypercertMetadata.sol/Hyperc
 export { HypercertMetadata__factory } from "./factories/contracts/HypercertMetadata.sol/HypercertMetadata__factory";
 export type { IHypercertMinter } from "./contracts/HypercertMetadata.sol/IHypercertMinter";
 export { IHypercertMinter__factory } from "./factories/contracts/HypercertMetadata.sol/IHypercertMinter__factory";
+export type { IHypercertSVG } from "./contracts/HypercertMetadata.sol/IHypercertSVG";
+export { IHypercertSVG__factory } from "./factories/contracts/HypercertMetadata.sol/IHypercertSVG__factory";
 export type { HypercertMinter } from "./contracts/HypercertMinter";
 export { HypercertMinter__factory } from "./factories/contracts/HypercertMinter__factory";
+export type { HypercertSVG } from "./contracts/HypercertSVG";
+export { HypercertSVG__factory } from "./factories/contracts/HypercertSVG__factory";
 export type { IERC3525MetadataUpgradeable } from "./contracts/interfaces/IERC3525MetadataUpgradeable";
 export { IERC3525MetadataUpgradeable__factory } from "./factories/contracts/interfaces/IERC3525MetadataUpgradeable__factory";
 export type { IERC3525Receiver } from "./contracts/interfaces/IERC3525Receiver";

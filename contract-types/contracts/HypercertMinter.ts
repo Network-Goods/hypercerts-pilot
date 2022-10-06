@@ -107,6 +107,7 @@ export interface HypercertMinterInterface extends utils.Interface {
     "impactScopes(bytes32)": FunctionFragment;
     "initialize(address)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
+    "merge(uint256[])": FunctionFragment;
     "mint(address,bytes)": FunctionFragment;
     "name()": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
@@ -121,6 +122,7 @@ export interface HypercertMinterInterface extends utils.Interface {
     "slotCount()": FunctionFragment;
     "slotOf(uint256)": FunctionFragment;
     "slotURI(uint256)": FunctionFragment;
+    "split(uint256,uint8[])": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "symbol()": FunctionFragment;
     "tokenByIndex(uint256)": FunctionFragment;
@@ -166,6 +168,7 @@ export interface HypercertMinterInterface extends utils.Interface {
       | "impactScopes"
       | "initialize"
       | "isApprovedForAll"
+      | "merge"
       | "mint"
       | "name"
       | "ownerOf"
@@ -180,6 +183,7 @@ export interface HypercertMinterInterface extends utils.Interface {
       | "slotCount"
       | "slotOf"
       | "slotURI"
+      | "split"
       | "supportsInterface"
       | "symbol"
       | "tokenByIndex"
@@ -296,6 +300,10 @@ export interface HypercertMinterInterface extends utils.Interface {
     values: [PromiseOrValue<string>, PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
+    functionFragment: "merge",
+    values: [PromiseOrValue<BigNumberish>[]]
+  ): string;
+  encodeFunctionData(
     functionFragment: "mint",
     values: [PromiseOrValue<string>, PromiseOrValue<BytesLike>]
   ): string;
@@ -353,6 +361,10 @@ export interface HypercertMinterInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "slotURI",
     values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "split",
+    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>[]]
   ): string;
   encodeFunctionData(
     functionFragment: "supportsInterface",
@@ -495,6 +507,7 @@ export interface HypercertMinterInterface extends utils.Interface {
     functionFragment: "isApprovedForAll",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "merge", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
@@ -527,6 +540,7 @@ export interface HypercertMinterInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "slotCount", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "slotOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "slotURI", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "split", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "supportsInterface",
     data: BytesLike
@@ -955,6 +969,11 @@ export interface HypercertMinter extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
+    merge(
+      tokenIds: PromiseOrValue<BigNumberish>[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     mint(
       account: PromiseOrValue<string>,
       data: PromiseOrValue<BytesLike>,
@@ -1024,6 +1043,12 @@ export interface HypercertMinter extends BaseContract {
       slotId_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[string]>;
+
+    split(
+      tokenId: PromiseOrValue<BigNumberish>,
+      amounts: PromiseOrValue<BigNumberish>[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
 
     supportsInterface(
       interfaceId: PromiseOrValue<BytesLike>,
@@ -1225,6 +1250,11 @@ export interface HypercertMinter extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
+  merge(
+    tokenIds: PromiseOrValue<BigNumberish>[],
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   mint(
     account: PromiseOrValue<string>,
     data: PromiseOrValue<BytesLike>,
@@ -1294,6 +1324,12 @@ export interface HypercertMinter extends BaseContract {
     slotId_: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<string>;
+
+  split(
+    tokenId: PromiseOrValue<BigNumberish>,
+    amounts: PromiseOrValue<BigNumberish>[],
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
   supportsInterface(
     interfaceId: PromiseOrValue<BytesLike>,
@@ -1495,6 +1531,11 @@ export interface HypercertMinter extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
+    merge(
+      tokenIds: PromiseOrValue<BigNumberish>[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     mint(
       account: PromiseOrValue<string>,
       data: PromiseOrValue<BytesLike>,
@@ -1564,6 +1605,12 @@ export interface HypercertMinter extends BaseContract {
       slotId_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<string>;
+
+    split(
+      tokenId: PromiseOrValue<BigNumberish>,
+      amounts: PromiseOrValue<BigNumberish>[],
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     supportsInterface(
       interfaceId: PromiseOrValue<BytesLike>,
@@ -1917,6 +1964,11 @@ export interface HypercertMinter extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    merge(
+      tokenIds: PromiseOrValue<BigNumberish>[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     mint(
       account: PromiseOrValue<string>,
       data: PromiseOrValue<BytesLike>,
@@ -1985,6 +2037,12 @@ export interface HypercertMinter extends BaseContract {
     slotURI(
       slotId_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    split(
+      tokenId: PromiseOrValue<BigNumberish>,
+      amounts: PromiseOrValue<BigNumberish>[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     supportsInterface(
@@ -2190,6 +2248,11 @@ export interface HypercertMinter extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    merge(
+      tokenIds: PromiseOrValue<BigNumberish>[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
     mint(
       account: PromiseOrValue<string>,
       data: PromiseOrValue<BytesLike>,
@@ -2258,6 +2321,12 @@ export interface HypercertMinter extends BaseContract {
     slotURI(
       slotId_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    split(
+      tokenId: PromiseOrValue<BigNumberish>,
+      amounts: PromiseOrValue<BigNumberish>[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     supportsInterface(

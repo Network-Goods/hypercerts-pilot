@@ -9,3 +9,8 @@ export const mintInteractionLabels = {
     `Certificate ${transactionHash} successfully minted`,
   toastError: "Something went wrong while minting the certificate",
 };
+
+export const mergeInteractionLabels = {
+  toastSuccess: "HyperCert fractions successfully merged",
+  toastError: "HyperCert fractions could not be merged",
+};

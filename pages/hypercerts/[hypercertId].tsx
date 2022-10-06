@@ -61,7 +61,7 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
       <Center height="100">
         <Spinner />
         <Heading fontSize="lg" ml={4}>
-          Loading hypercert info
+          Loading HyperCert info
         </Heading>
       </Center>
     );
@@ -71,7 +71,7 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
     return (
       <Alert status="error">
         <AlertIcon />
-        <AlertTitle>Incomplete hypercert data</AlertTitle>
+        <AlertTitle>Incomplete HyperCert data</AlertTitle>
       </Alert>
     );
   }
@@ -139,6 +139,7 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
           </UnorderedList>
 
           <MergeAllFractionsModal
+            fractionIds={ownedFractions.map((f) => f.id)}
             render={({ onClick }) => (
               <Button onClick={onClick}>Merge all my fractions</Button>
             )}

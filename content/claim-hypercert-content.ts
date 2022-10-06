@@ -37,7 +37,7 @@ export const placeholders = {
 };
 
 export const buttons = {
-  submit: "Claim hypercert",
+  submit: "Claim HyperCert",
 };
 
 export const addWorkScopeModal = {

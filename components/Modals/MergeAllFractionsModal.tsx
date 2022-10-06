@@ -14,11 +14,26 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { mergeHypercertModalContent } from "../../content/merge-hypercert-content";
+import { useMergeFractions } from "../../hooks/merge";
 
 type C = (args: { onClick: () => void }) => JSX.Element;
 
-export const MergeAllFractionsModal = ({ render }: { render: C }) => {
+export const MergeAllFractionsModal = ({
+  render,
+  fractionIds,
+}: {
+  render: C;
+  fractionIds: string[];
+}) => {
   const { isOpen, onClose, onOpen } = useDisclosure();
+  const merge = useMergeFractions({
+    onComplete: () => {
+      setStep("complete");
+    },
+    onError: () => {
+      setStep("confirmation");
+    },
+  });
 
   const [step, setStep] = useState<"confirmation" | "merging" | "complete">(
     "confirmation"
@@ -29,8 +44,10 @@ export const MergeAllFractionsModal = ({ render }: { render: C }) => {
     onClose();
   };
 
-  const onConfirm = () => {
+  const onConfirm = async () => {
+    console.log("Merging", fractionIds);
     setStep("merging");
+    await merge(fractionIds);
   };
 
   return (
