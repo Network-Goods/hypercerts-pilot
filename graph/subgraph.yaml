@@ -3,11 +3,11 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: HypercertMinter
+    name: HyperCertMinter
     network: goerli
     source:
-      address: "0xc9997Bf3D85ef279C2671Fccc4E7Fa4ef092450B"
-      abi: HypercertMinter
+      address: "0x2f940EE83e730F45353C3546124c83a6E3776Da1"
+      abi: HyperCertMinter
       startBlock: 7515859
     mapping:
       kind: ethereum/events
@@ -28,10 +28,10 @@ dataSources:
         - Upgraded
         - WorkScope
       abis:
-        - name: HypercertMinter
-          file: ./abis/HypercertMinter.sol/HypercertMinter.json
+        - name: HyperCertMinter
+          file: ./abis/HyperCertMinter.sol/HyperCertMinter.json
       eventHandlers:
-        - event: ImpactClaimed(uint256,address,uint8[])
+        - event: ImpactClaimed(uint256,address,uint256[])
           handler: handleImpactClaimed
         - event: ImpactScopeAdded(bytes32,string)
           handler: handleImpactScopeAdded

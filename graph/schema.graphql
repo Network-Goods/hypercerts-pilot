@@ -33,8 +33,6 @@ type Hypercert @entity {
   workScopes: [WorkScope!]
   "array of rights an owner of the impact certificate holds"
   rights: [Right!]
-  "SVG image string"
-  image: String!
   "external reference, usually IPFS CID"
   uri: String!
   "total unit of certificate, used for splitting and merging"
