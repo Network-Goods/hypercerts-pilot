@@ -6,7 +6,7 @@ dataSources:
     name: HyperCertMinter
     network: goerli
     source:
-      address: "0x2f940EE83e730F45353C3546124c83a6E3776Da1"
+      address: "0x2ae4F3E20C86b29650275aB61A3ef65402C5df69"
       abi: HyperCertMinter
       startBlock: 7515859
     mapping:
@@ -31,7 +31,7 @@ dataSources:
         - name: HyperCertMinter
           file: ./abis/HyperCertMinter.sol/HyperCertMinter.json
       eventHandlers:
-        - event: ImpactClaimed(uint256,address,uint256[])
+        - event: ImpactClaimed(uint256,address,uint64[])
           handler: handleImpactClaimed
         - event: ImpactScopeAdded(bytes32,string)
           handler: handleImpactScopeAdded

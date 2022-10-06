@@ -189,7 +189,6 @@ export function handleTransferValue(event: TransferValue): void {
   let hypercertID = contract.try_slotOf(event.params._toTokenId);
 
   if (hypercertID.reverted) {
-    log.info("slotOf reverted", []);
     return;
   }
   let hypercert = Hypercert.load(hypercertID.value.toHexString());
@@ -201,6 +200,7 @@ export function handleTransferValue(event: TransferValue): void {
   let fractionFrom = HypercertFraction.load(fromTokenID);
   if (fractionFrom) {
     fractionFrom.units = fractionFrom.units.minus(value);
+    fractionFrom.owner = Address.zero().toHexString();
     fractionFrom.save();
   }
 
