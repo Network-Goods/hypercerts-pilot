@@ -69,7 +69,7 @@ const ClaimHypercertPage: NextPage = () => {
   const { address } = useWallet();
   const { push } = useRouter();
   const mintHyperCertificate = useMintHyperCertificate({
-    onComplete: () => push(urls.burn.href),
+    onComplete: () => push(urls.myHypercerts.href),
   });
   const toast = useToast();
 
@@ -197,7 +197,7 @@ const ClaimHypercertPage: NextPage = () => {
                 </Alert>
               )}
               <form onSubmit={handleSubmit}>
-                <FormControl isRequired>
+                <FormControl mb={3} isRequired>
                   <Flex>
                     <FormLabel>Certificate name</FormLabel>
                     <ErrorMessage name="name" render={DisplayError} />
@@ -212,7 +212,7 @@ const ClaimHypercertPage: NextPage = () => {
                     disabled={isSubmitting}
                   />
                 </FormControl>
-                <FormControl isRequired>
+                <FormControl mb={3} isRequired>
                   <Flex>
                     <FormLabel>Description</FormLabel>
                     <ErrorMessage name="description" render={DisplayError} />
@@ -227,7 +227,7 @@ const ClaimHypercertPage: NextPage = () => {
                     disabled={isSubmitting}
                   />
                 </FormControl>
-                <FormControl isRequired>
+                <FormControl mb={3} isRequired>
                   <Flex>
                     <FormLabel>External link</FormLabel>
                     <ErrorMessage name="external_link" render={DisplayError} />
@@ -242,7 +242,7 @@ const ClaimHypercertPage: NextPage = () => {
                     disabled={isSubmitting}
                   />
                 </FormControl>
-                <FormControl isRequired>
+                <FormControl mb={3} isRequired>
                   <Flex>
                     <FormLabel>Fractions</FormLabel>
                     <ErrorMessage name="fractions" render={DisplayError} />

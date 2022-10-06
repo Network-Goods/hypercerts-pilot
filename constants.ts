@@ -14,7 +14,19 @@ export const SHEET_BEST_ENDPOINT = requireEnv(
 );
 
 export const urls = {
-  browse: { label: headerLinkLabels.browse, href: "/browse" },
-  claim: { label: headerLinkLabels.claim, href: "/claim-hypercert" },
-  burn: { label: headerLinkLabels.burn, href: "/burn-hypercert" },
+  browse: {
+    label: headerLinkLabels.browse,
+    href: "/",
+    showOnlyWhenConnected: false,
+  },
+  claim: {
+    label: headerLinkLabels.claim,
+    href: "/claim-hypercert",
+    showOnlyWhenConnected: true,
+  },
+  myHypercerts: {
+    label: headerLinkLabels.myHypercerts,
+    href: "/my-hypercerts",
+    showOnlyWhenConnected: true,
+  },
 };
