@@ -39,7 +39,7 @@ export const UserInfo = ({ address }: { address: string }) => {
     <WithLink link={url}>
       <Flex alignItems="center">
         <Avatar size="sm" src={avatarSrc} name={avatarName} />
-        <Text ml={4}>{name}</Text>
+        <Text ml={2}>{name}</Text>
       </Flex>
     </WithLink>
   );

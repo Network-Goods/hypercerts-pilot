@@ -249,12 +249,10 @@ const FractionLine = ({
 }) => {
   return (
     <ListItem display="flex" alignItems="center">
-      <Flex flexDirection="column">
-        <Text fontSize="xs" opacity={0.7}>
-          {percentage}
-        </Text>
-        <Text fontSize="md">{ownerId}</Text>
-      </Flex>
+      <UserInfo address={ownerId} />
+      <Text ml={1} fontSize="sm" opacity={0.7}>
+        - {percentage}
+      </Text>
       <Button
         as="a"
         target="_blank"
