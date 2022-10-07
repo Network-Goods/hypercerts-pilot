@@ -98,10 +98,7 @@ export const SplitFractionModal = ({
                     data.hypercertFraction.hypercert.totalUnits
                   )}
                 </Text>
-                <Text>
-                  The combined value of the new fractions should be equal to the
-                  original value.
-                </Text>{" "}
+
                 {valueIncorrect || onlyOneFraction ? (
                   <Alert borderRadius="sm" my={4} status="error">
                     <AlertIcon />
