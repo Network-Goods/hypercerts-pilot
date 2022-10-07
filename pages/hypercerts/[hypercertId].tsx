@@ -147,6 +147,7 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
                 address={address}
                 ownerId={fraction.owner.id}
                 tokenId={fraction.id}
+                hypercertId={hypercertId}
                 percentage={formatFractionPercentage(
                   fraction.units,
                   fraction.hypercert.totalUnits
@@ -159,6 +160,7 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
                 address={address}
                 ownerId={fraction.owner.id}
                 tokenId={fraction.id}
+                hypercertId={hypercertId}
                 percentage={formatFractionPercentage(
                   fraction.units,
                   fraction.hypercert.totalUnits
@@ -261,11 +263,13 @@ const FractionLine = ({
   ownerId,
   percentage,
   tokenId,
+  hypercertId,
 }: {
   address?: string | null;
   ownerId: string;
   percentage: string;
   tokenId: string;
+  hypercertId: string;
 }) => {
   return (
     <ListItem display="flex" alignItems="center">
@@ -284,6 +288,7 @@ const FractionLine = ({
       </Button>
       {ownerId.toLowerCase() === address?.toLowerCase() && (
         <SplitFractionModal
+          hypercertId={hypercertId}
           tokenId={tokenId}
           render={({ onClick }) => (
             <Button onClick={onClick} ml={2}>

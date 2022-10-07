@@ -21,17 +21,21 @@ import { splitFractionModal } from "../../content/split-hypercert-content";
 import { useFractionById } from "../../hooks/fractions";
 import { useSplitFraction } from "../../hooks/split";
 import _ from "lodash";
+import { useHypercertFractions } from "../../hooks/useHypercert";
 
 type C = (args: { onClick: () => void }) => JSX.Element;
 
 export const SplitFractionModal = ({
   render,
   tokenId,
+  hypercertId,
 }: {
   render: C;
   tokenId: string;
+  hypercertId: string;
 }) => {
   const { isOpen, onClose, onOpen } = useDisclosure();
+  const { startPolling } = useHypercertFractions(hypercertId);
 
   const [step, setStep] = useState<"input" | "splitting" | "complete">("input");
   const [value, setValue] = useState("");
@@ -40,6 +44,7 @@ export const SplitFractionModal = ({
   const split = useSplitFraction({
     onComplete: () => {
       setStep("complete");
+      startPolling(5000);
     },
     onError: () => {
       setStep("input");

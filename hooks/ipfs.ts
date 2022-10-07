@@ -14,6 +14,7 @@ export const useIpfsMetadata = (uri?: string) => {
         : null,
     {
       cacheTime: Infinity,
+      keepPreviousData: true,
       onError: () => {
         toast({
           status: "error",
