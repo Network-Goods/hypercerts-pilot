@@ -41,6 +41,7 @@ export const AddRightsModal = ({
       toast({
         description: addRightModal.toastSuccess(receipt.transactionHash),
         status: "success",
+        isClosable: true,
       });
       setAddingRight(false);
       onClose();

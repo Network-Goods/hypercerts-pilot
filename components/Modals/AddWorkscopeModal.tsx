@@ -41,6 +41,7 @@ export const AddWorkscopeModal = ({
       toast({
         description: addWorkScopeModal.toastSuccess(receipt.transactionHash),
         status: "success",
+        isClosable: true,
       });
       setAddingScope(false);
       onClose();
