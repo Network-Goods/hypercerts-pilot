@@ -50,6 +50,13 @@ export const SplitFractionModal = ({
 
   const fractionValue = data?.hypercertFraction?.units;
 
+  const formatValues = (s: string) => {
+    return s
+      .split(",")
+      .map((x) => x.trim())
+      .map((x) => parseInt(x, 10));
+  };
+
   useEffect(() => {
     setValue(fractionValue);
     setTotalValue(_.sum(formatValues(fractionValue || "")));
@@ -62,13 +69,6 @@ export const SplitFractionModal = ({
     onClose();
   };
 
-  const formatValues = (s: string) => {
-    return s
-      .split(",")
-      .map((x) => x.trim())
-      .map((x) => parseInt(x, 10));
-  };
-
   const onClickSplit = async () => {
     setStep("splitting");
     const formattedValues = formatValues(value);
@@ -78,7 +78,7 @@ export const SplitFractionModal = ({
   const fractionUnits = parseInt(data?.hypercertFraction?.units, 10);
   const valueIncorrect = totalValue !== fractionUnits || isNaN(totalValue);
 
-  const onlyOneFraction = value.split(",").length === 1;
+  const onlyOneFraction = value?.split(",").length === 1;
   const disabled = valueIncorrect || onlyOneFraction;
 
   return (
