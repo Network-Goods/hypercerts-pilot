@@ -6,9 +6,9 @@ dataSources:
     name: HyperCertMinter
     network: goerli
     source:
-      address: "0xd6bC5E4D5E20ac3E4B6a9F0B888D15d467A3508F"
+      address: "0xb43552D2459C62Bc2e1562c2896449CC44997C18"
       abi: HyperCertMinter
-      startBlock: 7705809
+      startBlock: 7726531
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -49,6 +49,8 @@ dataSources:
           handler: handleRoleRevoked
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
+        - event: SlotChanged(indexed uint256,indexed uint256,indexed uint256)
+          handler: handleSlotChanged
         - event: TransferValue(indexed uint256,indexed uint256,uint256)
           handler: handleTransferValue
         - event: Upgraded(indexed address)
