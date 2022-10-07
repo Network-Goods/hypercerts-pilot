@@ -16,3 +16,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 [Be sure to set the correct chainId in metamask for localhost:8584 development](https://stackoverflow.com/questions/73164955/hardhat-metamask-error-trying-to-send-a-raw-transaction-with-an-invalid-chain)
 
+## Tooling
+
+#### Graphql code generation
+Running `codegen:watch` will automatically update the graphql types from queries wrappen in the `graphql()` function.
