@@ -1,5 +1,5 @@
 import { Button, Flex } from "@chakra-ui/react";
-import Select from "react-select";
+import Select, { Props } from "react-select";
 import makeAnimated from "react-select/animated";
 
 export interface Option {
@@ -16,6 +16,7 @@ export interface AutoCompleteProps {
   // Necessary for resolving ssr issues
   instanceId: string;
   disabled: boolean;
+  value?: Props["value"];
 }
 
 const animatedComponents = makeAnimated();
@@ -28,10 +29,12 @@ export const AutoComplete = ({
   placeholder,
   instanceId,
   disabled,
+  value,
 }: AutoCompleteProps) => {
   return (
     <Flex>
       <Select
+        value={value}
         isDisabled={disabled}
         instanceId={instanceId}
         options={options}

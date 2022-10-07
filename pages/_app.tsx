@@ -96,8 +96,8 @@ const queryClient = new QueryClient({});
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ApolloProvider client={apolloClient}>
+    <ApolloProvider client={apolloClient}>
+      <QueryClientProvider client={queryClient}>
         <ChakraProvider
           toastOptions={{
             defaultOptions: {
@@ -124,9 +124,9 @@ function MyApp({ Component, pageProps }: AppProps) {
             </Layout>
           </WalletProvider>
         </ChakraProvider>
-      </ApolloProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
+    </ApolloProvider>
   );
 }
 

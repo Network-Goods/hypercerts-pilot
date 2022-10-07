@@ -7,7 +7,8 @@ import { placeholders } from "../../content/claim-hypercert-content";
 export const RightsAutoComplete = ({
   onChange,
   disabled,
-}: Pick<AutoCompleteProps, "onChange" | "disabled">) => {
+  value,
+}: Pick<AutoCompleteProps, "onChange" | "disabled" | "value">) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { data: rightsData, loading: rightsLoading } = useRights();
   const rightsOptions: Option[] =
@@ -16,6 +17,7 @@ export const RightsAutoComplete = ({
   return (
     <>
       <AutoComplete
+        value={value}
         options={rightsOptions}
         onChange={onChange}
         onOpenAddModal={onOpen}
