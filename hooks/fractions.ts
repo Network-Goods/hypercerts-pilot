@@ -1,6 +1,27 @@
 import { useQuery } from "@apollo/client";
 import { graphql } from "../gql";
 
+export const useFractionById = (tokenId: string) => {
+  const GET_FRACTION_BY_ID_QUERY = graphql(`
+    query GetFractionById($fractionId: ID!) {
+      hypercertFraction(id: $fractionId) {
+        id
+        units
+        hypercert {
+          id
+          totalUnits
+        }
+      }
+    }
+  `);
+
+  return useQuery(GET_FRACTION_BY_ID_QUERY, {
+    variables: {
+      fractionId: tokenId,
+    },
+  });
+};
+
 export const useFractionsListForUser = (address: string) => {
   const FRACTIONS_LIST_FOR_USER_QUERY = graphql(`
     query ListFractionsForUsers($userId: String!) {
@@ -13,24 +34,13 @@ export const useFractionsListForUser = (address: string) => {
         hypercert {
           id
           totalUnits
+          lastUpdated
         }
       }
     }
   `);
 
-  return useQuery<{
-    hypercertFractions: {
-      id: string;
-      units: number;
-      owner: {
-        id: string;
-      };
-      hypercert: {
-        id: string;
-        totalUnits: number;
-      };
-    }[];
-  }>(FRACTIONS_LIST_FOR_USER_QUERY, {
+  return useQuery(FRACTIONS_LIST_FOR_USER_QUERY, {
     variables: {
       userId: address.toLowerCase(),
     },

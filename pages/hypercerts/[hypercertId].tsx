@@ -34,6 +34,7 @@ import { UserInfo } from "../../components/UserInfo";
 import { hypercertDetailContent } from "../../content/hypercert-detail-content";
 import { useIpfsMetadata } from "../../hooks/ipfs";
 import { MetaDataResponse } from "../../types/MetaData";
+import { SplitFractionModal } from "../../components/Modals/SplitFractionModal";
 
 const HypercertPageWrapper = () => {
   const { query } = useRouter();
@@ -281,7 +282,16 @@ const FractionLine = ({
       >
         Show on OpenSea
       </Button>
-      {ownerId === address && <Button ml={4}>Split</Button>}
+      {ownerId.toLowerCase() === address?.toLowerCase() && (
+        <SplitFractionModal
+          tokenId={tokenId}
+          render={({ onClick }) => (
+            <Button onClick={onClick} ml={2}>
+              Split
+            </Button>
+          )}
+        />
+      )}
     </ListItem>
   );
 };

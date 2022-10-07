@@ -14,3 +14,8 @@ export const mergeInteractionLabels = {
   toastSuccess: "HyperCert fractions successfully merged",
   toastError: "HyperCert fractions could not be merged",
 };
+
+export const splitInteractionLabels = {
+  toastSuccess: "HyperCert fractions successfully split",
+  toastError: "HyperCert fractions could not be split",
+};

@@ -1,44 +1,805 @@
-type Contributor @entity {
-    id: String!
-    hypercerts: [Hypercert!]! @derivedFrom(field: "contributors")
+# This file was generated based on ".graphqlconfig". Do not edit manually.
+
+schema {
+    query: Query
+    subscription: Subscription
 }
 
-type Hypercert @entity {
-    id: String!
-    minter: String!
+"Marks the GraphQL type as indexable entity.  Each type that should be an entity is required to be annotated with this directive."
+directive @entity on OBJECT
+
+"Defined a Subgraph ID for an object type"
+directive @subgraphId(id: String!) on OBJECT
+
+"creates a virtual field on the entity that may be queried but cannot be set manually through the mappings API."
+directive @derivedFrom(field: String!) on FIELD_DEFINITION
+
+type Contributor {
+    "hypercert the contributor has contributed to"
+    hypercerts(first: Int = 100, orderBy: Hypercert_orderBy, orderDirection: OrderDirection, skip: Int = 0, where: Hypercert_filter): [Hypercert!]!
+    "contibutor ID is an Ethereum address"
+    id: ID!
+}
+
+type Hypercert {
+    "fingerprint of the hyperspace claimed by the minter"
     claimHash: Bytes!
-    contributors: [Contributor!]!
+    "array of know addresses representing contributors to this impact claim"
+    contributors(first: Int = 100, orderBy: Contributor_orderBy, orderDirection: OrderDirection, skip: Int = 0, where: Contributor_filter): [Contributor!]!
+    "fractions of certificate"
+    fractions(first: Int = 100, orderBy: HypercertFraction_orderBy, orderDirection: OrderDirection, skip: Int = 0, where: HypercertFraction_filter): [HypercertFraction!]!
+    "hypercert ID maps to the uint256 slotID in the ERC3525 Hypercert Minter"
+    id: ID!
+    "unix timestamp declaring when impact started"
     impactDateFrom: BigInt!
+    "unix timestamp declaring when impact ended"
     impactDateTo: BigInt!
-    impactScopes: [ImpactScope!]!
-    rights: [Right!]!
+    "array of impacts declared in claim"
+    impactScopes(first: Int = 100, orderBy: ImpactScope_orderBy, orderDirection: OrderDirection, skip: Int = 0, where: ImpactScope_filter): [ImpactScope!]
+    "unix timestamp of last change to entity"
+    lastUpdated: BigInt!
+    "address of the entity claiming the impact"
+    minter: String!
+    "array of rights an owner of the impact certificate holds"
+    rights(first: Int = 100, orderBy: Right_orderBy, orderDirection: OrderDirection, skip: Int = 0, where: Right_filter): [Right!]
+    "total unit of certificate, used for splitting and merging"
+    totalUnits: BigInt!
+    "external reference, usually IPFS CID"
     uri: String!
+    "hypercert version"
     version: BigInt!
+    "unix timestamp declaring when work started"
     workDateFrom: BigInt!
+    "unix timestamp declaring when work ended"
     workDateTo: BigInt!
-    workScopes: [WorkScope!]!
+    "array of work declared in claim"
+    workScopes(first: Int = 100, orderBy: WorkScope_orderBy, orderDirection: OrderDirection, skip: Int = 0, where: WorkScope_filter): [WorkScope!]
 }
 
-type HypercertBalance @entity {
-    id: String!
-    amount: BigInt!
-    token: Hypercert!
+type HypercertFraction {
+    "link to hypercert this fraction relates to"
+    hypercert: Hypercert!
+    "fraction ID maps to the uint256 tokenID in the ERC3525 Hypercert Minter"
+    id: ID!
+    "address of the entity owning the impact"
+    owner: Owner!
+    "units held by the fraction, used for splitting and merging"
+    units: BigInt!
 }
 
-type ImpactScope @entity {
-    id: Bytes!
+type ImpactScope {
+    "array of hypercerts claiming this type of impact"
+    hypercerts(first: Int = 100, orderBy: Hypercert_orderBy, orderDirection: OrderDirection, skip: Int = 0, where: Hypercert_filter): [Hypercert!]!
+    "impaceScope ID maps to byts32 input of 'impactScopes' on Hypercert Minter"
+    id: ID!
+    "natural language description of impact scope"
     text: String!
-    hypercerts: [Hypercert!]! @derivedFrom(field: "impactScopes")
 }
 
-type Right @entity {
-    id: Bytes!
-    text: String!
-    hypercerts: [Hypercert!]! @derivedFrom(field: "rights")
+type Owner {
+    "owner ID is an Ethereum address"
+    id: ID!
 }
 
-type WorkScope @entity {
-    id: Bytes!
+type Query {
+    "Access to subgraph metadata"
+    _meta(block: Block_height): _Meta_
+    contributor(
+        "The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+        block: Block_height,
+        id: ID!,
+        "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+        subgraphError: _SubgraphErrorPolicy_! = deny
+    ): Contributor
+    contributors(
+        "The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+        block: Block_height,
+        first: Int = 100,
+        orderBy: Contributor_orderBy,
+        orderDirection: OrderDirection,
+        skip: Int = 0,
+        "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+        subgraphError: _SubgraphErrorPolicy_! = deny,
+        where: Contributor_filter
+    ): [Contributor!]!
+    hypercert(
+        "The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+        block: Block_height,
+        id: ID!,
+        "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+        subgraphError: _SubgraphErrorPolicy_! = deny
+    ): Hypercert
+    hypercertFraction(
+        "The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+        block: Block_height,
+        id: ID!,
+        "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+        subgraphError: _SubgraphErrorPolicy_! = deny
+    ): HypercertFraction
+    hypercertFractions(
+        "The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+        block: Block_height,
+        first: Int = 100,
+        orderBy: HypercertFraction_orderBy,
+        orderDirection: OrderDirection,
+        skip: Int = 0,
+        "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+        subgraphError: _SubgraphErrorPolicy_! = deny,
+        where: HypercertFraction_filter
+    ): [HypercertFraction!]!
+    hypercerts(
+        "The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+        block: Block_height,
+        first: Int = 100,
+        orderBy: Hypercert_orderBy,
+        orderDirection: OrderDirection,
+        skip: Int = 0,
+        "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+        subgraphError: _SubgraphErrorPolicy_! = deny,
+        where: Hypercert_filter
+    ): [Hypercert!]!
+    impactScope(
+        "The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+        block: Block_height,
+        id: ID!,
+        "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+        subgraphError: _SubgraphErrorPolicy_! = deny
+    ): ImpactScope
+    impactScopes(
+        "The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+        block: Block_height,
+        first: Int = 100,
+        orderBy: ImpactScope_orderBy,
+        orderDirection: OrderDirection,
+        skip: Int = 0,
+        "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+        subgraphError: _SubgraphErrorPolicy_! = deny,
+        where: ImpactScope_filter
+    ): [ImpactScope!]!
+    owner(
+        "The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+        block: Block_height,
+        id: ID!,
+        "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+        subgraphError: _SubgraphErrorPolicy_! = deny
+    ): Owner
+    owners(
+        "The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+        block: Block_height,
+        first: Int = 100,
+        orderBy: Owner_orderBy,
+        orderDirection: OrderDirection,
+        skip: Int = 0,
+        "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+        subgraphError: _SubgraphErrorPolicy_! = deny,
+        where: Owner_filter
+    ): [Owner!]!
+    right(
+        "The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+        block: Block_height,
+        id: ID!,
+        "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+        subgraphError: _SubgraphErrorPolicy_! = deny
+    ): Right
+    rights(
+        "The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+        block: Block_height,
+        first: Int = 100,
+        orderBy: Right_orderBy,
+        orderDirection: OrderDirection,
+        skip: Int = 0,
+        "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+        subgraphError: _SubgraphErrorPolicy_! = deny,
+        where: Right_filter
+    ): [Right!]!
+    workScope(
+        "The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+        block: Block_height,
+        id: ID!,
+        "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+        subgraphError: _SubgraphErrorPolicy_! = deny
+    ): WorkScope
+    workScopes(
+        "The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+        block: Block_height,
+        first: Int = 100,
+        orderBy: WorkScope_orderBy,
+        orderDirection: OrderDirection,
+        skip: Int = 0,
+        "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+        subgraphError: _SubgraphErrorPolicy_! = deny,
+        where: WorkScope_filter
+    ): [WorkScope!]!
+}
+
+type Right {
+    "array of hypercerts claiming these type of rights"
+    hypercerts(first: Int = 100, orderBy: Hypercert_orderBy, orderDirection: OrderDirection, skip: Int = 0, where: Hypercert_filter): [Hypercert!]!
+    "impaceScope ID maps to bytes32 input of 'rights' on Hypercert Minter"
+    id: ID!
+    "natural language description of rights the owner holds"
     text: String!
-    hypercerts: [Hypercert!]! @derivedFrom(field: "workScopes")
+}
+
+type Subscription {
+    "Access to subgraph metadata"
+    _meta(block: Block_height): _Meta_
+    contributor(
+        "The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+        block: Block_height,
+        id: ID!,
+        "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+        subgraphError: _SubgraphErrorPolicy_! = deny
+    ): Contributor
+    contributors(
+        "The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+        block: Block_height,
+        first: Int = 100,
+        orderBy: Contributor_orderBy,
+        orderDirection: OrderDirection,
+        skip: Int = 0,
+        "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+        subgraphError: _SubgraphErrorPolicy_! = deny,
+        where: Contributor_filter
+    ): [Contributor!]!
+    hypercert(
+        "The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+        block: Block_height,
+        id: ID!,
+        "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+        subgraphError: _SubgraphErrorPolicy_! = deny
+    ): Hypercert
+    hypercertFraction(
+        "The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+        block: Block_height,
+        id: ID!,
+        "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+        subgraphError: _SubgraphErrorPolicy_! = deny
+    ): HypercertFraction
+    hypercertFractions(
+        "The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+        block: Block_height,
+        first: Int = 100,
+        orderBy: HypercertFraction_orderBy,
+        orderDirection: OrderDirection,
+        skip: Int = 0,
+        "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+        subgraphError: _SubgraphErrorPolicy_! = deny,
+        where: HypercertFraction_filter
+    ): [HypercertFraction!]!
+    hypercerts(
+        "The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+        block: Block_height,
+        first: Int = 100,
+        orderBy: Hypercert_orderBy,
+        orderDirection: OrderDirection,
+        skip: Int = 0,
+        "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+        subgraphError: _SubgraphErrorPolicy_! = deny,
+        where: Hypercert_filter
+    ): [Hypercert!]!
+    impactScope(
+        "The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+        block: Block_height,
+        id: ID!,
+        "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+        subgraphError: _SubgraphErrorPolicy_! = deny
+    ): ImpactScope
+    impactScopes(
+        "The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+        block: Block_height,
+        first: Int = 100,
+        orderBy: ImpactScope_orderBy,
+        orderDirection: OrderDirection,
+        skip: Int = 0,
+        "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+        subgraphError: _SubgraphErrorPolicy_! = deny,
+        where: ImpactScope_filter
+    ): [ImpactScope!]!
+    owner(
+        "The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+        block: Block_height,
+        id: ID!,
+        "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+        subgraphError: _SubgraphErrorPolicy_! = deny
+    ): Owner
+    owners(
+        "The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+        block: Block_height,
+        first: Int = 100,
+        orderBy: Owner_orderBy,
+        orderDirection: OrderDirection,
+        skip: Int = 0,
+        "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+        subgraphError: _SubgraphErrorPolicy_! = deny,
+        where: Owner_filter
+    ): [Owner!]!
+    right(
+        "The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+        block: Block_height,
+        id: ID!,
+        "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+        subgraphError: _SubgraphErrorPolicy_! = deny
+    ): Right
+    rights(
+        "The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+        block: Block_height,
+        first: Int = 100,
+        orderBy: Right_orderBy,
+        orderDirection: OrderDirection,
+        skip: Int = 0,
+        "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+        subgraphError: _SubgraphErrorPolicy_! = deny,
+        where: Right_filter
+    ): [Right!]!
+    workScope(
+        "The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+        block: Block_height,
+        id: ID!,
+        "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+        subgraphError: _SubgraphErrorPolicy_! = deny
+    ): WorkScope
+    workScopes(
+        "The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+        block: Block_height,
+        first: Int = 100,
+        orderBy: WorkScope_orderBy,
+        orderDirection: OrderDirection,
+        skip: Int = 0,
+        "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+        subgraphError: _SubgraphErrorPolicy_! = deny,
+        where: WorkScope_filter
+    ): [WorkScope!]!
+}
+
+type WorkScope {
+    "array of hypercerts claiming this type of work"
+    hypercerts(first: Int = 100, orderBy: Hypercert_orderBy, orderDirection: OrderDirection, skip: Int = 0, where: Hypercert_filter): [Hypercert!]!
+    "impaceScope ID maps to bytes32 input of 'workScopes' on Hypercert Minter"
+    id: ID!
+    "natural language description of work scope"
+    text: String!
+}
+
+type _Block_ {
+    "The hash of the block"
+    hash: Bytes
+    "The block number"
+    number: Int!
+    "Integer representation of the timestamp stored in blocks for the chain"
+    timestamp: Int
+}
+
+"The type for the top-level _meta field"
+type _Meta_ {
+    """
+
+    Information about a specific subgraph block. The hash of the block
+    will be null if the _meta field has a block constraint that asks for
+    a block number. It will be filled if the _meta field has no block constraint
+    and therefore asks for the latest  block
+    """
+    block: _Block_!
+    "The deployment ID"
+    deployment: String!
+    "If `true`, the subgraph encountered indexing errors at some past block"
+    hasIndexingErrors: Boolean!
+}
+
+enum Contributor_orderBy {
+    hypercerts
+    id
+}
+
+enum HypercertFraction_orderBy {
+    hypercert
+    id
+    owner
+    units
+}
+
+enum Hypercert_orderBy {
+    claimHash
+    contributors
+    fractions
+    id
+    impactDateFrom
+    impactDateTo
+    impactScopes
+    lastUpdated
+    minter
+    rights
+    totalUnits
+    uri
+    version
+    workDateFrom
+    workDateTo
+    workScopes
+}
+
+enum ImpactScope_orderBy {
+    hypercerts
+    id
+    text
+}
+
+"Defines the order direction, either ascending or descending"
+enum OrderDirection {
+    asc
+    desc
+}
+
+enum Owner_orderBy {
+    id
+}
+
+enum Right_orderBy {
+    hypercerts
+    id
+    text
+}
+
+enum WorkScope_orderBy {
+    hypercerts
+    id
+    text
+}
+
+enum _SubgraphErrorPolicy_ {
+    "Data will be returned even if the subgraph has indexing errors"
+    allow
+    "If the subgraph has indexing errors, data will be omitted. The default."
+    deny
+}
+
+scalar BigDecimal
+
+scalar BigInt
+
+scalar Bytes
+
+input BlockChangedFilter {
+    number_gte: Int!
+}
+
+input Block_height {
+    hash: Bytes
+    number: Int
+    number_gte: Int
+}
+
+input Contributor_filter {
+    "Filter for the block changed event."
+    _change_block: BlockChangedFilter
+    hypercerts_: Hypercert_filter
+    id: ID
+    id_gt: ID
+    id_gte: ID
+    id_in: [ID!]
+    id_lt: ID
+    id_lte: ID
+    id_not: ID
+    id_not_in: [ID!]
+}
+
+input HypercertFraction_filter {
+    "Filter for the block changed event."
+    _change_block: BlockChangedFilter
+    hypercert: String
+    hypercert_: Hypercert_filter
+    hypercert_contains: String
+    hypercert_contains_nocase: String
+    hypercert_ends_with: String
+    hypercert_ends_with_nocase: String
+    hypercert_gt: String
+    hypercert_gte: String
+    hypercert_in: [String!]
+    hypercert_lt: String
+    hypercert_lte: String
+    hypercert_not: String
+    hypercert_not_contains: String
+    hypercert_not_contains_nocase: String
+    hypercert_not_ends_with: String
+    hypercert_not_ends_with_nocase: String
+    hypercert_not_in: [String!]
+    hypercert_not_starts_with: String
+    hypercert_not_starts_with_nocase: String
+    hypercert_starts_with: String
+    hypercert_starts_with_nocase: String
+    id: ID
+    id_gt: ID
+    id_gte: ID
+    id_in: [ID!]
+    id_lt: ID
+    id_lte: ID
+    id_not: ID
+    id_not_in: [ID!]
+    owner: String
+    owner_: Owner_filter
+    owner_contains: String
+    owner_contains_nocase: String
+    owner_ends_with: String
+    owner_ends_with_nocase: String
+    owner_gt: String
+    owner_gte: String
+    owner_in: [String!]
+    owner_lt: String
+    owner_lte: String
+    owner_not: String
+    owner_not_contains: String
+    owner_not_contains_nocase: String
+    owner_not_ends_with: String
+    owner_not_ends_with_nocase: String
+    owner_not_in: [String!]
+    owner_not_starts_with: String
+    owner_not_starts_with_nocase: String
+    owner_starts_with: String
+    owner_starts_with_nocase: String
+    units: BigInt
+    units_gt: BigInt
+    units_gte: BigInt
+    units_in: [BigInt!]
+    units_lt: BigInt
+    units_lte: BigInt
+    units_not: BigInt
+    units_not_in: [BigInt!]
+}
+
+input Hypercert_filter {
+    "Filter for the block changed event."
+    _change_block: BlockChangedFilter
+    claimHash: Bytes
+    claimHash_contains: Bytes
+    claimHash_in: [Bytes!]
+    claimHash_not: Bytes
+    claimHash_not_contains: Bytes
+    claimHash_not_in: [Bytes!]
+    contributors: [String!]
+    contributors_: Contributor_filter
+    contributors_contains: [String!]
+    contributors_contains_nocase: [String!]
+    contributors_not: [String!]
+    contributors_not_contains: [String!]
+    contributors_not_contains_nocase: [String!]
+    fractions_: HypercertFraction_filter
+    id: ID
+    id_gt: ID
+    id_gte: ID
+    id_in: [ID!]
+    id_lt: ID
+    id_lte: ID
+    id_not: ID
+    id_not_in: [ID!]
+    impactDateFrom: BigInt
+    impactDateFrom_gt: BigInt
+    impactDateFrom_gte: BigInt
+    impactDateFrom_in: [BigInt!]
+    impactDateFrom_lt: BigInt
+    impactDateFrom_lte: BigInt
+    impactDateFrom_not: BigInt
+    impactDateFrom_not_in: [BigInt!]
+    impactDateTo: BigInt
+    impactDateTo_gt: BigInt
+    impactDateTo_gte: BigInt
+    impactDateTo_in: [BigInt!]
+    impactDateTo_lt: BigInt
+    impactDateTo_lte: BigInt
+    impactDateTo_not: BigInt
+    impactDateTo_not_in: [BigInt!]
+    impactScopes: [String!]
+    impactScopes_: ImpactScope_filter
+    impactScopes_contains: [String!]
+    impactScopes_contains_nocase: [String!]
+    impactScopes_not: [String!]
+    impactScopes_not_contains: [String!]
+    impactScopes_not_contains_nocase: [String!]
+    lastUpdated: BigInt
+    lastUpdated_gt: BigInt
+    lastUpdated_gte: BigInt
+    lastUpdated_in: [BigInt!]
+    lastUpdated_lt: BigInt
+    lastUpdated_lte: BigInt
+    lastUpdated_not: BigInt
+    lastUpdated_not_in: [BigInt!]
+    minter: String
+    minter_contains: String
+    minter_contains_nocase: String
+    minter_ends_with: String
+    minter_ends_with_nocase: String
+    minter_gt: String
+    minter_gte: String
+    minter_in: [String!]
+    minter_lt: String
+    minter_lte: String
+    minter_not: String
+    minter_not_contains: String
+    minter_not_contains_nocase: String
+    minter_not_ends_with: String
+    minter_not_ends_with_nocase: String
+    minter_not_in: [String!]
+    minter_not_starts_with: String
+    minter_not_starts_with_nocase: String
+    minter_starts_with: String
+    minter_starts_with_nocase: String
+    rights: [String!]
+    rights_: Right_filter
+    rights_contains: [String!]
+    rights_contains_nocase: [String!]
+    rights_not: [String!]
+    rights_not_contains: [String!]
+    rights_not_contains_nocase: [String!]
+    totalUnits: BigInt
+    totalUnits_gt: BigInt
+    totalUnits_gte: BigInt
+    totalUnits_in: [BigInt!]
+    totalUnits_lt: BigInt
+    totalUnits_lte: BigInt
+    totalUnits_not: BigInt
+    totalUnits_not_in: [BigInt!]
+    uri: String
+    uri_contains: String
+    uri_contains_nocase: String
+    uri_ends_with: String
+    uri_ends_with_nocase: String
+    uri_gt: String
+    uri_gte: String
+    uri_in: [String!]
+    uri_lt: String
+    uri_lte: String
+    uri_not: String
+    uri_not_contains: String
+    uri_not_contains_nocase: String
+    uri_not_ends_with: String
+    uri_not_ends_with_nocase: String
+    uri_not_in: [String!]
+    uri_not_starts_with: String
+    uri_not_starts_with_nocase: String
+    uri_starts_with: String
+    uri_starts_with_nocase: String
+    version: BigInt
+    version_gt: BigInt
+    version_gte: BigInt
+    version_in: [BigInt!]
+    version_lt: BigInt
+    version_lte: BigInt
+    version_not: BigInt
+    version_not_in: [BigInt!]
+    workDateFrom: BigInt
+    workDateFrom_gt: BigInt
+    workDateFrom_gte: BigInt
+    workDateFrom_in: [BigInt!]
+    workDateFrom_lt: BigInt
+    workDateFrom_lte: BigInt
+    workDateFrom_not: BigInt
+    workDateFrom_not_in: [BigInt!]
+    workDateTo: BigInt
+    workDateTo_gt: BigInt
+    workDateTo_gte: BigInt
+    workDateTo_in: [BigInt!]
+    workDateTo_lt: BigInt
+    workDateTo_lte: BigInt
+    workDateTo_not: BigInt
+    workDateTo_not_in: [BigInt!]
+    workScopes: [String!]
+    workScopes_: WorkScope_filter
+    workScopes_contains: [String!]
+    workScopes_contains_nocase: [String!]
+    workScopes_not: [String!]
+    workScopes_not_contains: [String!]
+    workScopes_not_contains_nocase: [String!]
+}
+
+input ImpactScope_filter {
+    "Filter for the block changed event."
+    _change_block: BlockChangedFilter
+    hypercerts_: Hypercert_filter
+    id: ID
+    id_gt: ID
+    id_gte: ID
+    id_in: [ID!]
+    id_lt: ID
+    id_lte: ID
+    id_not: ID
+    id_not_in: [ID!]
+    text: String
+    text_contains: String
+    text_contains_nocase: String
+    text_ends_with: String
+    text_ends_with_nocase: String
+    text_gt: String
+    text_gte: String
+    text_in: [String!]
+    text_lt: String
+    text_lte: String
+    text_not: String
+    text_not_contains: String
+    text_not_contains_nocase: String
+    text_not_ends_with: String
+    text_not_ends_with_nocase: String
+    text_not_in: [String!]
+    text_not_starts_with: String
+    text_not_starts_with_nocase: String
+    text_starts_with: String
+    text_starts_with_nocase: String
+}
+
+input Owner_filter {
+    "Filter for the block changed event."
+    _change_block: BlockChangedFilter
+    id: ID
+    id_gt: ID
+    id_gte: ID
+    id_in: [ID!]
+    id_lt: ID
+    id_lte: ID
+    id_not: ID
+    id_not_in: [ID!]
+}
+
+input Right_filter {
+    "Filter for the block changed event."
+    _change_block: BlockChangedFilter
+    hypercerts_: Hypercert_filter
+    id: ID
+    id_gt: ID
+    id_gte: ID
+    id_in: [ID!]
+    id_lt: ID
+    id_lte: ID
+    id_not: ID
+    id_not_in: [ID!]
+    text: String
+    text_contains: String
+    text_contains_nocase: String
+    text_ends_with: String
+    text_ends_with_nocase: String
+    text_gt: String
+    text_gte: String
+    text_in: [String!]
+    text_lt: String
+    text_lte: String
+    text_not: String
+    text_not_contains: String
+    text_not_contains_nocase: String
+    text_not_ends_with: String
+    text_not_ends_with_nocase: String
+    text_not_in: [String!]
+    text_not_starts_with: String
+    text_not_starts_with_nocase: String
+    text_starts_with: String
+    text_starts_with_nocase: String
+}
+
+input WorkScope_filter {
+    "Filter for the block changed event."
+    _change_block: BlockChangedFilter
+    hypercerts_: Hypercert_filter
+    id: ID
+    id_gt: ID
+    id_gte: ID
+    id_in: [ID!]
+    id_lt: ID
+    id_lte: ID
+    id_not: ID
+    id_not_in: [ID!]
+    text: String
+    text_contains: String
+    text_contains_nocase: String
+    text_ends_with: String
+    text_ends_with_nocase: String
+    text_gt: String
+    text_gte: String
+    text_in: [String!]
+    text_lt: String
+    text_lte: String
+    text_not: String
+    text_not_contains: String
+    text_not_contains_nocase: String
+    text_not_ends_with: String
+    text_not_ends_with_nocase: String
+    text_not_in: [String!]
+    text_not_starts_with: String
+    text_not_starts_with_nocase: String
+    text_starts_with: String
+    text_starts_with_nocase: String
 }
