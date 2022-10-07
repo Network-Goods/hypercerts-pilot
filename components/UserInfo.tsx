@@ -10,7 +10,7 @@ export const UserInfo = ({ nameOrAddress }: { nameOrAddress: string }) => {
     avatar,
     ens,
   } = useENS({
-    ens: nameOrAddress,
+    ens: nameOrAddress.endsWith(".eth") ? nameOrAddress : undefined,
   });
   const { isLoading: loadingUserInfoFallBacks, data: fallbackData } =
     useUserInfoFallbacks();
