@@ -11,9 +11,10 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { useFractionsListForUser } from "../hooks/fractions";
-import { TokenTile } from "../components/TokenTile";
 import { myHypercertsContent } from "../content/my-hypercerts-content";
 import { ethers } from "ethers";
+import _ from "lodash";
+import { HypercertTile } from "../components/HypercertTile";
 
 const MyHypercertsPageWrapper = () => {
   const { address } = useWallet();
@@ -43,12 +44,29 @@ const MyHypercertsPage = ({ userAddress }: { userAddress: string }) => {
     );
   }
 
-  const fractions = data.hypercertFractions.filter(
-    (f) => f.owner.id !== ethers.constants.AddressZero
-  );
-  const burnedFractions = data.hypercertFractions.filter(
-    (f) => f.owner.id === ethers.constants.AddressZero
-  );
+  const fractions = data.hypercertFractions
+    .filter((f) => f.owner.id !== ethers.constants.AddressZero)
+    .map((fraction) => ({
+      hypercertId: fraction.hypercert.id,
+      lastUpdated: fraction.hypercert.lastUpdated,
+    }));
+  const burnedFractions = data.hypercertFractions
+    .filter((f) => f.owner.id === ethers.constants.AddressZero)
+    .map((fraction) => ({
+      hypercertId: fraction.hypercert.id,
+      lastUpdated: fraction.hypercert.lastUpdated,
+    }));
+
+  const processFractions = (xs: { hypercertId: string; lastUpdated: any }[]) =>
+    _.chain(xs)
+      .sortBy((x) => x.lastUpdated)
+      .reverse()
+      .map((x) => x.hypercertId)
+      .uniq()
+      .value();
+
+  const uniqIds = processFractions(fractions);
+  const uniqBurnedIds = processFractions(burnedFractions);
 
   return (
     <Container maxWidth={1000}>
@@ -58,23 +76,23 @@ const MyHypercertsPage = ({ userAddress }: { userAddress: string }) => {
           <AlertTitle>{myHypercertsContent.noHypercertsOwned}</AlertTitle>
         </Alert>
       )}
-      {!!fractions.length && (
+      {!!uniqIds.length && (
         <>
           <Heading mb={4}>{myHypercertsContent.myHypercertsHeader}</Heading>
           <SimpleGrid columns={[2, 2, 3]} spacing={4}>
-            {fractions.map((f) => (
-              <TokenTile key={f.id} id={f.id} />
+            {uniqIds.map((id) => (
+              <HypercertTile hoverEffect key={id} id={id} />
             ))}
           </SimpleGrid>
         </>
       )}
-      {!!burnedFractions.length && (
+      {!!uniqBurnedIds.length && (
         <>
           <Heading my={4}>{myHypercertsContent.burnedHypercertsHeader}</Heading>
           <Text>{myHypercertsContent.burnedHypercertsText}</Text>
           <SimpleGrid columns={[2, 2, 3]} spacing={4}>
-            {burnedFractions.map((f) => (
-              <TokenTile key={f.id} id={f.id} />
+            {uniqBurnedIds.map((id) => (
+              <HypercertTile hoverEffect key={id} id={id} />
             ))}
           </SimpleGrid>
         </>

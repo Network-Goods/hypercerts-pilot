@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import { FORMAT_VERSION, urls } from "../../constants";
 import { WrongNetworkBanner } from "./WrongNetworkBanner";
 import { useWallet } from "@raidguild/quiver";
+import Image from "next/image";
 
 export const Layout = ({ children }: PropsWithChildren) => {
   const { pathname } = useRouter();
@@ -30,9 +31,18 @@ export const Layout = ({ children }: PropsWithChildren) => {
           <HStack justifyContent="start">
             <Link href={urls.browse.href}>
               <Flex alignItems="flex-end" as="a" cursor="pointer">
-                <Text fontSize="xl">HyperCert</Text>
-                <Text ml={2} mb={0.5} color="gray.400">
-                  v{FORMAT_VERSION}
+                <Image src="/logo.svg" width={30} height={30} />
+                <Text ml={2} fontSize="xl">
+                  HyperCert
+                </Text>
+                <Text
+                  as="sup"
+                  fontSize="14px"
+                  color="gray.400"
+                  transform="translateY(-8px)"
+                  ml={1}
+                >
+                  <sup>v{FORMAT_VERSION}</sup>
                 </Text>
               </Flex>
             </Link>

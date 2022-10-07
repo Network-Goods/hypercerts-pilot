@@ -1,5 +1,6 @@
 import { Hypercert, useHypercertInfo } from "../hooks/useHypercert";
 import { Tile } from "./Tile";
+import Link from "next/link";
 
 export const HypercertTile = ({
   id,
@@ -11,5 +12,11 @@ export const HypercertTile = ({
     return null;
   }
 
-  return <Tile src={data.image} hoverEffect={hoverEffect} />;
+  return (
+    <Link href={`/hypercerts/${id}`} passHref>
+      <a>
+        <Tile src={data.image} hoverEffect={hoverEffect} />
+      </a>
+    </Link>
+  );
 };

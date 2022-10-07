@@ -144,7 +144,6 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
             {ownedFractions.map((fraction) => (
               <FractionLine
                 key={fraction.id}
-                address={address}
                 ownerId={fraction.owner.id}
                 tokenId={fraction.id}
                 hypercertId={hypercertId}
@@ -157,7 +156,6 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
             {otherFractions.map((fraction) => (
               <FractionLine
                 key={fraction.id}
-                address={address}
                 ownerId={fraction.owner.id}
                 tokenId={fraction.id}
                 hypercertId={hypercertId}
@@ -259,18 +257,17 @@ const InfoBoxLine = ({
 );
 
 const FractionLine = ({
-  address,
   ownerId,
   percentage,
   tokenId,
   hypercertId,
 }: {
-  address?: string | null;
   ownerId: string;
   percentage: string;
   tokenId: string;
   hypercertId: string;
 }) => {
+  const { address } = useWallet();
   return (
     <ListItem display="flex" alignItems="center">
       <UserInfo nameOrAddress={ownerId} />
