@@ -141,8 +141,13 @@ export function handleSlotChanged(event: SlotChanged): void {
 
   // Handle burn
   if (fraction && event.params._newSlot.toI32() == 0) {
-    fraction.units = BigInt.fromI32(0);
-    fraction.owner = Address.zero().toHexString();
+    let owner = Owner.load(Address.zero().toHexString());
+
+    if (!owner) {
+      owner = new Owner(Address.zero().toHexString());
+      owner.save();
+    }
+    fraction.owner = owner.id;
     fraction.save();
     return;
   }
@@ -186,22 +191,20 @@ export function handleTransferValue(event: TransferValue): void {
   const toTokenID = event.params._toTokenId.toHexString();
   const value = event.params._value;
 
-  let hypercertID = contract.try_slotOf(event.params._toTokenId);
+  let hypercertSlot = contract.try_slotOf(event.params._toTokenId);
+  let hypercertID = "0";
 
-  if (hypercertID.reverted) {
-    return;
-  }
-  let hypercert = Hypercert.load(hypercertID.value.toHexString());
-
-  if (!hypercert) {
-    return;
+  if (!hypercertSlot.reverted) {
+    hypercertID = hypercertSlot.value.toHexString();
   }
 
-  let fractionFrom = HypercertFraction.load(fromTokenID);
-  if (fractionFrom) {
-    fractionFrom.units = fractionFrom.units.minus(value);
-    fractionFrom.owner = Address.zero().toHexString();
-    fractionFrom.save();
+
+  if (event.params._fromTokenId.toI32() != 0) {
+    let fractionFrom = HypercertFraction.load(fromTokenID);
+    if (fractionFrom) {
+      fractionFrom.units = fractionFrom.units.minus(value);
+      fractionFrom.save();
+    }
   }
 
   // To
@@ -224,7 +227,7 @@ export function handleTransferValue(event: TransferValue): void {
   if (!fractionTo) {
     fractionTo = new HypercertFraction(toTokenID);
     fractionTo.units = value;
-    fractionTo.hypercert = hypercert.id;
+    fractionTo.hypercert = hypercertID;
     fractionTo.owner = owner.id;
   }
 
