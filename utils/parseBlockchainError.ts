@@ -1,4 +1,5 @@
 import { useHypercertContract } from "../hooks/contracts";
+import { errorMessages } from "../content/readable-errors";
 
 export const useParseBlockchainError = () => {
   const contract = useHypercertContract();
@@ -8,7 +9,8 @@ export const useParseBlockchainError = () => {
 
     if (errorData) {
       console.log("Blockchain error", errorData);
-      return errorData.errorFragment.name;
+      const errorName = errorData.errorFragment.name;
+      return errorMessages[errorName] || errorName;
     }
 
     console.log("Trouble parsing error", { ...e });
