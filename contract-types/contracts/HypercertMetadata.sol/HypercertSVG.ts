@@ -23,56 +23,39 @@ import type {
   utils,
 } from "ethers";
 
-export interface IHyperCertSVGInterface extends utils.Interface {
+export interface HypercertSVGInterface extends utils.Interface {
   functions: {
-    "generateSvgFraction(string,string[],uint64[2],uint64[2],uint256,uint256)": FunctionFragment;
-    "generateSvgHyperCert(string,string[],uint64[2],uint64[2],uint256)": FunctionFragment;
+    "generateSVG(string,string,uint64[2],uint64[2],uint256,uint256)": FunctionFragment;
   };
 
-  getFunction(
-    nameOrSignatureOrTopic: "generateSvgFraction" | "generateSvgHyperCert"
-  ): FunctionFragment;
+  getFunction(nameOrSignatureOrTopic: "generateSVG"): FunctionFragment;
 
   encodeFunctionData(
-    functionFragment: "generateSvgFraction",
+    functionFragment: "generateSVG",
     values: [
       PromiseOrValue<string>,
-      PromiseOrValue<string>[],
+      PromiseOrValue<string>,
       [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>],
       [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>],
       PromiseOrValue<BigNumberish>,
       PromiseOrValue<BigNumberish>
     ]
   ): string;
-  encodeFunctionData(
-    functionFragment: "generateSvgHyperCert",
-    values: [
-      PromiseOrValue<string>,
-      PromiseOrValue<string>[],
-      [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>],
-      [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>],
-      PromiseOrValue<BigNumberish>
-    ]
-  ): string;
 
   decodeFunctionResult(
-    functionFragment: "generateSvgFraction",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "generateSvgHyperCert",
+    functionFragment: "generateSVG",
     data: BytesLike
   ): Result;
 
   events: {};
 }
 
-export interface IHyperCertSVG extends BaseContract {
+export interface HypercertSVG extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: IHyperCertSVGInterface;
+  interface: HypercertSVGInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
@@ -94,9 +77,9 @@ export interface IHyperCertSVG extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    generateSvgFraction(
+    generateSVG(
       name: PromiseOrValue<string>,
-      scopesOfImpact: PromiseOrValue<string>[],
+      description: PromiseOrValue<string>,
       workTimeframe: [
         PromiseOrValue<BigNumberish>,
         PromiseOrValue<BigNumberish>
@@ -109,26 +92,11 @@ export interface IHyperCertSVG extends BaseContract {
       totalUnits: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[string]>;
-
-    generateSvgHyperCert(
-      name: PromiseOrValue<string>,
-      scopesOfImpact: PromiseOrValue<string>[],
-      workTimeframe: [
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>
-      ],
-      impactTimeframe: [
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>
-      ],
-      totalUnits: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
   };
 
-  generateSvgFraction(
+  generateSVG(
     name: PromiseOrValue<string>,
-    scopesOfImpact: PromiseOrValue<string>[],
+    description: PromiseOrValue<string>,
     workTimeframe: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>],
     impactTimeframe: [
       PromiseOrValue<BigNumberish>,
@@ -139,22 +107,10 @@ export interface IHyperCertSVG extends BaseContract {
     overrides?: CallOverrides
   ): Promise<string>;
 
-  generateSvgHyperCert(
-    name: PromiseOrValue<string>,
-    scopesOfImpact: PromiseOrValue<string>[],
-    workTimeframe: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>],
-    impactTimeframe: [
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>
-    ],
-    totalUnits: PromiseOrValue<BigNumberish>,
-    overrides?: CallOverrides
-  ): Promise<string>;
-
   callStatic: {
-    generateSvgFraction(
+    generateSVG(
       name: PromiseOrValue<string>,
-      scopesOfImpact: PromiseOrValue<string>[],
+      description: PromiseOrValue<string>,
       workTimeframe: [
         PromiseOrValue<BigNumberish>,
         PromiseOrValue<BigNumberish>
@@ -164,21 +120,6 @@ export interface IHyperCertSVG extends BaseContract {
         PromiseOrValue<BigNumberish>
       ],
       units: PromiseOrValue<BigNumberish>,
-      totalUnits: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    generateSvgHyperCert(
-      name: PromiseOrValue<string>,
-      scopesOfImpact: PromiseOrValue<string>[],
-      workTimeframe: [
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>
-      ],
-      impactTimeframe: [
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>
-      ],
       totalUnits: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<string>;
@@ -187,9 +128,9 @@ export interface IHyperCertSVG extends BaseContract {
   filters: {};
 
   estimateGas: {
-    generateSvgFraction(
+    generateSVG(
       name: PromiseOrValue<string>,
-      scopesOfImpact: PromiseOrValue<string>[],
+      description: PromiseOrValue<string>,
       workTimeframe: [
         PromiseOrValue<BigNumberish>,
         PromiseOrValue<BigNumberish>
@@ -199,30 +140,15 @@ export interface IHyperCertSVG extends BaseContract {
         PromiseOrValue<BigNumberish>
       ],
       units: PromiseOrValue<BigNumberish>,
-      totalUnits: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    generateSvgHyperCert(
-      name: PromiseOrValue<string>,
-      scopesOfImpact: PromiseOrValue<string>[],
-      workTimeframe: [
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>
-      ],
-      impactTimeframe: [
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>
-      ],
       totalUnits: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    generateSvgFraction(
+    generateSVG(
       name: PromiseOrValue<string>,
-      scopesOfImpact: PromiseOrValue<string>[],
+      description: PromiseOrValue<string>,
       workTimeframe: [
         PromiseOrValue<BigNumberish>,
         PromiseOrValue<BigNumberish>
@@ -232,21 +158,6 @@ export interface IHyperCertSVG extends BaseContract {
         PromiseOrValue<BigNumberish>
       ],
       units: PromiseOrValue<BigNumberish>,
-      totalUnits: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    generateSvgHyperCert(
-      name: PromiseOrValue<string>,
-      scopesOfImpact: PromiseOrValue<string>[],
-      workTimeframe: [
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>
-      ],
-      impactTimeframe: [
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>
-      ],
       totalUnits: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;

@@ -30,7 +30,7 @@ import type {
   utils,
 } from "ethers";
 
-export declare namespace HypercertMinter {
+export declare namespace HyperCertMinter {
   export type ClaimStruct = {
     claimHash: PromiseOrValue<BytesLike>;
     workTimeframe: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>];
@@ -81,7 +81,7 @@ export declare namespace HypercertMinter {
   };
 }
 
-export interface HypercertMinterUpgradeInterface extends utils.Interface {
+export interface HyperCertMinterUpgradeInterface extends utils.Interface {
   functions: {
     "DECIMALS()": FunctionFragment;
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
@@ -98,6 +98,7 @@ export interface HypercertMinterUpgradeInterface extends utils.Interface {
     "balanceOf(uint256)": FunctionFragment;
     "burn(uint256)": FunctionFragment;
     "contractURI()": FunctionFragment;
+    "donate(uint256)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "getHash(uint64[2],bytes32[],uint64[2],bytes32[])": FunctionFragment;
     "getImpactCert(uint256)": FunctionFragment;
@@ -109,6 +110,7 @@ export interface HypercertMinterUpgradeInterface extends utils.Interface {
     "isApprovedForAll(address,address)": FunctionFragment;
     "merge(uint256[])": FunctionFragment;
     "mint(address,bytes)": FunctionFragment;
+    "mockedUpgradeFunction()": FunctionFragment;
     "name()": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
     "proxiableUUID()": FunctionFragment;
@@ -122,8 +124,7 @@ export interface HypercertMinterUpgradeInterface extends utils.Interface {
     "slotCount()": FunctionFragment;
     "slotOf(uint256)": FunctionFragment;
     "slotURI(uint256)": FunctionFragment;
-    "split(uint256)": FunctionFragment;
-    "split(uint256,uint8[])": FunctionFragment;
+    "split(uint256,uint256[])": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "symbol()": FunctionFragment;
     "tokenByIndex(uint256)": FunctionFragment;
@@ -160,6 +161,7 @@ export interface HypercertMinterUpgradeInterface extends utils.Interface {
       | "balanceOf(uint256)"
       | "burn"
       | "contractURI"
+      | "donate"
       | "getApproved"
       | "getHash"
       | "getImpactCert"
@@ -171,6 +173,7 @@ export interface HypercertMinterUpgradeInterface extends utils.Interface {
       | "isApprovedForAll"
       | "merge"
       | "mint"
+      | "mockedUpgradeFunction"
       | "name"
       | "ownerOf"
       | "proxiableUUID"
@@ -184,8 +187,7 @@ export interface HypercertMinterUpgradeInterface extends utils.Interface {
       | "slotCount"
       | "slotOf"
       | "slotURI"
-      | "split(uint256)"
-      | "split(uint256,uint8[])"
+      | "split"
       | "supportsInterface"
       | "symbol"
       | "tokenByIndex"
@@ -261,6 +263,10 @@ export interface HypercertMinterUpgradeInterface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "donate",
+    values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
     functionFragment: "getApproved",
     values: [PromiseOrValue<BigNumberish>]
   ): string;
@@ -308,6 +314,10 @@ export interface HypercertMinterUpgradeInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "mint",
     values: [PromiseOrValue<string>, PromiseOrValue<BytesLike>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "mockedUpgradeFunction",
+    values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(
@@ -365,11 +375,7 @@ export interface HypercertMinterUpgradeInterface extends utils.Interface {
     values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
-    functionFragment: "split(uint256)",
-    values: [PromiseOrValue<BigNumberish>]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "split(uint256,uint8[])",
+    functionFragment: "split",
     values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>[]]
   ): string;
   encodeFunctionData(
@@ -489,6 +495,7 @@ export interface HypercertMinterUpgradeInterface extends utils.Interface {
     functionFragment: "contractURI",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "donate", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getApproved",
     data: BytesLike
@@ -515,6 +522,10 @@ export interface HypercertMinterUpgradeInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "merge", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "mockedUpgradeFunction",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
   decodeFunctionResult(
@@ -546,14 +557,7 @@ export interface HypercertMinterUpgradeInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "slotCount", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "slotOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "slotURI", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "split(uint256)",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "split(uint256,uint8[])",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "split", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "supportsInterface",
     data: BytesLike
@@ -614,7 +618,7 @@ export interface HypercertMinterUpgradeInterface extends utils.Interface {
     "ApprovalForAll(address,address,bool)": EventFragment;
     "ApprovalValue(uint256,address,uint256)": EventFragment;
     "BeaconUpgraded(address)": EventFragment;
-    "ImpactClaimed(uint256,address,uint8[])": EventFragment;
+    "ImpactClaimed(uint256,address,uint64[])": EventFragment;
     "ImpactScopeAdded(bytes32,string)": EventFragment;
     "Initialized(uint8)": EventFragment;
     "RightAdded(bytes32,string)": EventFragment;
@@ -709,10 +713,10 @@ export type BeaconUpgradedEventFilter = TypedEventFilter<BeaconUpgradedEvent>;
 export interface ImpactClaimedEventObject {
   id: BigNumber;
   minter: string;
-  fractions: number[];
+  fractions: BigNumber[];
 }
 export type ImpactClaimedEvent = TypedEvent<
-  [BigNumber, string, number[]],
+  [BigNumber, string, BigNumber[]],
   ImpactClaimedEventObject
 >;
 
@@ -847,12 +851,12 @@ export type WorkScopeAddedEvent = TypedEvent<
 
 export type WorkScopeAddedEventFilter = TypedEventFilter<WorkScopeAddedEvent>;
 
-export interface HypercertMinterUpgrade extends BaseContract {
+export interface HyperCertMinterUpgrade extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: HypercertMinterUpgradeInterface;
+  interface: HyperCertMinterUpgradeInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
@@ -935,6 +939,11 @@ export interface HypercertMinterUpgrade extends BaseContract {
 
     contractURI(overrides?: CallOverrides): Promise<[string]>;
 
+    donate(
+      tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     getApproved(
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -957,7 +966,7 @@ export interface HypercertMinterUpgrade extends BaseContract {
     getImpactCert(
       claimID: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
-    ): Promise<[HypercertMinter.ClaimStructOutput]>;
+    ): Promise<[HyperCertMinter.ClaimStructOutput]>;
 
     getRoleAdmin(
       role: PromiseOrValue<BytesLike>,
@@ -1000,6 +1009,10 @@ export interface HypercertMinterUpgrade extends BaseContract {
     mint(
       account: PromiseOrValue<string>,
       data: PromiseOrValue<BytesLike>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    mockedUpgradeFunction(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -1067,12 +1080,7 @@ export interface HypercertMinterUpgrade extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
-    "split(uint256)"(
-      id: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    "split(uint256,uint8[])"(
+    split(
       tokenId: PromiseOrValue<BigNumberish>,
       amounts: PromiseOrValue<BigNumberish>[],
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -1221,6 +1229,11 @@ export interface HypercertMinterUpgrade extends BaseContract {
 
   contractURI(overrides?: CallOverrides): Promise<string>;
 
+  donate(
+    tokenId: PromiseOrValue<BigNumberish>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   getApproved(
     tokenId: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
@@ -1243,7 +1256,7 @@ export interface HypercertMinterUpgrade extends BaseContract {
   getImpactCert(
     claimID: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
-  ): Promise<HypercertMinter.ClaimStructOutput>;
+  ): Promise<HyperCertMinter.ClaimStructOutput>;
 
   getRoleAdmin(
     role: PromiseOrValue<BytesLike>,
@@ -1286,6 +1299,10 @@ export interface HypercertMinterUpgrade extends BaseContract {
   mint(
     account: PromiseOrValue<string>,
     data: PromiseOrValue<BytesLike>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  mockedUpgradeFunction(
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -1353,12 +1370,7 @@ export interface HypercertMinterUpgrade extends BaseContract {
     overrides?: CallOverrides
   ): Promise<string>;
 
-  "split(uint256)"(
-    id: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  "split(uint256,uint8[])"(
+  split(
     tokenId: PromiseOrValue<BigNumberish>,
     amounts: PromiseOrValue<BigNumberish>[],
     overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -1507,6 +1519,11 @@ export interface HypercertMinterUpgrade extends BaseContract {
 
     contractURI(overrides?: CallOverrides): Promise<string>;
 
+    donate(
+      tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     getApproved(
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -1529,7 +1546,7 @@ export interface HypercertMinterUpgrade extends BaseContract {
     getImpactCert(
       claimID: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
-    ): Promise<HypercertMinter.ClaimStructOutput>;
+    ): Promise<HyperCertMinter.ClaimStructOutput>;
 
     getRoleAdmin(
       role: PromiseOrValue<BytesLike>,
@@ -1574,6 +1591,8 @@ export interface HypercertMinterUpgrade extends BaseContract {
       data: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    mockedUpgradeFunction(overrides?: CallOverrides): Promise<boolean>;
 
     name(overrides?: CallOverrides): Promise<string>;
 
@@ -1639,12 +1658,7 @@ export interface HypercertMinterUpgrade extends BaseContract {
       overrides?: CallOverrides
     ): Promise<string>;
 
-    "split(uint256)"(
-      id: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "split(uint256,uint8[])"(
+    split(
       tokenId: PromiseOrValue<BigNumberish>,
       amounts: PromiseOrValue<BigNumberish>[],
       overrides?: CallOverrides
@@ -1780,7 +1794,7 @@ export interface HypercertMinterUpgrade extends BaseContract {
       beacon?: PromiseOrValue<string> | null
     ): BeaconUpgradedEventFilter;
 
-    "ImpactClaimed(uint256,address,uint8[])"(
+    "ImpactClaimed(uint256,address,uint64[])"(
       id?: null,
       minter?: null,
       fractions?: null
@@ -1948,6 +1962,11 @@ export interface HypercertMinterUpgrade extends BaseContract {
 
     contractURI(overrides?: CallOverrides): Promise<BigNumber>;
 
+    donate(
+      tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     getApproved(
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -2016,6 +2035,10 @@ export interface HypercertMinterUpgrade extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
+    mockedUpgradeFunction(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
     ownerOf(
@@ -2080,12 +2103,7 @@ export interface HypercertMinterUpgrade extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "split(uint256)"(
-      id: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    "split(uint256,uint8[])"(
+    split(
       tokenId: PromiseOrValue<BigNumberish>,
       amounts: PromiseOrValue<BigNumberish>[],
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -2237,6 +2255,11 @@ export interface HypercertMinterUpgrade extends BaseContract {
 
     contractURI(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    donate(
+      tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
     getApproved(
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -2305,6 +2328,10 @@ export interface HypercertMinterUpgrade extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
+    mockedUpgradeFunction(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     ownerOf(
@@ -2369,12 +2396,7 @@ export interface HypercertMinterUpgrade extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "split(uint256)"(
-      id: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "split(uint256,uint8[])"(
+    split(
       tokenId: PromiseOrValue<BigNumberish>,
       amounts: PromiseOrValue<BigNumberish>[],
       overrides?: Overrides & { from?: PromiseOrValue<string> }
