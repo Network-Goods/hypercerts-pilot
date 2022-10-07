@@ -37,9 +37,17 @@ export const formatFractionPercentage = (
   return `${percentage.toFixed(0)}%`;
 };
 
-export const formatTime = (startTime: number, endTime: number) => {
-  return `${new Date(startTime).toDateString()} - ${new Date(
-    endTime
+export const formatTime = (startTime: number, endTime?: number) => {
+  if (startTime === endTime) {
+    return new Date(startTime * 1000).toDateString();
+  }
+
+  if (endTime === undefined) {
+    return `from ${new Date(startTime * 1000)}`;
+  }
+
+  return `${new Date(startTime * 1000).toDateString()} until ${new Date(
+    endTime * 1000
   ).toDateString()}`;
 };
 

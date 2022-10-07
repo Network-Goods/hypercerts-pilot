@@ -204,6 +204,7 @@ const HypercertInfoBox = ({
       spacing={4}
       alignItems="flex-start"
       padding={4}
+      borderRadius="sm"
       backgroundColor="lightgoldenrodyellow"
     >
       <InfoBoxLine title={hypercertDetailContent.infoBox.timeOfWork}>
