@@ -49,7 +49,7 @@ export const useMintHyperCertificate = ({
       "string",
       "string",
       "string",
-      "uint8[]",
+      "uint64[]",
     ];
     const values = [
       data.rightsIds,
@@ -67,5 +67,7 @@ export const useMintHyperCertificate = ({
     return abiCoder.encode(types, values);
   };
 
-  return (data: MintCertificateData) => mutate(address!, encodeData(data));
+  return (data: MintCertificateData) => {
+    return mutate(address!, encodeData(data));
+  };
 };

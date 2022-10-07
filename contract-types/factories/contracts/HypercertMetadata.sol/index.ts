@@ -3,3 +3,4 @@
 /* eslint-disable */
 export { HypercertMetadata__factory } from "./HypercertMetadata__factory";
 export { IHypercertMinter__factory } from "./IHypercertMinter__factory";
+export { IHypercertSVG__factory } from "./IHypercertSVG__factory";

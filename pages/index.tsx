@@ -10,7 +10,7 @@ import { HypercertTile } from "../components/HypercertTile";
 import { useEffect, useState } from "react";
 import _ from "lodash";
 import Link from "next/link";
-import { useCollections } from "../hooks/listCollections";
+import { useCollections } from "../hooks/useCollections";
 import { useListAllHypercerts } from "../hooks/listHypercerts";
 import { GetAllHypercertsQuery } from "../gql/graphql";
 
@@ -20,8 +20,7 @@ const BrowsePage = () => {
   const [filteredHypercerts, setFilteredHypercerts] = useState<
     GetAllHypercertsQuery["hypercerts"]
   >([]);
-  const { fetching: fetchingCollections, result: collections } =
-    useCollections();
+  const { isLoading: loadingCollections, data: collections } = useCollections();
 
   useEffect(() => {
     if (hypercertsResult) {
@@ -52,7 +51,7 @@ const BrowsePage = () => {
         <Select
           onChange={(e) => onChangeCollectionFilter(e.target.value)}
           maxWidth={300}
-          disabled={fetchingCollections}
+          disabled={loadingCollections}
         >
           <option defaultChecked value="all">
             No collection filter
@@ -64,13 +63,13 @@ const BrowsePage = () => {
               </option>
             ))}
         </Select>
-        {fetchingCollections && <Spinner ml={4} />}
+        {loadingCollections && <Spinner ml={4} />}
       </Flex>
       <SimpleGrid columns={{ sm: 2, md: 2 }} spacing={8}>
         {filteredHypercerts.map((cert) => (
           <Link key={cert.id} href={`hypercerts/${cert.id}`}>
             <ScaleFade initialScale={0.9} in>
-              <HypercertTile {...cert} />
+              <HypercertTile {...cert} hoverEffect />
             </ScaleFade>
           </Link>
         ))}

@@ -8,6 +8,22 @@ export const toastMessages = {
   mintingError: "Something went wrong while minting the certificate",
 };
 
+export const alerts = {
+  wait: "Please wait while your hypercert is being minted",
+};
+
+export const labels = {
+  name: "Certificate name",
+  description: "Description",
+  contributors: "Contributors",
+  externalLink: "External link",
+  fractions: "Fractions",
+};
+
+export const helperTexts = {
+  contributors: "Names and/or addresses of contributors, comma-separated",
+};
+
 export const placeholders = {
   name: "Human-readable name for the certificate",
   description: "Description for the certificate",
@@ -37,7 +53,7 @@ export const placeholders = {
 };
 
 export const buttons = {
-  submit: "Claim hypercert",
+  submit: "Claim HyperCert",
 };
 
 export const addWorkScopeModal = {

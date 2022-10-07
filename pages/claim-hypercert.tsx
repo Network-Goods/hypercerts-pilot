@@ -3,6 +3,7 @@ import { ErrorMessage, Field, FieldProps, Formik } from "formik";
 import {
   Alert,
   AlertIcon,
+  AlertTitle,
   Button,
   Container,
   Divider,
@@ -15,14 +16,17 @@ import {
   Input,
   Textarea,
   useToast,
+  VStack,
 } from "@chakra-ui/react";
-import { uploadCertificateToIpfs } from "../utils/ipfsClient";
 import { useWallet } from "@raidguild/quiver";
 import { useMintHyperCertificate } from "../hooks/mint";
 import * as Yup from "yup";
 import { FORMAT_VERSION, urls } from "../constants";
 import {
+  alerts,
   buttons,
+  helperTexts,
+  labels,
   placeholders,
   toastMessages,
 } from "../content/claim-hypercert-content";
@@ -31,6 +35,11 @@ import { ImpactScopesAutoComplete } from "../components/AutoComplete/ImpactScope
 import { RightsAutoComplete } from "../components/AutoComplete/RightsAutoComplete";
 import { Option } from "../components/AutoComplete/AutoComplete";
 import { useRouter } from "next/router";
+import qs from "qs";
+import { useEffect, useState } from "react";
+import _ from "lodash";
+import { isAddress } from "ethers/lib/utils";
+import { uploadCertificateToIpfs } from "../utils/ipfsClient";
 
 const ValidationSchema = Yup.object().shape({
   name: Yup.string()
@@ -65,40 +74,62 @@ const testValues = {
   uri: "",
 };
 
+const defaultValues = {
+  name: "",
+  description: "",
+  external_link: "",
+  image: null as File | null,
+  contributors: "",
+
+  format_version: FORMAT_VERSION,
+  prev_hypercert: "",
+  creators: [],
+  workTimeStart: undefined as string | undefined,
+  workTimeEnd: undefined as string | undefined,
+  impactTimeStart: undefined as string | undefined,
+  impactTimeEnd: undefined as string | undefined,
+  workScopes: [] as Option[],
+  impactScopes: [] as Option[],
+  rights: [] as Option[],
+  uri: "",
+  fractions: "1000",
+};
+
 const ClaimHypercertPage: NextPage = () => {
   const { address } = useWallet();
-  const { push } = useRouter();
+  const { push, query } = useRouter();
   const mintHyperCertificate = useMintHyperCertificate({
     onComplete: () => push(urls.myHypercerts.href),
   });
   const toast = useToast();
+  const [currentQuery] = useState(qs.stringify(query));
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && currentQuery !== "") {
+      push({ query: currentQuery });
+    }
+  }, [currentQuery]);
+
+  // const updateQueryString = (values: Record<string, unknown>) => {
+  //   const filteredValues = _.pickBy(values);
+  //   const formattedQueryString = qs.stringify(filteredValues);
+  //   if (formattedQueryString !== currentQuery) {
+  //     console.log("Setting it", currentQuery);
+  //     setCurrentQueryString(formattedQueryString);
+  //   }
+  // };
 
   return (
     <Container>
       <Formik
         validationSchema={ValidationSchema}
-        initialValues={testValues}
-        // initialValues={{
-        //   name: "",
-        //   description: "",
-        //   external_link: "",
-        //   image: null as File | null,
-        //
-        //   format_version: FORMAT_VERSION,
-        //   prev_hypercert: "",
-        //   creators: [],
-        //   workTimeStart: undefined as string | undefined,
-        //   workTimeEnd: undefined as string | undefined,
-        //   impactTimeStart: undefined as string | undefined,
-        //   impactTimeEnd: undefined as string | undefined,
-        //   workScopes: [] as Option[],
-        //   impactScopes: [] as Option[],
-        //   rights: [] as Option[],
-        //   uri: "",
-        //   fractions: "1000",
-        // }}
+        initialValues={{
+          ...defaultValues,
+          ...query,
+          ...testValues,
+        }}
+        enableReinitialize
         onSubmit={async (val) => {
-          console.log("Starting hypercert creation", val);
           window.scrollTo({ top: 0, behavior: "smooth" });
           /**
            * Steps:
@@ -107,28 +138,40 @@ const ClaimHypercertPage: NextPage = () => {
            * 3. Call the mint function on the contract with the required parameters, including the cid for the metadata json.
            */
 
-          // Upload certificate to ipfs
-          let certificateMetadataIpfsId: string | undefined;
+          // Split contributor names and addresses. Addresses are stored on-chain, while names will be stored on IPFS.
+          const contributorNamesAndAddresses = val.contributors
+            .split(",")
+            .map((name) => name.trim());
+          const contributorNames = contributorNamesAndAddresses.filter(
+            (x) => !isAddress(x)
+          );
+          const contributorAddresses = contributorNamesAndAddresses.filter(
+            (x) => isAddress(x)
+          );
+
+          // Upload certificate metadata to ipfs
+          let certificateMetadataIpfsUrl: string | undefined;
           toast({
             description: toastMessages.metadataUploadStart,
             status: "info",
           });
           try {
             const metaData = {
+              name: val.name,
               description: val.description,
+              contributor_names: contributorNames,
               external_url: val.external_link,
               format_version: val.format_version,
-              name: val.name,
               prev_hypercert: val.prev_hypercert,
               refs: [],
             };
             const certificateIpfsMetadata = await uploadCertificateToIpfs(
               metaData
             );
-            certificateMetadataIpfsId = certificateIpfsMetadata.url;
+            certificateMetadataIpfsUrl = certificateIpfsMetadata.url;
             toast({
               description: toastMessages.metadataUploadSuccess(
-                certificateMetadataIpfsId
+                certificateMetadataIpfsUrl!
               ),
               status: "success",
             });
@@ -142,16 +185,16 @@ const ClaimHypercertPage: NextPage = () => {
 
           // Mint certificate using contract
           const workTimeStart = val.workTimeStart
-            ? new Date(val.workTimeStart).getTime()
+            ? new Date(val.workTimeStart).getTime() / 1000
             : 0;
           const workTimeEnd = val.workTimeEnd
-            ? new Date(val.workTimeEnd).getTime()
+            ? new Date(val.workTimeEnd).getTime() / 1000
             : 0;
           const impactTimeStart = val.impactTimeStart
-            ? new Date(val.impactTimeStart).getTime()
+            ? new Date(val.impactTimeStart).getTime() / 1000
             : 0;
           const impactTimeEnd = val.impactTimeEnd
-            ? new Date(val.impactTimeEnd).getTime()
+            ? new Date(val.impactTimeEnd).getTime() / 1000
             : 0;
 
           try {
@@ -160,10 +203,10 @@ const ClaimHypercertPage: NextPage = () => {
               status: "info",
             });
             await mintHyperCertificate({
-              contributors: [address!],
+              contributors: _.uniq([address!, ...contributorAddresses]),
               workTime: [workTimeStart, workTimeEnd],
               impactTime: [impactTimeStart, impactTimeEnd],
-              uri: certificateMetadataIpfsId!,
+              uri: certificateMetadataIpfsUrl!,
               workScopeIds: val.workScopes.map((s) => s.value),
               impactScopeIds: val.impactScopes.map((option) => option.value),
               rightsIds: val.rights.map((right) => right.value),
@@ -187,77 +230,98 @@ const ClaimHypercertPage: NextPage = () => {
           handleSubmit,
           isValid,
           isSubmitting,
-          /* and other goodies */
         }) => {
+          // updateQueryString(values);
           return (
             <>
               {isSubmitting && (
                 <Alert status="info" my={4}>
                   <AlertIcon />
-                  Please wait while your hypercert is being minted
+                  <AlertTitle>{alerts.wait}</AlertTitle>
                 </Alert>
               )}
               <form onSubmit={handleSubmit}>
-                <FormControl mb={3} isRequired>
-                  <Flex>
-                    <FormLabel>Certificate name</FormLabel>
-                    <ErrorMessage name="name" render={DisplayError} />
-                  </Flex>
-                  <Input
-                    type="text"
-                    name="name"
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    value={values.name}
-                    placeholder={placeholders.name}
-                    disabled={isSubmitting}
-                  />
-                </FormControl>
-                <FormControl mb={3} isRequired>
-                  <Flex>
-                    <FormLabel>Description</FormLabel>
-                    <ErrorMessage name="description" render={DisplayError} />
-                  </Flex>
-                  <Textarea
-                    name="description"
-                    value={values.description}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    placeholder={placeholders.description}
-                    size="sm"
-                    disabled={isSubmitting}
-                  />
-                </FormControl>
-                <FormControl mb={3} isRequired>
-                  <Flex>
-                    <FormLabel>External link</FormLabel>
-                    <ErrorMessage name="external_link" render={DisplayError} />
-                  </Flex>
-                  <Input
-                    type="text"
-                    name="external_link"
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    value={values.external_link}
-                    placeholder={placeholders.external_link}
-                    disabled={isSubmitting}
-                  />
-                </FormControl>
-                <FormControl mb={3} isRequired>
-                  <Flex>
-                    <FormLabel>Fractions</FormLabel>
-                    <ErrorMessage name="fractions" render={DisplayError} />
-                  </Flex>
-                  <Input
-                    type="text"
-                    name="fractions"
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    value={values.fractions}
-                    placeholder={placeholders.external_link}
-                    disabled={isSubmitting}
-                  />
-                </FormControl>
+                <VStack spacing={3}>
+                  <FormControl isRequired>
+                    <Flex>
+                      <FormLabel>{labels.name}</FormLabel>
+                      <ErrorMessage name="name" render={DisplayError} />
+                    </Flex>
+                    <Input
+                      type="text"
+                      name="name"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.name}
+                      placeholder={placeholders.name}
+                      disabled={isSubmitting}
+                    />
+                  </FormControl>
+                  <FormControl isRequired>
+                    <Flex>
+                      <FormLabel>{labels.description}</FormLabel>
+                      <ErrorMessage name="description" render={DisplayError} />
+                    </Flex>
+                    <Textarea
+                      name="description"
+                      value={values.description}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      placeholder={placeholders.description}
+                      size="sm"
+                      disabled={isSubmitting}
+                    />
+                  </FormControl>
+                  <FormControl isRequired>
+                    <Flex>
+                      <FormLabel>{labels.contributors}</FormLabel>
+                      <ErrorMessage name="description" render={DisplayError} />
+                    </Flex>
+                    <Textarea
+                      name="contributors"
+                      value={values.contributors}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      placeholder={placeholders.description}
+                      size="sm"
+                      disabled={isSubmitting}
+                    />
+                    <FormHelperText>{helperTexts.contributors}</FormHelperText>
+                  </FormControl>
+                  <FormControl isRequired>
+                    <Flex>
+                      <FormLabel>{labels.externalLink}</FormLabel>
+                      <ErrorMessage
+                        name="external_link"
+                        render={DisplayError}
+                      />
+                    </Flex>
+                    <Input
+                      type="text"
+                      name="external_link"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.external_link}
+                      placeholder={placeholders.external_link}
+                      disabled={isSubmitting}
+                    />
+                  </FormControl>
+                  <FormControl isRequired>
+                    <Flex>
+                      <FormLabel>{labels.fractions}</FormLabel>
+                      <ErrorMessage name="fractions" render={DisplayError} />
+                    </Flex>
+                    <Input
+                      type="text"
+                      name="fractions"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.fractions}
+                      placeholder={placeholders.external_link}
+                      disabled={isSubmitting}
+                    />
+                  </FormControl>
+                </VStack>
                 <Divider my={3} />
                 <HStack>
                   <FormControl>

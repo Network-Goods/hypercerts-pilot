@@ -1,14 +1,10 @@
-import { requireEnv } from "../utils/requireEnv";
 import { useTypedContract } from "@raidguild/quiver";
 import { HypercertMinter__factory } from "../contract-types";
+import { CONTRACT_ADDRESS } from "../constants";
 
 export const useHypercertContract = () => {
-  const contractAddress = requireEnv(
-    process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
-    "NEXT_PUBLIC_CONTRACT_ADDRESS"
-  );
   const { contract } = useTypedContract(
-    contractAddress,
+    CONTRACT_ADDRESS,
     HypercertMinter__factory
   );
 

@@ -14,11 +14,33 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { mergeHypercertModalContent } from "../../content/merge-hypercert-content";
+import { useMergeFractions } from "../../hooks/merge";
+import { BigNumber } from "ethers";
+import { useHypercertFractions } from "../../hooks/useHypercert";
 
 type C = (args: { onClick: () => void }) => JSX.Element;
 
-export const MergeAllFractionsModal = ({ render }: { render: C }) => {
+export const MergeAllFractionsModal = ({
+  render,
+  fractionIds,
+  hypercertId,
+}: {
+  render: C;
+  fractionIds: string[];
+  hypercertId: string;
+}) => {
   const { isOpen, onClose, onOpen } = useDisclosure();
+  const { startPolling } = useHypercertFractions(hypercertId);
+
+  const merge = useMergeFractions({
+    onComplete: () => {
+      setStep("complete");
+      startPolling(5000);
+    },
+    onError: () => {
+      setStep("confirmation");
+    },
+  });
 
   const [step, setStep] = useState<"confirmation" | "merging" | "complete">(
     "confirmation"
@@ -29,8 +51,13 @@ export const MergeAllFractionsModal = ({ render }: { render: C }) => {
     onClose();
   };
 
-  const onConfirm = () => {
+  const onConfirm = async () => {
+    const parsedFractions = fractionIds.map((x) =>
+      BigNumber.from(x).toNumber()
+    );
+    console.log("Merging tokens with id", parsedFractions);
     setStep("merging");
+    await merge(parsedFractions);
   };
 
   return (

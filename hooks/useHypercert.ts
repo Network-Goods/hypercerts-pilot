@@ -23,6 +23,22 @@ export const useHyperCertById = (id: string) => {
         totalUnits
         minter
         uri
+        rights {
+          id
+          text
+        }
+        impactDateFrom
+        impactDateTo
+        impactScopes {
+          id
+          text
+        }
+        workDateFrom
+        workDateTo
+        workScopes {
+          id
+          text
+        }
         contributors {
           id
         }

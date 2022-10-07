@@ -3,3 +3,4 @@
 /* eslint-disable */
 export type { HypercertMetadata } from "./HypercertMetadata";
 export type { IHypercertMinter } from "./IHypercertMinter";
+export type { IHypercertSVG } from "./IHypercertSVG";
