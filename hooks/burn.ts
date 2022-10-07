@@ -1,11 +1,12 @@
 import { useHypercertContract } from "./contracts";
 import { useWriteContract } from "@raidguild/quiver";
 import { useToast } from "@chakra-ui/react";
-import { parseBlockchainError } from "../utils/parseBlockchainError";
 import { burnInteractionLabels } from "../content/chainInteractions";
+import { useParseBlockchainError } from "../utils/parseBlockchainError";
 
 export const useBurnHypercert = () => {
   const contract = useHypercertContract();
+  const parseBlockchainError = useParseBlockchainError();
   const toast = useToast();
 
   const { mutate } = useWriteContract(contract, "burn", {

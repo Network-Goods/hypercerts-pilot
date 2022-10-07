@@ -14,11 +14,11 @@ import {
 } from "@chakra-ui/react";
 import { useHypercertContract } from "../../hooks/contracts";
 import { useWriteContract } from "@raidguild/quiver";
-import { parseBlockchainError } from "../../utils/parseBlockchainError";
 import { useState } from "react";
 import { addImpactScopeModal } from "../../content/claim-hypercert-content";
 import { formatScope } from "../../utils/formatting";
 import { useImpactScopes } from "../../hooks/listImpactScopes";
+import { useParseBlockchainError } from "../../utils/parseBlockchainError";
 
 export const AddImpactScopeModal = ({
   isOpen,
@@ -26,6 +26,7 @@ export const AddImpactScopeModal = ({
 }: Omit<ModalProps, "children">) => {
   const contract = useHypercertContract();
   const toast = useToast();
+  const parseBlockchainError = useParseBlockchainError();
   const { startPolling } = useImpactScopes();
   const [value, setValue] = useState<string>("");
   const [addingScope, setAddingScope] = useState(false);

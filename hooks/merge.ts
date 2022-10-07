@@ -1,8 +1,8 @@
-import { parseBlockchainError } from "../utils/parseBlockchainError";
 import { mergeInteractionLabels } from "../content/chainInteractions";
 import { useHypercertContract } from "./contracts";
 import { useWriteContract } from "@raidguild/quiver";
 import { useToast } from "@chakra-ui/react";
+import { useParseBlockchainError } from "../utils/parseBlockchainError";
 
 export const useMergeFractions = ({
   onComplete,
@@ -12,6 +12,7 @@ export const useMergeFractions = ({
   onError?: () => void;
 }) => {
   const contract = useHypercertContract();
+  const parseBlockchainError = useParseBlockchainError();
   const toast = useToast();
 
   const { mutate: merge } = useWriteContract(contract, "merge", {

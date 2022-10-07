@@ -2,7 +2,7 @@ import { MintCertificateData } from "../types/MintCertificateData";
 import { useWallet, useWriteContract } from "@raidguild/quiver";
 import { useToast } from "@chakra-ui/react";
 import { ethers } from "ethers";
-import { parseBlockchainError } from "../utils/parseBlockchainError";
+import { useParseBlockchainError } from "../utils/parseBlockchainError";
 import { useHypercertContract } from "./contracts";
 import { mintInteractionLabels } from "../content/chainInteractions";
 
@@ -13,10 +13,14 @@ export const useMintHyperCertificate = ({
 }) => {
   const { address } = useWallet();
   const contract = useHypercertContract();
+  const parseBlockchainError = useParseBlockchainError();
   const toast = useToast();
+
+  const parseError = useParseBlockchainError();
 
   const { mutate } = useWriteContract(contract, "mint", {
     onError: (error) => {
+      parseError(error, "the fallback");
       toast({
         description: parseBlockchainError(
           error,

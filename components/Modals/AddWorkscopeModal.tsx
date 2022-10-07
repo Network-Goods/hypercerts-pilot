@@ -14,17 +14,18 @@ import {
 } from "@chakra-ui/react";
 import { useHypercertContract } from "../../hooks/contracts";
 import { useWriteContract } from "@raidguild/quiver";
-import { parseBlockchainError } from "../../utils/parseBlockchainError";
 import { useState } from "react";
 import { addWorkScopeModal } from "../../content/claim-hypercert-content";
 import { formatScope } from "../../utils/formatting";
 import { useWorkScopes } from "../../hooks/listWorkscopes";
+import { useParseBlockchainError } from "../../utils/parseBlockchainError";
 
 export const AddWorkscopeModal = ({
   isOpen,
   onClose,
 }: Omit<ModalProps, "children">) => {
   const contract = useHypercertContract();
+  const parseBlockchainError = useParseBlockchainError();
   const toast = useToast();
   const { startPolling } = useWorkScopes();
   const [value, setValue] = useState<string>("");
