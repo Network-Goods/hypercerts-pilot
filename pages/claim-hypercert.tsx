@@ -3,6 +3,7 @@ import { ErrorMessage, Field, FieldProps, Formik } from "formik";
 import {
   Alert,
   AlertIcon,
+  AlertTitle,
   Button,
   Container,
   Divider,
@@ -22,7 +23,10 @@ import { useMintHyperCertificate } from "../hooks/mint";
 import * as Yup from "yup";
 import { FORMAT_VERSION, urls } from "../constants";
 import {
+  alerts,
   buttons,
+  helperTexts,
+  labels,
   placeholders,
   toastMessages,
 } from "../content/claim-hypercert-content";
@@ -125,27 +129,7 @@ const ClaimHypercertPage: NextPage = () => {
           ...testValues,
         }}
         enableReinitialize
-        // initialValues={{
-        //   name: "",
-        //   description: "",
-        //   external_link: "",
-        //   image: null as File | null,
-        //
-        //   format_version: FORMAT_VERSION,
-        //   prev_hypercert: "",
-        //   creators: [],
-        //   workTimeStart: undefined as string | undefined,
-        //   workTimeEnd: undefined as string | undefined,
-        //   impactTimeStart: undefined as string | undefined,
-        //   impactTimeEnd: undefined as string | undefined,
-        //   workScopes: [] as Option[],
-        //   impactScopes: [] as Option[],
-        //   rights: [] as Option[],
-        //   uri: "",
-        //   fractions: "1000",
-        // }}
         onSubmit={async (val) => {
-          console.log("Starting hypercert creation", val);
           window.scrollTo({ top: 0, behavior: "smooth" });
           /**
            * Steps:
@@ -154,6 +138,7 @@ const ClaimHypercertPage: NextPage = () => {
            * 3. Call the mint function on the contract with the required parameters, including the cid for the metadata json.
            */
 
+          // Split contributor names and addresses. Addresses are stored on-chain, while names will be stored on IPFS.
           const contributorNamesAndAddresses = val.contributors
             .split(",")
             .map((name) => name.trim());
@@ -245,7 +230,6 @@ const ClaimHypercertPage: NextPage = () => {
           handleSubmit,
           isValid,
           isSubmitting,
-          /* and other goodies */
         }) => {
           // updateQueryString(values);
           return (
@@ -253,14 +237,14 @@ const ClaimHypercertPage: NextPage = () => {
               {isSubmitting && (
                 <Alert status="info" my={4}>
                   <AlertIcon />
-                  Please wait while your hypercert is being minted
+                  <AlertTitle>{alerts.wait}</AlertTitle>
                 </Alert>
               )}
               <form onSubmit={handleSubmit}>
                 <VStack spacing={3}>
                   <FormControl isRequired>
                     <Flex>
-                      <FormLabel>Certificate name</FormLabel>
+                      <FormLabel>{labels.name}</FormLabel>
                       <ErrorMessage name="name" render={DisplayError} />
                     </Flex>
                     <Input
@@ -275,7 +259,7 @@ const ClaimHypercertPage: NextPage = () => {
                   </FormControl>
                   <FormControl isRequired>
                     <Flex>
-                      <FormLabel>Description</FormLabel>
+                      <FormLabel>{labels.description}</FormLabel>
                       <ErrorMessage name="description" render={DisplayError} />
                     </Flex>
                     <Textarea
@@ -290,7 +274,7 @@ const ClaimHypercertPage: NextPage = () => {
                   </FormControl>
                   <FormControl isRequired>
                     <Flex>
-                      <FormLabel>Contributors</FormLabel>
+                      <FormLabel>{labels.contributors}</FormLabel>
                       <ErrorMessage name="description" render={DisplayError} />
                     </Flex>
                     <Textarea
@@ -302,13 +286,11 @@ const ClaimHypercertPage: NextPage = () => {
                       size="sm"
                       disabled={isSubmitting}
                     />
-                    <FormHelperText>
-                      Names and/or addresses of contributors
-                    </FormHelperText>
+                    <FormHelperText>{helperTexts.contributors}</FormHelperText>
                   </FormControl>
                   <FormControl isRequired>
                     <Flex>
-                      <FormLabel>External link</FormLabel>
+                      <FormLabel>{labels.externalLink}</FormLabel>
                       <ErrorMessage
                         name="external_link"
                         render={DisplayError}
@@ -326,7 +308,7 @@ const ClaimHypercertPage: NextPage = () => {
                   </FormControl>
                   <FormControl isRequired>
                     <Flex>
-                      <FormLabel>Fractions</FormLabel>
+                      <FormLabel>{labels.fractions}</FormLabel>
                       <ErrorMessage name="fractions" render={DisplayError} />
                     </Flex>
                     <Input
