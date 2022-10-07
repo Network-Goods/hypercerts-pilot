@@ -74,7 +74,7 @@ const testValues = {
   uri: "",
 };
 
-const defaultTime = dayjs().format("YYYY-MM-dd");
+const defaultTime = dayjs().format("yyyy-MM-DD");
 
 const defaultValues = {
   name: "",

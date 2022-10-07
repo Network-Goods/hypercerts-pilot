@@ -12,6 +12,10 @@ yarn dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Structure
+
+- All human readable strings live in `/content`
+
 ## Metamask config
 
 [Be sure to set the correct chainId in metamask for localhost:8584 development](https://stackoverflow.com/questions/73164955/hardhat-metamask-error-trying-to-send-a-raw-transaction-with-an-invalid-chain)
