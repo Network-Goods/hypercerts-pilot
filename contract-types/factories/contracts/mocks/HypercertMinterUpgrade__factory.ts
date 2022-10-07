@@ -7,7 +7,7 @@ import type { PromiseOrValue } from "../../../common";
 import type {
   HyperCertMinterUpgrade,
   HyperCertMinterUpgradeInterface,
-} from "../../../contracts/mocks/HyperCertMinterUpgrade";
+} from "../../../contracts/mocks/HypercertMinterUpgrade";
 import type { Provider, TransactionRequest } from "@ethersproject/providers";
 import { Signer, utils, Contract, ContractFactory, Overrides } from "ethers";
 

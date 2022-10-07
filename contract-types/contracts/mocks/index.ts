@@ -2,4 +2,4 @@
 /* tslint:disable */
 /* eslint-disable */
 export type { ERC3525_Testing } from "./ERC3525_Testing";
-export type { HyperCertMinterUpgrade } from "./HyperCertMinterUpgrade";
+export type { HyperCertMinterUpgrade } from "./HypercertMinterUpgrade";

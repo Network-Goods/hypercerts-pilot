@@ -7,7 +7,7 @@ import type { PromiseOrValue } from "../../../common";
 import type {
   HyperCertMetadata,
   HyperCertMetadataInterface,
-} from "../../../contracts/HyperCertMetadata.sol/HyperCertMetadata";
+} from "../../../contracts/HyperCertMetadata.sol/HypercertMetadata";
 import type { Provider, TransactionRequest } from "@ethersproject/providers";
 import { Signer, utils, Contract, ContractFactory, Overrides } from "ethers";
 

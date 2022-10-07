@@ -6,7 +6,7 @@
 import type {
   IHyperCertMetadata,
   IHyperCertMetadataInterface,
-} from "../../../contracts/interfaces/IHyperCertMetadata";
+} from "../../../contracts/interfaces/IHypercertMetadata";
 import type { Provider } from "@ethersproject/providers";
 import { Contract, Signer, utils } from "ethers";
 

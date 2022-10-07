@@ -2,4 +2,4 @@
 /* tslint:disable */
 /* eslint-disable */
 export { ERC3525_Testing__factory } from "./ERC3525_Testing__factory";
-export { HyperCertMinterUpgrade__factory } from "./HyperCertMinterUpgrade__factory";
+export { HyperCertMinterUpgrade__factory } from "./HypercertMinterUpgrade__factory";
