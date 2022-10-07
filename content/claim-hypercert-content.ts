@@ -62,8 +62,8 @@ export const addWorkScopeModal = {
   submit: "Confirm",
   close: "Close",
   toastError: "Something went wrong while adding the work scope ",
-  toastSuccess: (transactionHash: string) =>
-    `Work scope ${transactionHash} successfully added`,
+  toastSuccess: (text: string, transactionHash: string) =>
+    `Work scope "${text}" (${transactionHash}) successfully added`,
 };
 
 export const addImpactScopeModal = {
@@ -72,8 +72,8 @@ export const addImpactScopeModal = {
   submit: "Confirm",
   close: "Close",
   toastError: "Something went wrong while adding the impact scope",
-  toastSuccess: (transactionHash: string) =>
-    `Impact scope ${transactionHash} successfully added`,
+  toastSuccess: (text: string, transactionHash: string) =>
+    `Impact scope "${text}" (${transactionHash}) successfully added`,
 };
 
 export const addRightModal = {
@@ -82,6 +82,6 @@ export const addRightModal = {
   submit: "Confirm",
   close: "Close",
   toastError: "Something went wrong while adding the right",
-  toastSuccess: (transactionHash: string) =>
-    `right ${transactionHash} successfully added`,
+  toastSuccess: (text: string, transactionHash: string) =>
+    `right "${text}" (${transactionHash}) successfully added`,
 };

@@ -43,7 +43,10 @@ export const AddImpactScopeModal = ({
     },
     onConfirmation: (receipt) => {
       toast({
-        description: addImpactScopeModal.toastSuccess(receipt.transactionHash),
+        description: addImpactScopeModal.toastSuccess(
+          value,
+          receipt.transactionHash
+        ),
         status: "success",
         isClosable: true,
       });

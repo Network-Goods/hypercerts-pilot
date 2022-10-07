@@ -40,7 +40,7 @@ export const AddRightsModal = ({
     },
     onConfirmation: (receipt) => {
       toast({
-        description: addRightModal.toastSuccess(receipt.transactionHash),
+        description: addRightModal.toastSuccess(value, receipt.transactionHash),
         status: "success",
         isClosable: true,
       });

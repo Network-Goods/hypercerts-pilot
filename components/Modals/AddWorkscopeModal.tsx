@@ -40,7 +40,10 @@ export const AddWorkscopeModal = ({
     },
     onConfirmation: (receipt) => {
       toast({
-        description: addWorkScopeModal.toastSuccess(receipt.transactionHash),
+        description: addWorkScopeModal.toastSuccess(
+          value,
+          receipt.transactionHash
+        ),
         status: "success",
         isClosable: true,
       });
