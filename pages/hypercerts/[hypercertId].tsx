@@ -129,17 +129,17 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
           <Heading mb={2}>{hypercertDetailContent.contributors}</Heading>
           <VStack spacing={2} alignItems="flex-start">
             {hypercert.contributors?.map((x) => (
-              <UserInfo key={x.id} address={x.id} />
+              <UserInfo key={x.id} nameOrAddress={x.id} />
             ))}
             {ipfsData.properties.contributor_names.map((x) => (
-              <UserInfo key={x} address={x} />
+              <UserInfo key={x} nameOrAddress={x} />
             ))}
           </VStack>
         </Box>
 
         <Box mb={6}>
           <Heading mb={2}>{hypercertDetailContent.owners}</Heading>
-          <UnorderedList ml={0} spacing={4}>
+          <UnorderedList ml={0} spacing={2}>
             {ownedFractions.map((fraction) => (
               <FractionLine
                 key={fraction.id}
@@ -268,7 +268,7 @@ const FractionLine = ({
 }) => {
   return (
     <ListItem display="flex" alignItems="center">
-      <UserInfo address={ownerId} />
+      <UserInfo nameOrAddress={ownerId} />
       <Text ml={1} fontSize="sm" opacity={0.7}>
         - {percentage}
       </Text>

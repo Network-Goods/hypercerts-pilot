@@ -4,13 +4,13 @@ import { useUserInfoFallbacks } from "../hooks/useUserInfoFallbacks";
 import React from "react";
 import { ethers } from "ethers";
 
-export const UserInfo = ({ address }: { address: string }) => {
+export const UserInfo = ({ nameOrAddress }: { nameOrAddress: string }) => {
   const {
     loading: loadingENS,
     avatar,
     ens,
   } = useENS({
-    address: ethers.utils.isAddress(address) ? address : undefined,
+    ens: nameOrAddress,
   });
   const { isLoading: loadingUserInfoFallBacks, data: fallbackData } =
     useUserInfoFallbacks();
@@ -24,7 +24,7 @@ export const UserInfo = ({ address }: { address: string }) => {
   }
 
   const fallbackUserInfo = fallbackData?.find(
-    (x) => x.address.toLowerCase() === address
+    (x) => x.address.toLowerCase() === nameOrAddress
   );
 
   const avatarSrc = avatar || fallbackUserInfo?.avatar;
@@ -32,8 +32,10 @@ export const UserInfo = ({ address }: { address: string }) => {
   const name =
     ens ||
     fallbackUserInfo?.name ||
-    (ethers.utils.isAddress(address) ? formatAddress(address) : address);
-  const url = ens ? `https://${ens}.eth` : fallbackUserInfo?.website;
+    (ethers.utils.isAddress(nameOrAddress)
+      ? formatAddress(nameOrAddress)
+      : nameOrAddress);
+  const url = ens ? `https://${ens}` : fallbackUserInfo?.website;
 
   return (
     <WithLink link={url}>
