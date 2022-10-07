@@ -6,4 +6,4 @@ export type { IERC3525Receiver } from "./IERC3525Receiver";
 export type { IERC3525SlotApprovableUpgradeable } from "./IERC3525SlotApprovableUpgradeable";
 export type { IERC3525SlotEnumerableUpgradeable } from "./IERC3525SlotEnumerableUpgradeable";
 export type { IERC3525Upgradeable } from "./IERC3525Upgradeable";
-export type { IHypercertMetadata } from "./IHypercertMetadata";
+export type { IHyperCertMetadata } from "./IHypercertMetadata";

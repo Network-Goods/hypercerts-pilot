@@ -6,4 +6,4 @@ export { IERC3525Receiver__factory } from "./IERC3525Receiver__factory";
 export { IERC3525SlotApprovableUpgradeable__factory } from "./IERC3525SlotApprovableUpgradeable__factory";
 export { IERC3525SlotEnumerableUpgradeable__factory } from "./IERC3525SlotEnumerableUpgradeable__factory";
 export { IERC3525Upgradeable__factory } from "./IERC3525Upgradeable__factory";
-export { IHypercertMetadata__factory } from "./IHypercertMetadata__factory";
+export { IHyperCertMetadata__factory } from "./IHypercertMetadata__factory";

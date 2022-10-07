@@ -23,7 +23,7 @@ import type {
   utils,
 } from "ethers";
 
-export declare namespace IHypercertMinter {
+export declare namespace IHyperCertMinter {
   export type ClaimStruct = {
     claimHash: PromiseOrValue<BytesLike>;
     workTimeframe: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>];
@@ -74,7 +74,7 @@ export declare namespace IHypercertMinter {
   };
 }
 
-export interface IHypercertMinterInterface extends utils.Interface {
+export interface IHyperCertMinterInterface extends utils.Interface {
   functions: {
     "balanceOf(uint256)": FunctionFragment;
     "getImpactCert(uint256)": FunctionFragment;
@@ -128,12 +128,12 @@ export interface IHypercertMinterInterface extends utils.Interface {
   events: {};
 }
 
-export interface IHypercertMinter extends BaseContract {
+export interface IHyperCertMinter extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: IHypercertMinterInterface;
+  interface: IHyperCertMinterInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
@@ -163,7 +163,7 @@ export interface IHypercertMinter extends BaseContract {
     getImpactCert(
       claimID: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
-    ): Promise<[IHypercertMinter.ClaimStructOutput]>;
+    ): Promise<[IHyperCertMinter.ClaimStructOutput]>;
 
     impactScopes(
       impactScopeId: PromiseOrValue<BytesLike>,
@@ -189,7 +189,7 @@ export interface IHypercertMinter extends BaseContract {
   getImpactCert(
     claimID: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
-  ): Promise<IHypercertMinter.ClaimStructOutput>;
+  ): Promise<IHyperCertMinter.ClaimStructOutput>;
 
   impactScopes(
     impactScopeId: PromiseOrValue<BytesLike>,
@@ -215,7 +215,7 @@ export interface IHypercertMinter extends BaseContract {
     getImpactCert(
       claimID: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
-    ): Promise<IHypercertMinter.ClaimStructOutput>;
+    ): Promise<IHyperCertMinter.ClaimStructOutput>;
 
     impactScopes(
       impactScopeId: PromiseOrValue<BytesLike>,

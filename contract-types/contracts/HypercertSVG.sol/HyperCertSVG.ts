@@ -10,7 +10,11 @@ import type {
   OnEvent,
   PromiseOrValue,
 } from "../../common";
-import type { FunctionFragment, Result } from "@ethersproject/abi";
+import type {
+  FunctionFragment,
+  Result,
+  EventFragment,
+} from "@ethersproject/abi";
 import type { Listener, Provider } from "@ethersproject/providers";
 import type {
   BaseContract,
@@ -18,21 +22,33 @@ import type {
   BigNumberish,
   BytesLike,
   CallOverrides,
+  ContractTransaction,
+  Overrides,
   PopulatedTransaction,
   Signer,
   utils,
 } from "ethers";
 
-export interface IHypercertSVGInterface extends utils.Interface {
+export interface HyperCertSVGInterface extends utils.Interface {
   functions: {
+    "addBackground(string)": FunctionFragment;
     "generateSvgFraction(string,string[],uint64[2],uint64[2],uint256,uint256)": FunctionFragment;
-    "generateSvgHypercert(string,string[],uint64[2],uint64[2],uint256)": FunctionFragment;
+    "generateSvgHyperCert(string,string[],uint64[2],uint64[2],uint256)": FunctionFragment;
+    "getPercent(uint256,uint256)": FunctionFragment;
   };
 
   getFunction(
-    nameOrSignatureOrTopic: "generateSvgFraction" | "generateSvgHypercert"
+    nameOrSignatureOrTopic:
+      | "addBackground"
+      | "generateSvgFraction"
+      | "generateSvgHyperCert"
+      | "getPercent"
   ): FunctionFragment;
 
+  encodeFunctionData(
+    functionFragment: "addBackground",
+    values: [PromiseOrValue<string>]
+  ): string;
   encodeFunctionData(
     functionFragment: "generateSvgFraction",
     values: [
@@ -45,7 +61,7 @@ export interface IHypercertSVGInterface extends utils.Interface {
     ]
   ): string;
   encodeFunctionData(
-    functionFragment: "generateSvgHypercert",
+    functionFragment: "generateSvgHyperCert",
     values: [
       PromiseOrValue<string>,
       PromiseOrValue<string>[],
@@ -54,25 +70,48 @@ export interface IHypercertSVGInterface extends utils.Interface {
       PromiseOrValue<BigNumberish>
     ]
   ): string;
+  encodeFunctionData(
+    functionFragment: "getPercent",
+    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
+  ): string;
 
+  decodeFunctionResult(
+    functionFragment: "addBackground",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "generateSvgFraction",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "generateSvgHypercert",
+    functionFragment: "generateSvgHyperCert",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "getPercent", data: BytesLike): Result;
 
-  events: {};
+  events: {
+    "BackgroundAdded(uint256)": EventFragment;
+  };
+
+  getEvent(nameOrSignatureOrTopic: "BackgroundAdded"): EventFragment;
 }
 
-export interface IHypercertSVG extends BaseContract {
+export interface BackgroundAddedEventObject {
+  id: BigNumber;
+}
+export type BackgroundAddedEvent = TypedEvent<
+  [BigNumber],
+  BackgroundAddedEventObject
+>;
+
+export type BackgroundAddedEventFilter = TypedEventFilter<BackgroundAddedEvent>;
+
+export interface HyperCertSVG extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: IHypercertSVGInterface;
+  interface: HyperCertSVGInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
@@ -94,6 +133,11 @@ export interface IHypercertSVG extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
+    addBackground(
+      svgString: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     generateSvgFraction(
       name: PromiseOrValue<string>,
       scopesOfImpact: PromiseOrValue<string>[],
@@ -110,7 +154,7 @@ export interface IHypercertSVG extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
-    generateSvgHypercert(
+    generateSvgHyperCert(
       name: PromiseOrValue<string>,
       scopesOfImpact: PromiseOrValue<string>[],
       workTimeframe: [
@@ -124,7 +168,18 @@ export interface IHypercertSVG extends BaseContract {
       totalUnits: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[string]>;
+
+    getPercent(
+      part: PromiseOrValue<BigNumberish>,
+      whole: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber] & { percent: BigNumber }>;
   };
+
+  addBackground(
+    svgString: PromiseOrValue<string>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
   generateSvgFraction(
     name: PromiseOrValue<string>,
@@ -139,7 +194,7 @@ export interface IHypercertSVG extends BaseContract {
     overrides?: CallOverrides
   ): Promise<string>;
 
-  generateSvgHypercert(
+  generateSvgHyperCert(
     name: PromiseOrValue<string>,
     scopesOfImpact: PromiseOrValue<string>[],
     workTimeframe: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>],
@@ -151,7 +206,18 @@ export interface IHypercertSVG extends BaseContract {
     overrides?: CallOverrides
   ): Promise<string>;
 
+  getPercent(
+    part: PromiseOrValue<BigNumberish>,
+    whole: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   callStatic: {
+    addBackground(
+      svgString: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     generateSvgFraction(
       name: PromiseOrValue<string>,
       scopesOfImpact: PromiseOrValue<string>[],
@@ -168,7 +234,7 @@ export interface IHypercertSVG extends BaseContract {
       overrides?: CallOverrides
     ): Promise<string>;
 
-    generateSvgHypercert(
+    generateSvgHyperCert(
       name: PromiseOrValue<string>,
       scopesOfImpact: PromiseOrValue<string>[],
       workTimeframe: [
@@ -182,11 +248,25 @@ export interface IHypercertSVG extends BaseContract {
       totalUnits: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<string>;
+
+    getPercent(
+      part: PromiseOrValue<BigNumberish>,
+      whole: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
   };
 
-  filters: {};
+  filters: {
+    "BackgroundAdded(uint256)"(id?: null): BackgroundAddedEventFilter;
+    BackgroundAdded(id?: null): BackgroundAddedEventFilter;
+  };
 
   estimateGas: {
+    addBackground(
+      svgString: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     generateSvgFraction(
       name: PromiseOrValue<string>,
       scopesOfImpact: PromiseOrValue<string>[],
@@ -203,7 +283,7 @@ export interface IHypercertSVG extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    generateSvgHypercert(
+    generateSvgHyperCert(
       name: PromiseOrValue<string>,
       scopesOfImpact: PromiseOrValue<string>[],
       workTimeframe: [
@@ -215,11 +295,22 @@ export interface IHypercertSVG extends BaseContract {
         PromiseOrValue<BigNumberish>
       ],
       totalUnits: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getPercent(
+      part: PromiseOrValue<BigNumberish>,
+      whole: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
+    addBackground(
+      svgString: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
     generateSvgFraction(
       name: PromiseOrValue<string>,
       scopesOfImpact: PromiseOrValue<string>[],
@@ -236,7 +327,7 @@ export interface IHypercertSVG extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    generateSvgHypercert(
+    generateSvgHyperCert(
       name: PromiseOrValue<string>,
       scopesOfImpact: PromiseOrValue<string>[],
       workTimeframe: [
@@ -248,6 +339,12 @@ export interface IHypercertSVG extends BaseContract {
         PromiseOrValue<BigNumberish>
       ],
       totalUnits: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getPercent(
+      part: PromiseOrValue<BigNumberish>,
+      whole: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
   };

@@ -23,16 +23,24 @@ import type {
   utils,
 } from "ethers";
 
-export interface IHypercertMetadataInterface extends utils.Interface {
+export interface IHyperCertMetadataInterface extends utils.Interface {
   functions: {
+    "generateContractURI()": FunctionFragment;
     "generateSlotURI(uint256)": FunctionFragment;
     "generateTokenURI(uint256,uint256)": FunctionFragment;
   };
 
   getFunction(
-    nameOrSignatureOrTopic: "generateSlotURI" | "generateTokenURI"
+    nameOrSignatureOrTopic:
+      | "generateContractURI"
+      | "generateSlotURI"
+      | "generateTokenURI"
   ): FunctionFragment;
 
+  encodeFunctionData(
+    functionFragment: "generateContractURI",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "generateSlotURI",
     values: [PromiseOrValue<BigNumberish>]
@@ -42,6 +50,10 @@ export interface IHypercertMetadataInterface extends utils.Interface {
     values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "generateContractURI",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "generateSlotURI",
     data: BytesLike
@@ -54,12 +66,12 @@ export interface IHypercertMetadataInterface extends utils.Interface {
   events: {};
 }
 
-export interface IHypercertMetadata extends BaseContract {
+export interface IHyperCertMetadata extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: IHypercertMetadataInterface;
+  interface: IHyperCertMetadataInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
@@ -81,6 +93,8 @@ export interface IHypercertMetadata extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
+    generateContractURI(overrides?: CallOverrides): Promise<[string]>;
+
     generateSlotURI(
       slotId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -92,6 +106,8 @@ export interface IHypercertMetadata extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string]>;
   };
+
+  generateContractURI(overrides?: CallOverrides): Promise<string>;
 
   generateSlotURI(
     slotId: PromiseOrValue<BigNumberish>,
@@ -105,6 +121,8 @@ export interface IHypercertMetadata extends BaseContract {
   ): Promise<string>;
 
   callStatic: {
+    generateContractURI(overrides?: CallOverrides): Promise<string>;
+
     generateSlotURI(
       slotId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -120,6 +138,8 @@ export interface IHypercertMetadata extends BaseContract {
   filters: {};
 
   estimateGas: {
+    generateContractURI(overrides?: CallOverrides): Promise<BigNumber>;
+
     generateSlotURI(
       slotId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -133,6 +153,10 @@ export interface IHypercertMetadata extends BaseContract {
   };
 
   populateTransaction: {
+    generateContractURI(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     generateSlotURI(
       slotId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides

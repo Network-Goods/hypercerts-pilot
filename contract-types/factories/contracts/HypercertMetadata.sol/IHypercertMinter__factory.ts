@@ -4,9 +4,9 @@
 
 /* eslint-disable */
 import type {
-  IHypercertMinter,
-  IHypercertMinterInterface,
-} from "../../../contracts/HypercertMetadata.sol/IHypercertMinter";
+  IHyperCertMinter,
+  IHyperCertMinterInterface,
+} from "../../../contracts/HyperCertMetadata.sol/IHypercertMinter";
 import type { Provider } from "@ethersproject/providers";
 import { Contract, Signer, utils } from "ethers";
 
@@ -108,7 +108,7 @@ const _abi = [
             type: "string",
           },
         ],
-        internalType: "struct IHypercertMinter.Claim",
+        internalType: "struct IHyperCertMinter.Claim",
         name: "",
         type: "tuple",
       },
@@ -175,15 +175,15 @@ const _abi = [
   },
 ];
 
-export class IHypercertMinter__factory {
+export class IHyperCertMinter__factory {
   static readonly abi = _abi;
-  static createInterface(): IHypercertMinterInterface {
-    return new utils.Interface(_abi) as IHypercertMinterInterface;
+  static createInterface(): IHyperCertMinterInterface {
+    return new utils.Interface(_abi) as IHyperCertMinterInterface;
   }
   static connect(
     address: string,
     signerOrProvider: Signer | Provider
-  ): IHypercertMinter {
-    return new Contract(address, _abi, signerOrProvider) as IHypercertMinter;
+  ): IHyperCertMinter {
+    return new Contract(address, _abi, signerOrProvider) as IHyperCertMinter;
   }
 }

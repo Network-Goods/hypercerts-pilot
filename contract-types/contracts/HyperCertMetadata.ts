@@ -9,7 +9,7 @@ import type {
   TypedListener,
   OnEvent,
   PromiseOrValue,
-} from "../../common";
+} from "../common";
 import type { FunctionFragment, Result } from "@ethersproject/abi";
 import type { Listener, Provider } from "@ethersproject/providers";
 import type {
@@ -23,7 +23,7 @@ import type {
   utils,
 } from "ethers";
 
-export interface HypercertMetadataInterface extends utils.Interface {
+export interface HyperCertMetadataInterface extends utils.Interface {
   functions: {
     "generateSlotURI(uint256)": FunctionFragment;
     "generateTokenURI(uint256,uint256)": FunctionFragment;
@@ -54,12 +54,12 @@ export interface HypercertMetadataInterface extends utils.Interface {
   events: {};
 }
 
-export interface HypercertMetadata extends BaseContract {
+export interface HyperCertMetadata extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: HypercertMetadataInterface;
+  interface: HyperCertMetadataInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,

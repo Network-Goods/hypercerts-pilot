@@ -4,13 +4,26 @@
 
 /* eslint-disable */
 import type {
-  IHypercertMetadata,
-  IHypercertMetadataInterface,
+  IHyperCertMetadata,
+  IHyperCertMetadataInterface,
 } from "../../../contracts/interfaces/IHypercertMetadata";
 import type { Provider } from "@ethersproject/providers";
 import { Contract, Signer, utils } from "ethers";
 
 const _abi = [
+  {
+    inputs: [],
+    name: "generateContractURI",
+    outputs: [
+      {
+        internalType: "string",
+        name: "",
+        type: "string",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
   {
     inputs: [
       {
@@ -56,15 +69,15 @@ const _abi = [
   },
 ];
 
-export class IHypercertMetadata__factory {
+export class IHyperCertMetadata__factory {
   static readonly abi = _abi;
-  static createInterface(): IHypercertMetadataInterface {
-    return new utils.Interface(_abi) as IHypercertMetadataInterface;
+  static createInterface(): IHyperCertMetadataInterface {
+    return new utils.Interface(_abi) as IHyperCertMetadataInterface;
   }
   static connect(
     address: string,
     signerOrProvider: Signer | Provider
-  ): IHypercertMetadata {
-    return new Contract(address, _abi, signerOrProvider) as IHypercertMetadata;
+  ): IHyperCertMetadata {
+    return new Contract(address, _abi, signerOrProvider) as IHyperCertMetadata;
   }
 }

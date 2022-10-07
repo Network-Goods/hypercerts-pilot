@@ -9,7 +9,7 @@ import type {
   TypedListener,
   OnEvent,
   PromiseOrValue,
-} from "../common";
+} from "../../common";
 import type {
   FunctionFragment,
   Result,
@@ -30,20 +30,17 @@ import type {
   utils,
 } from "ethers";
 
-export interface HyperCertSVGInterface extends utils.Interface {
+export interface HyperCertMetadataInterface extends utils.Interface {
   functions: {
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
     "UPGRADER_ROLE()": FunctionFragment;
-    "addBackground(string)": FunctionFragment;
-    "backgroundCounter()": FunctionFragment;
-    "backgrounds(uint256)": FunctionFragment;
-    "generateSvgFraction(string,string[],uint64[2],uint64[2],uint256,uint256)": FunctionFragment;
-    "generateSvgHyperCert(string,string[],uint64[2],uint64[2],uint256)": FunctionFragment;
-    "getPercent(uint256,uint256)": FunctionFragment;
+    "generateContractURI()": FunctionFragment;
+    "generateSlotURI(uint256)": FunctionFragment;
+    "generateTokenURI(uint256,uint256)": FunctionFragment;
     "getRoleAdmin(bytes32)": FunctionFragment;
     "grantRole(bytes32,address)": FunctionFragment;
     "hasRole(bytes32,address)": FunctionFragment;
-    "initialize()": FunctionFragment;
+    "initialize(address)": FunctionFragment;
     "proxiableUUID()": FunctionFragment;
     "renounceRole(bytes32,address)": FunctionFragment;
     "revokeRole(bytes32,address)": FunctionFragment;
@@ -58,12 +55,9 @@ export interface HyperCertSVGInterface extends utils.Interface {
     nameOrSignatureOrTopic:
       | "DEFAULT_ADMIN_ROLE"
       | "UPGRADER_ROLE"
-      | "addBackground"
-      | "backgroundCounter"
-      | "backgrounds"
-      | "generateSvgFraction"
-      | "generateSvgHyperCert"
-      | "getPercent"
+      | "generateContractURI"
+      | "generateSlotURI"
+      | "generateTokenURI"
       | "getRoleAdmin"
       | "grantRole"
       | "hasRole"
@@ -87,40 +81,15 @@ export interface HyperCertSVGInterface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "addBackground",
-    values: [PromiseOrValue<string>]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "backgroundCounter",
+    functionFragment: "generateContractURI",
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "backgrounds",
+    functionFragment: "generateSlotURI",
     values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
-    functionFragment: "generateSvgFraction",
-    values: [
-      PromiseOrValue<string>,
-      PromiseOrValue<string>[],
-      [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>],
-      [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>],
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "generateSvgHyperCert",
-    values: [
-      PromiseOrValue<string>,
-      PromiseOrValue<string>[],
-      [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>],
-      [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>],
-      PromiseOrValue<BigNumberish>
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getPercent",
+    functionFragment: "generateTokenURI",
     values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
@@ -137,7 +106,7 @@ export interface HyperCertSVGInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "initialize",
-    values?: undefined
+    values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
     functionFragment: "proxiableUUID",
@@ -178,26 +147,17 @@ export interface HyperCertSVGInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "addBackground",
+    functionFragment: "generateContractURI",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "backgroundCounter",
+    functionFragment: "generateSlotURI",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "backgrounds",
+    functionFragment: "generateTokenURI",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "generateSvgFraction",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "generateSvgHyperCert",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "getPercent", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getRoleAdmin",
     data: BytesLike
@@ -231,7 +191,6 @@ export interface HyperCertSVGInterface extends utils.Interface {
 
   events: {
     "AdminChanged(address,address)": EventFragment;
-    "BackgroundAdded(uint256)": EventFragment;
     "BeaconUpgraded(address)": EventFragment;
     "Initialized(uint8)": EventFragment;
     "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
@@ -241,7 +200,6 @@ export interface HyperCertSVGInterface extends utils.Interface {
   };
 
   getEvent(nameOrSignatureOrTopic: "AdminChanged"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "BackgroundAdded"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "BeaconUpgraded"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleAdminChanged"): EventFragment;
@@ -260,16 +218,6 @@ export type AdminChangedEvent = TypedEvent<
 >;
 
 export type AdminChangedEventFilter = TypedEventFilter<AdminChangedEvent>;
-
-export interface BackgroundAddedEventObject {
-  id: BigNumber;
-}
-export type BackgroundAddedEvent = TypedEvent<
-  [BigNumber],
-  BackgroundAddedEventObject
->;
-
-export type BackgroundAddedEventFilter = TypedEventFilter<BackgroundAddedEvent>;
 
 export interface BeaconUpgradedEventObject {
   beacon: string;
@@ -332,12 +280,12 @@ export type UpgradedEvent = TypedEvent<[string], UpgradedEventObject>;
 
 export type UpgradedEventFilter = TypedEventFilter<UpgradedEvent>;
 
-export interface HyperCertSVG extends BaseContract {
+export interface HyperCertMetadata extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: HyperCertSVGInterface;
+  interface: HyperCertMetadataInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
@@ -363,54 +311,18 @@ export interface HyperCertSVG extends BaseContract {
 
     UPGRADER_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
-    addBackground(
-      svgString: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+    generateContractURI(overrides?: CallOverrides): Promise<[string]>;
 
-    backgroundCounter(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    backgrounds(
-      arg0: PromiseOrValue<BigNumberish>,
+    generateSlotURI(
+      slotId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[string]>;
 
-    generateSvgFraction(
-      name: PromiseOrValue<string>,
-      scopesOfImpact: PromiseOrValue<string>[],
-      workTimeframe: [
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>
-      ],
-      impactTimeframe: [
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>
-      ],
-      units: PromiseOrValue<BigNumberish>,
-      totalUnits: PromiseOrValue<BigNumberish>,
+    generateTokenURI(
+      slotId: PromiseOrValue<BigNumberish>,
+      tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[string]>;
-
-    generateSvgHyperCert(
-      name: PromiseOrValue<string>,
-      scopesOfImpact: PromiseOrValue<string>[],
-      workTimeframe: [
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>
-      ],
-      impactTimeframe: [
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>
-      ],
-      totalUnits: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
-    getPercent(
-      part: PromiseOrValue<BigNumberish>,
-      whole: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber] & { percent: BigNumber }>;
 
     getRoleAdmin(
       role: PromiseOrValue<BytesLike>,
@@ -430,6 +342,7 @@ export interface HyperCertSVG extends BaseContract {
     ): Promise<[boolean]>;
 
     initialize(
+      svgGenerationAddress: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -474,48 +387,18 @@ export interface HyperCertSVG extends BaseContract {
 
   UPGRADER_ROLE(overrides?: CallOverrides): Promise<string>;
 
-  addBackground(
-    svgString: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
+  generateContractURI(overrides?: CallOverrides): Promise<string>;
 
-  backgroundCounter(overrides?: CallOverrides): Promise<BigNumber>;
-
-  backgrounds(
-    arg0: PromiseOrValue<BigNumberish>,
+  generateSlotURI(
+    slotId: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<string>;
 
-  generateSvgFraction(
-    name: PromiseOrValue<string>,
-    scopesOfImpact: PromiseOrValue<string>[],
-    workTimeframe: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>],
-    impactTimeframe: [
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>
-    ],
-    units: PromiseOrValue<BigNumberish>,
-    totalUnits: PromiseOrValue<BigNumberish>,
+  generateTokenURI(
+    slotId: PromiseOrValue<BigNumberish>,
+    tokenId: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<string>;
-
-  generateSvgHyperCert(
-    name: PromiseOrValue<string>,
-    scopesOfImpact: PromiseOrValue<string>[],
-    workTimeframe: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>],
-    impactTimeframe: [
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>
-    ],
-    totalUnits: PromiseOrValue<BigNumberish>,
-    overrides?: CallOverrides
-  ): Promise<string>;
-
-  getPercent(
-    part: PromiseOrValue<BigNumberish>,
-    whole: PromiseOrValue<BigNumberish>,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
 
   getRoleAdmin(
     role: PromiseOrValue<BytesLike>,
@@ -535,6 +418,7 @@ export interface HyperCertSVG extends BaseContract {
   ): Promise<boolean>;
 
   initialize(
+    svgGenerationAddress: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -579,54 +463,18 @@ export interface HyperCertSVG extends BaseContract {
 
     UPGRADER_ROLE(overrides?: CallOverrides): Promise<string>;
 
-    addBackground(
-      svgString: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    generateContractURI(overrides?: CallOverrides): Promise<string>;
 
-    backgroundCounter(overrides?: CallOverrides): Promise<BigNumber>;
-
-    backgrounds(
-      arg0: PromiseOrValue<BigNumberish>,
+    generateSlotURI(
+      slotId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<string>;
 
-    generateSvgFraction(
-      name: PromiseOrValue<string>,
-      scopesOfImpact: PromiseOrValue<string>[],
-      workTimeframe: [
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>
-      ],
-      impactTimeframe: [
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>
-      ],
-      units: PromiseOrValue<BigNumberish>,
-      totalUnits: PromiseOrValue<BigNumberish>,
+    generateTokenURI(
+      slotId: PromiseOrValue<BigNumberish>,
+      tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<string>;
-
-    generateSvgHyperCert(
-      name: PromiseOrValue<string>,
-      scopesOfImpact: PromiseOrValue<string>[],
-      workTimeframe: [
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>
-      ],
-      impactTimeframe: [
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>
-      ],
-      totalUnits: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    getPercent(
-      part: PromiseOrValue<BigNumberish>,
-      whole: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     getRoleAdmin(
       role: PromiseOrValue<BytesLike>,
@@ -645,7 +493,10 @@ export interface HyperCertSVG extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    initialize(overrides?: CallOverrides): Promise<void>;
+    initialize(
+      svgGenerationAddress: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     proxiableUUID(overrides?: CallOverrides): Promise<string>;
 
@@ -691,9 +542,6 @@ export interface HyperCertSVG extends BaseContract {
       previousAdmin?: null,
       newAdmin?: null
     ): AdminChangedEventFilter;
-
-    "BackgroundAdded(uint256)"(id?: null): BackgroundAddedEventFilter;
-    BackgroundAdded(id?: null): BackgroundAddedEventFilter;
 
     "BeaconUpgraded(address)"(
       beacon?: PromiseOrValue<string> | null
@@ -751,52 +599,16 @@ export interface HyperCertSVG extends BaseContract {
 
     UPGRADER_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
-    addBackground(
-      svgString: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
+    generateContractURI(overrides?: CallOverrides): Promise<BigNumber>;
 
-    backgroundCounter(overrides?: CallOverrides): Promise<BigNumber>;
-
-    backgrounds(
-      arg0: PromiseOrValue<BigNumberish>,
+    generateSlotURI(
+      slotId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    generateSvgFraction(
-      name: PromiseOrValue<string>,
-      scopesOfImpact: PromiseOrValue<string>[],
-      workTimeframe: [
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>
-      ],
-      impactTimeframe: [
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>
-      ],
-      units: PromiseOrValue<BigNumberish>,
-      totalUnits: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    generateSvgHyperCert(
-      name: PromiseOrValue<string>,
-      scopesOfImpact: PromiseOrValue<string>[],
-      workTimeframe: [
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>
-      ],
-      impactTimeframe: [
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>
-      ],
-      totalUnits: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getPercent(
-      part: PromiseOrValue<BigNumberish>,
-      whole: PromiseOrValue<BigNumberish>,
+    generateTokenURI(
+      slotId: PromiseOrValue<BigNumberish>,
+      tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -818,6 +630,7 @@ export interface HyperCertSVG extends BaseContract {
     ): Promise<BigNumber>;
 
     initialize(
+      svgGenerationAddress: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -865,52 +678,18 @@ export interface HyperCertSVG extends BaseContract {
 
     UPGRADER_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    addBackground(
-      svgString: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    backgroundCounter(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    backgrounds(
-      arg0: PromiseOrValue<BigNumberish>,
+    generateContractURI(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    generateSvgFraction(
-      name: PromiseOrValue<string>,
-      scopesOfImpact: PromiseOrValue<string>[],
-      workTimeframe: [
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>
-      ],
-      impactTimeframe: [
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>
-      ],
-      units: PromiseOrValue<BigNumberish>,
-      totalUnits: PromiseOrValue<BigNumberish>,
+    generateSlotURI(
+      slotId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    generateSvgHyperCert(
-      name: PromiseOrValue<string>,
-      scopesOfImpact: PromiseOrValue<string>[],
-      workTimeframe: [
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>
-      ],
-      impactTimeframe: [
-        PromiseOrValue<BigNumberish>,
-        PromiseOrValue<BigNumberish>
-      ],
-      totalUnits: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getPercent(
-      part: PromiseOrValue<BigNumberish>,
-      whole: PromiseOrValue<BigNumberish>,
+    generateTokenURI(
+      slotId: PromiseOrValue<BigNumberish>,
+      tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -932,6 +711,7 @@ export interface HyperCertSVG extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     initialize(
+      svgGenerationAddress: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 

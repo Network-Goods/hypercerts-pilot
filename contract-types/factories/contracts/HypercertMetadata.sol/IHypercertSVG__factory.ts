@@ -4,9 +4,9 @@
 
 /* eslint-disable */
 import type {
-  IHypercertSVG,
-  IHypercertSVGInterface,
-} from "../../../contracts/HypercertMetadata.sol/IHypercertSVG";
+  IHyperCertSVG,
+  IHyperCertSVGInterface,
+} from "../../../contracts/HyperCertMetadata.sol/IHypercertSVG";
 import type { Provider } from "@ethersproject/providers";
 import { Contract, Signer, utils } from "ethers";
 
@@ -83,7 +83,7 @@ const _abi = [
         type: "uint256",
       },
     ],
-    name: "generateSvgHypercert",
+    name: "generateSvgHyperCert",
     outputs: [
       {
         internalType: "string",
@@ -96,15 +96,15 @@ const _abi = [
   },
 ];
 
-export class IHypercertSVG__factory {
+export class IHyperCertSVG__factory {
   static readonly abi = _abi;
-  static createInterface(): IHypercertSVGInterface {
-    return new utils.Interface(_abi) as IHypercertSVGInterface;
+  static createInterface(): IHyperCertSVGInterface {
+    return new utils.Interface(_abi) as IHyperCertSVGInterface;
   }
   static connect(
     address: string,
     signerOrProvider: Signer | Provider
-  ): IHypercertSVG {
-    return new Contract(address, _abi, signerOrProvider) as IHypercertSVG;
+  ): IHyperCertSVG {
+    return new Contract(address, _abi, signerOrProvider) as IHyperCertSVG;
   }
 }
