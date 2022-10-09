@@ -50,7 +50,6 @@ const ValidationSchema = Yup.object().shape({
     .min(20, "Too Short!")
     .max(500, "Too Long!")
     .required("Required"),
-  external_link: Yup.string().url().required("Required"),
   workScopes: Yup.array().min(1),
 });
 
@@ -235,6 +234,7 @@ const ClaimHypercertPage = () => {
           handleSubmit,
           isValid,
           isSubmitting,
+          setFieldValue,
         }) => {
           return (
             <>
@@ -304,7 +304,15 @@ const ClaimHypercertPage = () => {
                       type="text"
                       name="external_link"
                       onChange={handleChange}
-                      onBlur={handleBlur}
+                      onBlur={(e) => {
+                        if (!e.target.value.match(/^(https|http|ftp):\/\//)) {
+                          setFieldValue(
+                            "external_link",
+                            "https://" + e.target.value
+                          );
+                        }
+                        handleBlur(e);
+                      }}
                       value={values.external_link}
                       placeholder={placeholders.external_link}
                       disabled={isSubmitting}
