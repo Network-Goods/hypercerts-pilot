@@ -50,6 +50,24 @@ const ValidationSchema = Yup.object().shape({
     .min(20, "Too Short!")
     .max(500, "Too Long!")
     .required("Required"),
+  external_link: Yup.string()
+    .required()
+    .test("valid uri", "Please enter a valid url", (value) => {
+      if (!value) return false;
+      const isIpfsUrl = value.match(/^(ipfs):\/\//);
+
+      if (isIpfsUrl) {
+        return true;
+      }
+
+      try {
+        const urlSchema = Yup.string().url();
+        urlSchema.validateSync(value);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }),
   workScopes: Yup.array().min(1),
 });
 
@@ -305,7 +323,10 @@ const ClaimHypercertPage = () => {
                       name="external_link"
                       onChange={handleChange}
                       onBlur={(e) => {
-                        if (!e.target.value.match(/^(https|http|ftp):\/\//)) {
+                        if (
+                          e.target.value &&
+                          !e.target.value.match(/^(https|http|ftp|ipfs):\/\//)
+                        ) {
                           setFieldValue(
                             "external_link",
                             "https://" + e.target.value
