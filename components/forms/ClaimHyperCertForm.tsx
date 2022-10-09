@@ -113,7 +113,7 @@ const defaultValues = {
 };
 
 const ClaimHypercertPage = () => {
-  const { address } = useWallet();
+  const { address, isConnected } = useWallet();
   const { push } = useRouter();
   const mintHyperCertificate = useMintHyperCertificate({
     onComplete: () => push(urls.myHypercerts.href),
@@ -254,6 +254,7 @@ const ClaimHypercertPage = () => {
           isSubmitting,
           setFieldValue,
         }) => {
+          const disabled = isSubmitting || !isConnected;
           return (
             <>
               {isSubmitting && (
@@ -276,7 +277,7 @@ const ClaimHypercertPage = () => {
                       onBlur={handleBlur}
                       value={values.name}
                       placeholder={placeholders.name}
-                      disabled={isSubmitting}
+                      disabled={disabled}
                     />
                   </FormControl>
                   <FormControl isRequired>
@@ -291,7 +292,7 @@ const ClaimHypercertPage = () => {
                       onBlur={handleBlur}
                       placeholder={placeholders.description}
                       size="sm"
-                      disabled={isSubmitting}
+                      disabled={disabled}
                     />
                   </FormControl>
                   <FormControl isRequired>
@@ -306,7 +307,7 @@ const ClaimHypercertPage = () => {
                       onBlur={handleBlur}
                       placeholder={placeholders.description}
                       size="sm"
-                      disabled={isSubmitting}
+                      disabled={disabled}
                     />
                     <FormHelperText>{helperTexts.contributors}</FormHelperText>
                   </FormControl>
@@ -336,7 +337,7 @@ const ClaimHypercertPage = () => {
                       }}
                       value={values.external_link}
                       placeholder={placeholders.external_link}
-                      disabled={isSubmitting}
+                      disabled={disabled}
                     />
                   </FormControl>
                   <FormControl isRequired>
@@ -351,7 +352,7 @@ const ClaimHypercertPage = () => {
                       onBlur={handleBlur}
                       value={values.fractions}
                       placeholder={placeholders.external_link}
-                      disabled={isSubmitting}
+                      disabled={disabled}
                     />
                   </FormControl>
                 </VStack>
@@ -365,7 +366,7 @@ const ClaimHypercertPage = () => {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       value={values.workTimeStart}
-                      disabled={isSubmitting}
+                      disabled={disabled}
                     />
                     {!errors.workTimeStart ? (
                       <FormHelperText>
@@ -385,7 +386,7 @@ const ClaimHypercertPage = () => {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       value={values.workTimeEnd}
-                      disabled={isSubmitting}
+                      disabled={disabled}
                     />
                     {!errors.workTimeEnd ? (
                       <FormHelperText>
@@ -406,7 +407,7 @@ const ClaimHypercertPage = () => {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       value={values.impactTimeStart}
-                      disabled={isSubmitting}
+                      disabled={disabled}
                     />
                     {!errors.impactTimeStart ? (
                       <FormHelperText>
@@ -426,7 +427,7 @@ const ClaimHypercertPage = () => {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       value={values.impactTimeEnd}
-                      disabled={isSubmitting}
+                      disabled={disabled}
                     />
                     {!errors.impactTimeEnd ? (
                       <FormHelperText>
@@ -449,7 +450,7 @@ const ClaimHypercertPage = () => {
                     {({ form }: FieldProps) => (
                       <WorkScopesAutoComplete
                         value={values.workScopes}
-                        disabled={isSubmitting}
+                        disabled={disabled}
                         onChange={(workScopes) =>
                           form.setFieldValue("workScopes", workScopes)
                         }
@@ -470,7 +471,7 @@ const ClaimHypercertPage = () => {
                     {({ form }: FieldProps) => (
                       <ImpactScopesAutoComplete
                         value={values.impactScopes}
-                        disabled={isSubmitting}
+                        disabled={disabled}
                         onChange={(impactScopes) =>
                           form.setFieldValue("impactScopes", impactScopes)
                         }
@@ -491,7 +492,7 @@ const ClaimHypercertPage = () => {
                     {({ form }: FieldProps) => (
                       <RightsAutoComplete
                         value={values.rights}
-                        disabled={isSubmitting}
+                        disabled={disabled}
                         onChange={(rights) =>
                           form.setFieldValue("rights", rights)
                         }
@@ -506,7 +507,7 @@ const ClaimHypercertPage = () => {
                 <Button
                   width="100%"
                   type="submit"
-                  disabled={!isValid || isSubmitting}
+                  disabled={!isValid || disabled}
                   colorScheme="green"
                 >
                   {buttons.submit}
