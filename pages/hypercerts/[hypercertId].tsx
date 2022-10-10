@@ -35,6 +35,7 @@ import { hypercertDetailContent } from "../../content/hypercert-detail-content";
 import { useIpfsMetadata } from "../../hooks/ipfs";
 import { MetaDataResponse } from "../../types/MetaData";
 import { SplitFractionModal } from "../../components/Modals/SplitFractionModal";
+import { BurnFractionModal } from "../../components/Modals/BurnFractionModal";
 
 const HypercertPageWrapper = () => {
   const { query, isReady } = useRouter();
@@ -146,47 +147,49 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
           </Box>
         )}
 
-        <Box mb={6}>
-          <Heading mb={2}>{hypercertDetailContent.owners}</Heading>
-          <UnorderedList ml={0} spacing={2}>
-            {ownedFractions.map((fraction) => (
-              <FractionLine
-                key={fraction.id}
-                ownerId={fraction.owner.id}
-                tokenId={fraction.id}
-                hypercertId={hypercertId}
-                percentage={formatFractionPercentage(
-                  fraction.units,
-                  fraction.hypercert.totalUnits
-                )}
-              />
-            ))}
-            {otherFractions.map((fraction) => (
-              <FractionLine
-                key={fraction.id}
-                ownerId={fraction.owner.id}
-                tokenId={fraction.id}
-                hypercertId={hypercertId}
-                percentage={formatFractionPercentage(
-                  fraction.units,
-                  fraction.hypercert.totalUnits
-                )}
-              />
-            ))}
-          </UnorderedList>
+        {!!(ownedFractions.length || otherFractions.length) && (
+          <Box mb={6}>
+            <Heading mb={2}>{hypercertDetailContent.owners}</Heading>
+            <UnorderedList ml={0} spacing={2}>
+              {ownedFractions.map((fraction) => (
+                <FractionLine
+                  key={fraction.id}
+                  ownerId={fraction.owner.id}
+                  tokenId={fraction.id}
+                  hypercertId={hypercertId}
+                  percentage={formatFractionPercentage(
+                    fraction.units,
+                    fraction.hypercert.totalUnits
+                  )}
+                />
+              ))}
+              {otherFractions.map((fraction) => (
+                <FractionLine
+                  key={fraction.id}
+                  ownerId={fraction.owner.id}
+                  tokenId={fraction.id}
+                  hypercertId={hypercertId}
+                  percentage={formatFractionPercentage(
+                    fraction.units,
+                    fraction.hypercert.totalUnits
+                  )}
+                />
+              ))}
+            </UnorderedList>
 
-          {!!ownedFractions.length && (
-            <MergeAllFractionsModal
-              hypercertId={hypercertId}
-              fractionIds={ownedFractions.map((f) => f.id)}
-              render={({ onClick }) => (
-                <Button mt={6} onClick={onClick}>
-                  Merge all my fractions
-                </Button>
-              )}
-            />
-          )}
-        </Box>
+            {!!ownedFractions.length && (
+              <MergeAllFractionsModal
+                hypercertId={hypercertId}
+                fractionIds={ownedFractions.map((f) => f.id)}
+                render={({ onClick }) => (
+                  <Button mt={6} onClick={onClick}>
+                    Merge all my fractions
+                  </Button>
+                )}
+              />
+            )}
+          </Box>
+        )}
       </Flex>
     </>
   );
@@ -283,15 +286,26 @@ const FractionLine = ({
         - {percentage}
       </Text>
       {ownerId.toLowerCase() === address?.toLowerCase() && (
-        <SplitFractionModal
-          hypercertId={hypercertId}
-          tokenId={tokenId}
-          render={({ onClick }) => (
-            <Button onClick={onClick} mr={2}>
-              Split
-            </Button>
-          )}
-        />
+        <>
+          <SplitFractionModal
+            hypercertId={hypercertId}
+            tokenId={tokenId}
+            render={({ onClick }) => (
+              <Button onClick={onClick} mr={2}>
+                Split
+              </Button>
+            )}
+          />
+          <BurnFractionModal
+            render={({ onClick }) => (
+              <Button mr={2} onClick={onClick}>
+                Burn
+              </Button>
+            )}
+            tokenId={tokenId}
+            hypercertId={hypercertId}
+          />
+        </>
       )}
       <Button
         as="a"
