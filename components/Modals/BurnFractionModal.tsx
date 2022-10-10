@@ -88,8 +88,9 @@ export const BurnFractionModal = ({
                       data.hypercertFraction.units,
                       data.hypercertFraction.hypercert.totalUnits
                     )
-                  )}{" "}
-                  '<b>{hypercertInfo.name}</b>
+                  )}
+                  {" '"}
+                  <b>{hypercertInfo.name}</b>
                   {"'."}
                 </Text>
               </ModalBody>
