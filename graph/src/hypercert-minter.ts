@@ -181,7 +181,7 @@ export function handleTransfer(event: Transfer): void {
       owner = new Owner(toHex);
       owner.save();
     }
-    token.owner = toHex;
+    token.owner = owner.id;
     token.save();
   }
 }
