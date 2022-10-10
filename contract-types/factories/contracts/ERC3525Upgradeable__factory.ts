@@ -72,12 +72,34 @@ const _abi = [
         type: "uint256",
       },
     ],
+    name: "InvalidID",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+    ],
     name: "NonExistentToken",
     type: "error",
   },
   {
     inputs: [],
     name: "NotApprovedOrOwner",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "receiver",
+        type: "address",
+      },
+    ],
+    name: "NotERC3525Receiver",
     type: "error",
   },
   {
@@ -94,6 +116,11 @@ const _abi = [
       },
     ],
     name: "SlotsMismatch",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "ToZeroAddress",
     type: "error",
   },
   {
@@ -287,12 +314,12 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
-        name: "to",
+        name: "to_",
         type: "address",
       },
       {
         internalType: "uint256",
-        name: "tokenId",
+        name: "tokenId_",
         type: "uint256",
       },
     ],
@@ -328,7 +355,7 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
-        name: "owner",
+        name: "owner_",
         type: "address",
       },
     ],
@@ -336,7 +363,7 @@ const _abi = [
     outputs: [
       {
         internalType: "uint256",
-        name: "",
+        name: "balance",
         type: "uint256",
       },
     ],
@@ -363,19 +390,6 @@ const _abi = [
     type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "tokenId",
-        type: "uint256",
-      },
-    ],
-    name: "burn",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
     inputs: [],
     name: "contractURI",
     outputs: [
@@ -392,7 +406,7 @@ const _abi = [
     inputs: [
       {
         internalType: "uint256",
-        name: "tokenId",
+        name: "tokenId_",
         type: "uint256",
       },
     ],
@@ -411,12 +425,12 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
-        name: "owner",
+        name: "owner_",
         type: "address",
       },
       {
         internalType: "address",
-        name: "operator",
+        name: "operator_",
         type: "address",
       },
     ],
@@ -448,7 +462,7 @@ const _abi = [
     inputs: [
       {
         internalType: "uint256",
-        name: "tokenId",
+        name: "tokenId_",
         type: "uint256",
       },
     ],
@@ -456,7 +470,7 @@ const _abi = [
     outputs: [
       {
         internalType: "address",
-        name: "",
+        name: "owner_",
         type: "address",
       },
     ],
@@ -467,17 +481,17 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
-        name: "from",
+        name: "from_",
         type: "address",
       },
       {
         internalType: "address",
-        name: "to",
+        name: "to_",
         type: "address",
       },
       {
         internalType: "uint256",
-        name: "tokenId",
+        name: "tokenId_",
         type: "uint256",
       },
     ],
@@ -490,22 +504,22 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
-        name: "from",
+        name: "from_",
         type: "address",
       },
       {
         internalType: "address",
-        name: "to",
+        name: "to_",
         type: "address",
       },
       {
         internalType: "uint256",
-        name: "tokenId",
+        name: "tokenId_",
         type: "uint256",
       },
       {
         internalType: "bytes",
-        name: "data",
+        name: "data_",
         type: "bytes",
       },
     ],
@@ -518,50 +532,18 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
-        name: "operator",
+        name: "operator_",
         type: "address",
       },
       {
         internalType: "bool",
-        name: "approved",
+        name: "approved_",
         type: "bool",
       },
     ],
     name: "setApprovalForAll",
     outputs: [],
     stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "_index",
-        type: "uint256",
-      },
-    ],
-    name: "slotByIndex",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "slotCount",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
     type: "function",
   },
   {
@@ -638,7 +620,7 @@ const _abi = [
     inputs: [
       {
         internalType: "uint256",
-        name: "index",
+        name: "index_",
         type: "uint256",
       },
     ],
@@ -656,60 +638,17 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "uint256",
-        name: "_slot",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "_index",
-        type: "uint256",
-      },
-    ],
-    name: "tokenInSlotByIndex",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
         internalType: "address",
-        name: "owner",
+        name: "owner_",
         type: "address",
       },
       {
         internalType: "uint256",
-        name: "index",
+        name: "index_",
         type: "uint256",
       },
     ],
     name: "tokenOfOwnerByIndex",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "_slot",
-        type: "uint256",
-      },
-    ],
-    name: "tokenSupplyInSlot",
     outputs: [
       {
         internalType: "uint256",
@@ -774,7 +713,7 @@ const _abi = [
     outputs: [
       {
         internalType: "uint256",
-        name: "newTokenId",
+        name: "",
         type: "uint256",
       },
     ],
@@ -785,17 +724,17 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
-        name: "from",
+        name: "from_",
         type: "address",
       },
       {
         internalType: "address",
-        name: "to",
+        name: "to_",
         type: "address",
       },
       {
         internalType: "uint256",
-        name: "tokenId",
+        name: "tokenId_",
         type: "uint256",
       },
     ],
