@@ -6,9 +6,9 @@ dataSources:
     name: HyperCertMinter
     network: goerli
     source:
-      address: "0xb43552D2459C62Bc2e1562c2896449CC44997C18"
+      address: "0x4D65c5b183E8B96b7529Bee346d7bdA7B441f01B"
       abi: HyperCertMinter
-      startBlock: 7726531
+      startBlock: 7744909 
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
