@@ -36,6 +36,7 @@ import { useIpfsMetadata } from "../../hooks/ipfs";
 import { MetaDataResponse } from "../../types/MetaData";
 import { SplitFractionModal } from "../../components/Modals/SplitFractionModal";
 import { BurnFractionModal } from "../../components/Modals/BurnFractionModal";
+import _ from "lodash";
 
 const HypercertPageWrapper = () => {
   const { query, isReady } = useRouter();
@@ -108,6 +109,12 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
     (fraction) => fraction.owner.id !== address?.toLowerCase()
   );
 
+  const showBurnButton =
+    otherFractions.length === 0 &&
+    ownedFractions.length === 1 &&
+    _.sum(ownedFractions.map((f) => f.units)) ===
+      ownedFractions[0].hypercert.totalUnits;
+
   return (
     <>
       <Flex flexDirection="column">
@@ -177,7 +184,7 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
               ))}
             </UnorderedList>
 
-            {!!ownedFractions.length && (
+            {ownedFractions.length > 1 && (
               <MergeAllFractionsModal
                 hypercertId={hypercertId}
                 fractionIds={ownedFractions.map((f) => f.id)}
@@ -186,6 +193,17 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
                     Merge all my fractions
                   </Button>
                 )}
+              />
+            )}
+            {showBurnButton && (
+              <BurnFractionModal
+                render={({ onClick }) => (
+                  <Button mt={6} colorScheme="red" mr={2} onClick={onClick}>
+                    Burn HyperCert
+                  </Button>
+                )}
+                tokenId={ownedFractions[0].id}
+                hypercertId={hypercertId}
               />
             )}
           </Box>
@@ -286,26 +304,15 @@ const FractionLine = ({
         - {percentage}
       </Text>
       {ownerId.toLowerCase() === address?.toLowerCase() && (
-        <>
-          <SplitFractionModal
-            hypercertId={hypercertId}
-            tokenId={tokenId}
-            render={({ onClick }) => (
-              <Button onClick={onClick} mr={2}>
-                Split
-              </Button>
-            )}
-          />
-          <BurnFractionModal
-            render={({ onClick }) => (
-              <Button mr={2} onClick={onClick}>
-                Burn
-              </Button>
-            )}
-            tokenId={tokenId}
-            hypercertId={hypercertId}
-          />
-        </>
+        <SplitFractionModal
+          hypercertId={hypercertId}
+          tokenId={tokenId}
+          render={({ onClick }) => (
+            <Button onClick={onClick} mr={2}>
+              Split
+            </Button>
+          )}
+        />
       )}
       <Button
         as="a"

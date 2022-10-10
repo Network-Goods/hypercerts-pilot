@@ -14,13 +14,11 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useFractionById } from "../../hooks/fractions";
-import {
-  useHypercertFractions,
-  useHypercertInfo,
-} from "../../hooks/useHypercert";
+import { useHypercertInfo } from "../../hooks/useHypercert";
 import { useBurnFraction } from "../../hooks/burn";
 import { burnFractionModal } from "../../content/burn-hypercert-content";
 import { formatFractionPercentage } from "../../utils/formatting";
+import { useRouter } from "next/router";
 
 type C = (args: { onClick: () => void }) => JSX.Element;
 
@@ -34,7 +32,8 @@ export const BurnFractionModal = ({
   hypercertId: string;
 }) => {
   const { isOpen, onClose, onOpen } = useDisclosure();
-  const { startPolling } = useHypercertFractions(hypercertId);
+  const { push } = useRouter();
+
   const { data: hypercertInfo, loading: loadingHypercertInfo } =
     useHypercertInfo(hypercertId);
 
@@ -44,9 +43,9 @@ export const BurnFractionModal = ({
 
   const { data, loading } = useFractionById(tokenId);
   const split = useBurnFraction({
-    onComplete: () => {
+    onComplete: async () => {
       setStep("complete");
-      startPolling(5000);
+      await push({ pathname: "/my-hypercerts", query: { withPolling: true } });
     },
     onError: () => {
       setStep("confirm");
@@ -90,7 +89,7 @@ export const BurnFractionModal = ({
                       data.hypercertFraction.hypercert.totalUnits
                     )
                   )}{" "}
-                  '<b>{hypercertInfo.name}</b>'
+                  '<b>{hypercertInfo.name}</b>'.
                 </Text>
               </ModalBody>
 
@@ -98,7 +97,7 @@ export const BurnFractionModal = ({
                 <Button variant="ghost" onClick={close}>
                   {burnFractionModal.confirm.closeButton}
                 </Button>
-                <Button colorScheme="green" mr={3} onClick={onClickBurn}>
+                <Button colorScheme="red" mr={3} onClick={onClickBurn}>
                   {burnFractionModal.confirm.confirmButton}
                 </Button>
               </ModalFooter>
