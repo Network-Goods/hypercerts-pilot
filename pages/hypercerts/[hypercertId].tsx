@@ -270,9 +270,20 @@ const FractionLine = ({
   return (
     <ListItem display="flex" alignItems="center">
       <UserInfo nameOrAddress={ownerId} />
-      <Text ml={1} fontSize="sm" opacity={0.7}>
+      <Text ml={1} fontSize="sm" opacity={0.7} flexGrow={1}>
         - {percentage}
       </Text>
+      {ownerId.toLowerCase() === address?.toLowerCase() && (
+        <SplitFractionModal
+          hypercertId={hypercertId}
+          tokenId={tokenId}
+          render={({ onClick }) => (
+            <Button onClick={onClick} mr={2}>
+              Split
+            </Button>
+          )}
+        />
+      )}
       <Button
         as="a"
         target="_blank"
@@ -282,17 +293,6 @@ const FractionLine = ({
       >
         Show on OpenSea
       </Button>
-      {ownerId.toLowerCase() === address?.toLowerCase() && (
-        <SplitFractionModal
-          hypercertId={hypercertId}
-          tokenId={tokenId}
-          render={({ onClick }) => (
-            <Button onClick={onClick} ml={2}>
-              Split
-            </Button>
-          )}
-        />
-      )}
     </ListItem>
   );
 };
