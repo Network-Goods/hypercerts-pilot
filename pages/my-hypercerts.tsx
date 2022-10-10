@@ -85,7 +85,7 @@ const MyHypercertsPage = ({ userAddress }: { userAddress: string }) => {
 
   return (
     <Container maxWidth={1000}>
-      {!fractions.length && !burnedFractions.length && (
+      {!uniqIds.length && !burnedFractions.length && (
         <Alert status="info">
           <AlertIcon />
           <AlertTitle>{myHypercertsContent.noHypercertsOwned}</AlertTitle>
