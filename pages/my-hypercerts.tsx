@@ -15,6 +15,8 @@ import { myHypercertsContent } from "../content/my-hypercerts-content";
 import { ethers } from "ethers";
 import _ from "lodash";
 import { HypercertTile } from "../components/HypercertTile";
+import { useEffect } from "react";
+import { useRouter } from "next/router";
 
 const MyHypercertsPageWrapper = () => {
   const { address } = useWallet();
@@ -34,7 +36,20 @@ const MyHypercertsPageWrapper = () => {
 };
 
 const MyHypercertsPage = ({ userAddress }: { userAddress: string }) => {
-  const { data, loading } = useFractionsListForUser(userAddress);
+  const {
+    query: { withPolling },
+  } = useRouter();
+  const { data, loading, startPolling, stopPolling } =
+    useFractionsListForUser(userAddress);
+
+  useEffect(() => {
+    if (withPolling) {
+      startPolling(10000);
+    }
+    return () => {
+      stopPolling();
+    };
+  }, [withPolling]);
 
   if (loading || !data) {
     return (
