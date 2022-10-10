@@ -1,5 +1,8 @@
 import { useState } from "react";
 import {
+  Alert,
+  AlertIcon,
+  AlertTitle,
   Button,
   Center,
   Modal,
@@ -74,13 +77,17 @@ export const MergeAllFractionsModal = ({
               <ModalCloseButton />
               <ModalBody>
                 <Text>{mergeHypercertModalContent.confirmation.body}</Text>
+                <Alert mt={4} status="warning">
+                  <AlertIcon />
+                  <AlertTitle>Merging has been temporarily disabled</AlertTitle>
+                </Alert>
               </ModalBody>
 
               <ModalFooter>
                 <Button variant="ghost" onClick={close}>
                   {mergeHypercertModalContent.confirmation.closeButton}
                 </Button>
-                <Button colorScheme="green" mr={3} onClick={onConfirm}>
+                <Button colorScheme="green" mr={3} onClick={onConfirm} disabled>
                   {mergeHypercertModalContent.confirmation.confirmButton}
                 </Button>
               </ModalFooter>

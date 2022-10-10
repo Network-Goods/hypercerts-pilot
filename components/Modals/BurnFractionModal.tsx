@@ -1,5 +1,8 @@
 import { useState } from "react";
 import {
+  Alert,
+  AlertIcon,
+  AlertTitle,
   Button,
   Center,
   Modal,
@@ -93,13 +96,17 @@ export const BurnFractionModal = ({
                   <b>{hypercertInfo.name}</b>
                   {"'."}
                 </Text>
+                <Alert mt={4} status="warning">
+                  <AlertIcon />
+                  <AlertTitle>Burning has been temporarily disabled</AlertTitle>
+                </Alert>
               </ModalBody>
 
               <ModalFooter>
                 <Button variant="ghost" onClick={close}>
                   {burnFractionModal.confirm.closeButton}
                 </Button>
-                <Button colorScheme="red" mr={3} onClick={onClickBurn}>
+                <Button colorScheme="red" mr={3} onClick={onClickBurn} disabled>
                   {burnFractionModal.confirm.confirmButton}
                 </Button>
               </ModalFooter>
