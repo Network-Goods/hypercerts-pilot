@@ -69,6 +69,8 @@ const ValidationSchema = Yup.object().shape({
       }
     }),
   workScopes: Yup.array().min(1),
+  impactScopes: Yup.array().min(1),
+  rights: Yup.array().min(1),
 });
 
 const testValues = {
@@ -150,6 +152,7 @@ const ClaimHypercertPage = () => {
     <Container>
       <Formik
         validationSchema={ValidationSchema}
+        validateOnMount={true}
         validate={(values) => {
           updateQueryString(values);
         }}
@@ -469,7 +472,7 @@ const ClaimHypercertPage = () => {
                   </FormHelperText>
                 </FormControl>
                 <Divider my={3} />
-                <FormControl>
+                <FormControl isRequired>
                   <Flex>
                     <FormLabel>{placeholders.impactScopesLabel}</FormLabel>
                     <ErrorMessage name="impactScopes" render={DisplayError} />
@@ -490,7 +493,7 @@ const ClaimHypercertPage = () => {
                   </FormHelperText>
                 </FormControl>
                 <Divider my={3} />
-                <FormControl>
+                <FormControl isRequired>
                   <Flex>
                     <FormLabel>{placeholders.rightsLabel}</FormLabel>
                     <ErrorMessage name="rights" render={DisplayError} />
