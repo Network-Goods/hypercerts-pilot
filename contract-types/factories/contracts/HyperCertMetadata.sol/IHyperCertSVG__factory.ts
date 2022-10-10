@@ -6,7 +6,7 @@
 import type {
   IHyperCertSVG,
   IHyperCertSVGInterface,
-} from "../../../contracts/HypercertMetadata.sol/IHyperCertSVG";
+} from "../../../contracts/HyperCertMetadata.sol/IHyperCertSVG";
 import type { Provider } from "@ethersproject/providers";
 import { Contract, Signer, utils } from "ethers";
 

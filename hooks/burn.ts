@@ -4,7 +4,13 @@ import { useToast } from "@chakra-ui/react";
 import { burnInteractionLabels } from "../content/chainInteractions";
 import { useParseBlockchainError } from "../utils/parseBlockchainError";
 
-export const useBurnHypercert = () => {
+export const useBurnFraction = ({
+  onComplete,
+  onError,
+}: {
+  onComplete?: () => void;
+  onError?: () => void;
+}) => {
   const contract = useHypercertContract();
   const parseBlockchainError = useParseBlockchainError();
   const toast = useToast();
@@ -19,6 +25,7 @@ export const useBurnHypercert = () => {
         status: "error",
       });
       console.error(error);
+      onError?.();
     },
     onConfirmation: (receipt) => {
       toast({
@@ -27,8 +34,9 @@ export const useBurnHypercert = () => {
         ),
         status: "success",
       });
+      onComplete?.();
     },
   });
 
-  return async (id: string) => mutate(id);
+  return async (tokenId: string) => mutate(tokenId);
 };

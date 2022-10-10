@@ -116,7 +116,14 @@ const ClaimHypercertPage = () => {
   const { address, isConnected } = useWallet();
   const { push } = useRouter();
   const mintHyperCertificate = useMintHyperCertificate({
-    onComplete: () => push(urls.myHypercerts.href),
+    onComplete: async () => {
+      await push({
+        pathname: urls.myHypercerts.href,
+        query: {
+          withPolling: true,
+        },
+      });
+    },
   });
   const toast = useToast();
   const [currentQuery, setCurrentQuery] = useState<string | undefined>(() =>

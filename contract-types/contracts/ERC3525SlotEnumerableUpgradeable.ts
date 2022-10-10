@@ -30,7 +30,8 @@ import type {
   utils,
 } from "ethers";
 
-export interface ERC3525UpgradeableInterface extends utils.Interface {
+export interface ERC3525SlotEnumerableUpgradeableInterface
+  extends utils.Interface {
   functions: {
     "allowance(uint256,address)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
@@ -45,12 +46,16 @@ export interface ERC3525UpgradeableInterface extends utils.Interface {
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256,bytes)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
+    "slotByIndex(uint256)": FunctionFragment;
+    "slotCount()": FunctionFragment;
     "slotOf(uint256)": FunctionFragment;
     "slotURI(uint256)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "symbol()": FunctionFragment;
     "tokenByIndex(uint256)": FunctionFragment;
+    "tokenInSlotByIndex(uint256,uint256)": FunctionFragment;
     "tokenOfOwnerByIndex(address,uint256)": FunctionFragment;
+    "tokenSupplyInSlot(uint256)": FunctionFragment;
     "tokenURI(uint256)": FunctionFragment;
     "totalSupply()": FunctionFragment;
     "transferFrom(uint256,address,uint256)": FunctionFragment;
@@ -74,12 +79,16 @@ export interface ERC3525UpgradeableInterface extends utils.Interface {
       | "safeTransferFrom(address,address,uint256)"
       | "safeTransferFrom(address,address,uint256,bytes)"
       | "setApprovalForAll"
+      | "slotByIndex"
+      | "slotCount"
       | "slotOf"
       | "slotURI"
       | "supportsInterface"
       | "symbol"
       | "tokenByIndex"
+      | "tokenInSlotByIndex"
       | "tokenOfOwnerByIndex"
+      | "tokenSupplyInSlot"
       | "tokenURI"
       | "totalSupply"
       | "transferFrom(uint256,address,uint256)"
@@ -151,6 +160,11 @@ export interface ERC3525UpgradeableInterface extends utils.Interface {
     values: [PromiseOrValue<string>, PromiseOrValue<boolean>]
   ): string;
   encodeFunctionData(
+    functionFragment: "slotByIndex",
+    values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(functionFragment: "slotCount", values?: undefined): string;
+  encodeFunctionData(
     functionFragment: "slotOf",
     values: [PromiseOrValue<BigNumberish>]
   ): string;
@@ -168,8 +182,16 @@ export interface ERC3525UpgradeableInterface extends utils.Interface {
     values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
+    functionFragment: "tokenInSlotByIndex",
+    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
     functionFragment: "tokenOfOwnerByIndex",
     values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "tokenSupplyInSlot",
+    values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
     functionFragment: "tokenURI",
@@ -251,6 +273,11 @@ export interface ERC3525UpgradeableInterface extends utils.Interface {
     functionFragment: "setApprovalForAll",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "slotByIndex",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "slotCount", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "slotOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "slotURI", data: BytesLike): Result;
   decodeFunctionResult(
@@ -263,7 +290,15 @@ export interface ERC3525UpgradeableInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "tokenInSlotByIndex",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "tokenOfOwnerByIndex",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "tokenSupplyInSlot",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "tokenURI", data: BytesLike): Result;
@@ -386,12 +421,12 @@ export type TransferValueEvent = TypedEvent<
 
 export type TransferValueEventFilter = TypedEventFilter<TransferValueEvent>;
 
-export interface ERC3525Upgradeable extends BaseContract {
+export interface ERC3525SlotEnumerableUpgradeable extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: ERC3525UpgradeableInterface;
+  interface: ERC3525SlotEnumerableUpgradeableInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
@@ -483,6 +518,13 @@ export interface ERC3525Upgradeable extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    slotByIndex(
+      index_: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    slotCount(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     slotOf(
       tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -505,9 +547,20 @@ export interface ERC3525Upgradeable extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
+    tokenInSlotByIndex(
+      slot_: PromiseOrValue<BigNumberish>,
+      index_: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
     tokenOfOwnerByIndex(
       owner_: PromiseOrValue<string>,
       index_: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    tokenSupplyInSlot(
+      slot_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
@@ -612,6 +665,13 @@ export interface ERC3525Upgradeable extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
+  slotByIndex(
+    index_: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  slotCount(overrides?: CallOverrides): Promise<BigNumber>;
+
   slotOf(
     tokenId_: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
@@ -634,9 +694,20 @@ export interface ERC3525Upgradeable extends BaseContract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
+  tokenInSlotByIndex(
+    slot_: PromiseOrValue<BigNumberish>,
+    index_: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   tokenOfOwnerByIndex(
     owner_: PromiseOrValue<string>,
     index_: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  tokenSupplyInSlot(
+    slot_: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
@@ -741,6 +812,13 @@ export interface ERC3525Upgradeable extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    slotByIndex(
+      index_: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    slotCount(overrides?: CallOverrides): Promise<BigNumber>;
+
     slotOf(
       tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -763,9 +841,20 @@ export interface ERC3525Upgradeable extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    tokenInSlotByIndex(
+      slot_: PromiseOrValue<BigNumberish>,
+      index_: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     tokenOfOwnerByIndex(
       owner_: PromiseOrValue<string>,
       index_: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    tokenSupplyInSlot(
+      slot_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -942,6 +1031,13 @@ export interface ERC3525Upgradeable extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
+    slotByIndex(
+      index_: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    slotCount(overrides?: CallOverrides): Promise<BigNumber>;
+
     slotOf(
       tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -964,9 +1060,20 @@ export interface ERC3525Upgradeable extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    tokenInSlotByIndex(
+      slot_: PromiseOrValue<BigNumberish>,
+      index_: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     tokenOfOwnerByIndex(
       owner_: PromiseOrValue<string>,
       index_: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    tokenSupplyInSlot(
+      slot_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1072,6 +1179,13 @@ export interface ERC3525Upgradeable extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
+    slotByIndex(
+      index_: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    slotCount(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     slotOf(
       tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -1094,9 +1208,20 @@ export interface ERC3525Upgradeable extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    tokenInSlotByIndex(
+      slot_: PromiseOrValue<BigNumberish>,
+      index_: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     tokenOfOwnerByIndex(
       owner_: PromiseOrValue<string>,
       index_: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    tokenSupplyInSlot(
+      slot_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

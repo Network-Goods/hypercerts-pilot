@@ -35,12 +35,19 @@ import { hypercertDetailContent } from "../../content/hypercert-detail-content";
 import { useIpfsMetadata } from "../../hooks/ipfs";
 import { MetaDataResponse } from "../../types/MetaData";
 import { SplitFractionModal } from "../../components/Modals/SplitFractionModal";
+import { BurnFractionModal } from "../../components/Modals/BurnFractionModal";
+import _ from "lodash";
 
 const HypercertPageWrapper = () => {
-  const { query } = useRouter();
+  const { query, isReady } = useRouter();
   const hypercertId = query["hypercertId"];
 
-  if (!hypercertId) {
+  if (!isReady) {
+    return null;
+  }
+
+  if (isReady && !hypercertId) {
+    console.log("Its not here", hypercertId, isReady);
     return (
       <Container>
         <Alert status="error">No hypercert id provided</Alert>
@@ -86,7 +93,7 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
 
   const hypercert = hypercertData?.hypercert;
 
-  if (!hypercert || !fractions || !ipfsData) {
+  if (!hypercert || !fractions) {
     return (
       <Alert status="error">
         <AlertIcon />
@@ -101,6 +108,12 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
   const otherFractions = fractions.hypercertFractions.filter(
     (fraction) => fraction.owner.id !== address?.toLowerCase()
   );
+
+  const showBurnButton =
+    otherFractions.length === 0 &&
+    ownedFractions.length === 1 &&
+    _.sum(ownedFractions.map((f) => f.units)) ===
+      ownedFractions[0].hypercert.totalUnits;
 
   return (
     <>
@@ -121,63 +134,80 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
           </Box>
         )}
 
-        <Box mb={6}>
-          <HypercertInfoBox ipfsData={ipfsData} hypercert={hypercert} />
-        </Box>
+        {ipfsData && (
+          <Box mb={6}>
+            <HypercertInfoBox ipfsData={ipfsData} hypercert={hypercert} />
+          </Box>
+        )}
 
-        <Box mb={6}>
-          <Heading mb={2}>{hypercertDetailContent.contributors}</Heading>
-          <VStack spacing={2} alignItems="flex-start">
-            {hypercert.contributors?.map((x) => (
-              <UserInfo key={x.id} nameOrAddress={x.id} />
-            ))}
-            {ipfsData.properties.contributor_names.map((x) => (
-              <UserInfo key={x} nameOrAddress={x} />
-            ))}
-          </VStack>
-        </Box>
+        {ipfsData && (
+          <Box mb={6}>
+            <Heading mb={2}>{hypercertDetailContent.contributors}</Heading>
+            <VStack spacing={2} alignItems="flex-start">
+              {hypercert.contributors?.map((x) => (
+                <UserInfo key={x.id} nameOrAddress={x.id} />
+              ))}
+              {ipfsData.properties.contributor_names.map((x) => (
+                <UserInfo key={x} nameOrAddress={x} />
+              ))}
+            </VStack>
+          </Box>
+        )}
 
-        <Box mb={6}>
-          <Heading mb={2}>{hypercertDetailContent.owners}</Heading>
-          <UnorderedList ml={0} spacing={2}>
-            {ownedFractions.map((fraction) => (
-              <FractionLine
-                key={fraction.id}
-                ownerId={fraction.owner.id}
-                tokenId={fraction.id}
+        {!!(ownedFractions.length || otherFractions.length) && (
+          <Box mb={6}>
+            <Heading mb={2}>{hypercertDetailContent.owners}</Heading>
+            <UnorderedList ml={0} spacing={2}>
+              {ownedFractions.map((fraction) => (
+                <FractionLine
+                  key={fraction.id}
+                  ownerId={fraction.owner.id}
+                  tokenId={fraction.id}
+                  hypercertId={hypercertId}
+                  percentage={formatFractionPercentage(
+                    fraction.units,
+                    fraction.hypercert.totalUnits
+                  )}
+                />
+              ))}
+              {otherFractions.map((fraction) => (
+                <FractionLine
+                  key={fraction.id}
+                  ownerId={fraction.owner.id}
+                  tokenId={fraction.id}
+                  hypercertId={hypercertId}
+                  percentage={formatFractionPercentage(
+                    fraction.units,
+                    fraction.hypercert.totalUnits
+                  )}
+                />
+              ))}
+            </UnorderedList>
+
+            {ownedFractions.length > 1 && (
+              <MergeAllFractionsModal
                 hypercertId={hypercertId}
-                percentage={formatFractionPercentage(
-                  fraction.units,
-                  fraction.hypercert.totalUnits
+                fractionIds={ownedFractions.map((f) => f.id)}
+                render={({ onClick }) => (
+                  <Button mt={6} onClick={onClick}>
+                    Merge all my fractions
+                  </Button>
                 )}
               />
-            ))}
-            {otherFractions.map((fraction) => (
-              <FractionLine
-                key={fraction.id}
-                ownerId={fraction.owner.id}
-                tokenId={fraction.id}
-                hypercertId={hypercertId}
-                percentage={formatFractionPercentage(
-                  fraction.units,
-                  fraction.hypercert.totalUnits
+            )}
+            {showBurnButton && (
+              <BurnFractionModal
+                render={({ onClick }) => (
+                  <Button mt={6} colorScheme="red" mr={2} onClick={onClick}>
+                    Burn HyperCert
+                  </Button>
                 )}
+                tokenId={ownedFractions[0].id}
+                hypercertId={hypercertId}
               />
-            ))}
-          </UnorderedList>
-
-          {!!ownedFractions.length && (
-            <MergeAllFractionsModal
-              hypercertId={hypercertId}
-              fractionIds={ownedFractions.map((f) => f.id)}
-              render={({ onClick }) => (
-                <Button mt={6} onClick={onClick}>
-                  Merge all my fractions
-                </Button>
-              )}
-            />
-          )}
-        </Box>
+            )}
+          </Box>
+        )}
       </Flex>
     </>
   );
@@ -270,9 +300,20 @@ const FractionLine = ({
   return (
     <ListItem display="flex" alignItems="center">
       <UserInfo nameOrAddress={ownerId} />
-      <Text ml={1} fontSize="sm" opacity={0.7}>
+      <Text ml={1} fontSize="sm" opacity={0.7} flexGrow={1}>
         - {percentage}
       </Text>
+      {ownerId.toLowerCase() === address?.toLowerCase() && (
+        <SplitFractionModal
+          hypercertId={hypercertId}
+          tokenId={tokenId}
+          render={({ onClick }) => (
+            <Button onClick={onClick} mr={2}>
+              Split
+            </Button>
+          )}
+        />
+      )}
       <Button
         as="a"
         target="_blank"
@@ -282,17 +323,6 @@ const FractionLine = ({
       >
         Show on OpenSea
       </Button>
-      {ownerId.toLowerCase() === address?.toLowerCase() && (
-        <SplitFractionModal
-          hypercertId={hypercertId}
-          tokenId={tokenId}
-          render={({ onClick }) => (
-            <Button onClick={onClick} ml={2}>
-              Split
-            </Button>
-          )}
-        />
-      )}
     </ListItem>
   );
 };

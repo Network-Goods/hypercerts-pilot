@@ -7,3 +7,20 @@ export const errors = {
 export const labels = {
   burnButtonLabel: "Burn",
 };
+
+export const burnFractionModal = {
+  confirm: {
+    title: "Burn fraction",
+    body: (value: number, percentage: string) =>
+      `Confirm burning ${value} units (${percentage}) of`,
+    closeButton: "Close",
+    confirmButton: "Burn",
+  },
+  burning: {
+    title: "Burning",
+  },
+  complete: {
+    title: "Burned fraction successfully!",
+    confirmButton: "Done",
+  },
+};

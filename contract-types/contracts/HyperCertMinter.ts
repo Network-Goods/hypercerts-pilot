@@ -9,7 +9,7 @@ import type {
   TypedListener,
   OnEvent,
   PromiseOrValue,
-} from "../../common";
+} from "../common";
 import type {
   FunctionFragment,
   Result,
@@ -48,6 +48,7 @@ export declare namespace HyperCertMinter {
     name: PromiseOrValue<string>;
     description: PromiseOrValue<string>;
     uri: PromiseOrValue<string>;
+    minter: PromiseOrValue<string>;
   };
 
   export type ClaimStructOutput = [
@@ -61,6 +62,7 @@ export declare namespace HyperCertMinter {
     BigNumber,
     number,
     boolean,
+    string,
     string,
     string,
     string
@@ -78,6 +80,7 @@ export declare namespace HyperCertMinter {
     name: string;
     description: string;
     uri: string;
+    minter: string;
   };
 }
 
@@ -119,6 +122,7 @@ export interface HyperCertMinterInterface extends utils.Interface {
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256,bytes)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
+    "setMetadataGenerator(address)": FunctionFragment;
     "slotByIndex(uint256)": FunctionFragment;
     "slotCount()": FunctionFragment;
     "slotOf(uint256)": FunctionFragment;
@@ -181,6 +185,7 @@ export interface HyperCertMinterInterface extends utils.Interface {
       | "safeTransferFrom(address,address,uint256)"
       | "safeTransferFrom(address,address,uint256,bytes)"
       | "setApprovalForAll"
+      | "setMetadataGenerator"
       | "slotByIndex"
       | "slotCount"
       | "slotOf"
@@ -354,6 +359,10 @@ export interface HyperCertMinterInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "setApprovalForAll",
     values: [PromiseOrValue<string>, PromiseOrValue<boolean>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setMetadataGenerator",
+    values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
     functionFragment: "slotByIndex",
@@ -538,6 +547,10 @@ export interface HyperCertMinterInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "setApprovalForAll",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setMetadataGenerator",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -890,8 +903,8 @@ export interface HyperCertMinter extends BaseContract {
     ): Promise<[BigNumber]>;
 
     "approve(address,uint256)"(
-      to: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
+      to_: PromiseOrValue<string>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -903,9 +916,9 @@ export interface HyperCertMinter extends BaseContract {
     ): Promise<ContractTransaction>;
 
     "balanceOf(address)"(
-      owner: PromiseOrValue<string>,
+      owner_: PromiseOrValue<string>,
       overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+    ): Promise<[BigNumber] & { balance: BigNumber }>;
 
     "balanceOf(uint256)"(
       tokenId_: PromiseOrValue<BigNumberish>,
@@ -913,19 +926,19 @@ export interface HyperCertMinter extends BaseContract {
     ): Promise<[BigNumber]>;
 
     burn(
-      tokenId: PromiseOrValue<BigNumberish>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
     contractURI(overrides?: CallOverrides): Promise<[string]>;
 
     donate(
-      tokenId: PromiseOrValue<BigNumberish>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
     getApproved(
-      tokenId: PromiseOrValue<BigNumberish>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[string]>;
 
@@ -976,8 +989,8 @@ export interface HyperCertMinter extends BaseContract {
     ): Promise<ContractTransaction>;
 
     isApprovedForAll(
-      owner: PromiseOrValue<string>,
-      operator: PromiseOrValue<string>,
+      owner_: PromiseOrValue<string>,
+      operator_: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
@@ -995,9 +1008,9 @@ export interface HyperCertMinter extends BaseContract {
     name(overrides?: CallOverrides): Promise<[string]>;
 
     ownerOf(
-      tokenId: PromiseOrValue<BigNumberish>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
-    ): Promise<[string]>;
+    ): Promise<[string] & { owner_: string }>;
 
     proxiableUUID(overrides?: CallOverrides): Promise<[string]>;
 
@@ -1019,28 +1032,33 @@ export interface HyperCertMinter extends BaseContract {
     ): Promise<[string]>;
 
     "safeTransferFrom(address,address,uint256)"(
-      from: PromiseOrValue<string>,
-      to: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
+      from_: PromiseOrValue<string>,
+      to_: PromiseOrValue<string>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
     "safeTransferFrom(address,address,uint256,bytes)"(
-      from: PromiseOrValue<string>,
-      to: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      data: PromiseOrValue<BytesLike>,
+      from_: PromiseOrValue<string>,
+      to_: PromiseOrValue<string>,
+      tokenId_: PromiseOrValue<BigNumberish>,
+      data_: PromiseOrValue<BytesLike>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
     setApprovalForAll(
-      operator: PromiseOrValue<string>,
-      approved: PromiseOrValue<boolean>,
+      operator_: PromiseOrValue<string>,
+      approved_: PromiseOrValue<boolean>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    setMetadataGenerator(
+      metadataGenerator: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
     slotByIndex(
-      _index: PromiseOrValue<BigNumberish>,
+      index_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
@@ -1070,24 +1088,24 @@ export interface HyperCertMinter extends BaseContract {
     symbol(overrides?: CallOverrides): Promise<[string]>;
 
     tokenByIndex(
-      index: PromiseOrValue<BigNumberish>,
+      index_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
     tokenInSlotByIndex(
-      _slot: PromiseOrValue<BigNumberish>,
-      _index: PromiseOrValue<BigNumberish>,
+      slot_: PromiseOrValue<BigNumberish>,
+      index_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
     tokenOfOwnerByIndex(
-      owner: PromiseOrValue<string>,
-      index: PromiseOrValue<BigNumberish>,
+      owner_: PromiseOrValue<string>,
+      index_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
     tokenSupplyInSlot(
-      _slot: PromiseOrValue<BigNumberish>,
+      slot_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
@@ -1106,9 +1124,9 @@ export interface HyperCertMinter extends BaseContract {
     ): Promise<ContractTransaction>;
 
     "transferFrom(address,address,uint256)"(
-      from: PromiseOrValue<string>,
-      to: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
+      from_: PromiseOrValue<string>,
+      to_: PromiseOrValue<string>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -1176,8 +1194,8 @@ export interface HyperCertMinter extends BaseContract {
   ): Promise<BigNumber>;
 
   "approve(address,uint256)"(
-    to: PromiseOrValue<string>,
-    tokenId: PromiseOrValue<BigNumberish>,
+    to_: PromiseOrValue<string>,
+    tokenId_: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -1189,7 +1207,7 @@ export interface HyperCertMinter extends BaseContract {
   ): Promise<ContractTransaction>;
 
   "balanceOf(address)"(
-    owner: PromiseOrValue<string>,
+    owner_: PromiseOrValue<string>,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
@@ -1199,19 +1217,19 @@ export interface HyperCertMinter extends BaseContract {
   ): Promise<BigNumber>;
 
   burn(
-    tokenId: PromiseOrValue<BigNumberish>,
+    tokenId_: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
   contractURI(overrides?: CallOverrides): Promise<string>;
 
   donate(
-    tokenId: PromiseOrValue<BigNumberish>,
+    tokenId_: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
   getApproved(
-    tokenId: PromiseOrValue<BigNumberish>,
+    tokenId_: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<string>;
 
@@ -1262,8 +1280,8 @@ export interface HyperCertMinter extends BaseContract {
   ): Promise<ContractTransaction>;
 
   isApprovedForAll(
-    owner: PromiseOrValue<string>,
-    operator: PromiseOrValue<string>,
+    owner_: PromiseOrValue<string>,
+    operator_: PromiseOrValue<string>,
     overrides?: CallOverrides
   ): Promise<boolean>;
 
@@ -1281,7 +1299,7 @@ export interface HyperCertMinter extends BaseContract {
   name(overrides?: CallOverrides): Promise<string>;
 
   ownerOf(
-    tokenId: PromiseOrValue<BigNumberish>,
+    tokenId_: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<string>;
 
@@ -1305,28 +1323,33 @@ export interface HyperCertMinter extends BaseContract {
   ): Promise<string>;
 
   "safeTransferFrom(address,address,uint256)"(
-    from: PromiseOrValue<string>,
-    to: PromiseOrValue<string>,
-    tokenId: PromiseOrValue<BigNumberish>,
+    from_: PromiseOrValue<string>,
+    to_: PromiseOrValue<string>,
+    tokenId_: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
   "safeTransferFrom(address,address,uint256,bytes)"(
-    from: PromiseOrValue<string>,
-    to: PromiseOrValue<string>,
-    tokenId: PromiseOrValue<BigNumberish>,
-    data: PromiseOrValue<BytesLike>,
+    from_: PromiseOrValue<string>,
+    to_: PromiseOrValue<string>,
+    tokenId_: PromiseOrValue<BigNumberish>,
+    data_: PromiseOrValue<BytesLike>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
   setApprovalForAll(
-    operator: PromiseOrValue<string>,
-    approved: PromiseOrValue<boolean>,
+    operator_: PromiseOrValue<string>,
+    approved_: PromiseOrValue<boolean>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  setMetadataGenerator(
+    metadataGenerator: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
   slotByIndex(
-    _index: PromiseOrValue<BigNumberish>,
+    index_: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
@@ -1356,24 +1379,24 @@ export interface HyperCertMinter extends BaseContract {
   symbol(overrides?: CallOverrides): Promise<string>;
 
   tokenByIndex(
-    index: PromiseOrValue<BigNumberish>,
+    index_: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
   tokenInSlotByIndex(
-    _slot: PromiseOrValue<BigNumberish>,
-    _index: PromiseOrValue<BigNumberish>,
+    slot_: PromiseOrValue<BigNumberish>,
+    index_: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
   tokenOfOwnerByIndex(
-    owner: PromiseOrValue<string>,
-    index: PromiseOrValue<BigNumberish>,
+    owner_: PromiseOrValue<string>,
+    index_: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
   tokenSupplyInSlot(
-    _slot: PromiseOrValue<BigNumberish>,
+    slot_: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
@@ -1392,9 +1415,9 @@ export interface HyperCertMinter extends BaseContract {
   ): Promise<ContractTransaction>;
 
   "transferFrom(address,address,uint256)"(
-    from: PromiseOrValue<string>,
-    to: PromiseOrValue<string>,
-    tokenId: PromiseOrValue<BigNumberish>,
+    from_: PromiseOrValue<string>,
+    to_: PromiseOrValue<string>,
+    tokenId_: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -1462,8 +1485,8 @@ export interface HyperCertMinter extends BaseContract {
     ): Promise<BigNumber>;
 
     "approve(address,uint256)"(
-      to: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
+      to_: PromiseOrValue<string>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1475,7 +1498,7 @@ export interface HyperCertMinter extends BaseContract {
     ): Promise<void>;
 
     "balanceOf(address)"(
-      owner: PromiseOrValue<string>,
+      owner_: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1485,19 +1508,19 @@ export interface HyperCertMinter extends BaseContract {
     ): Promise<BigNumber>;
 
     burn(
-      tokenId: PromiseOrValue<BigNumberish>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
 
     contractURI(overrides?: CallOverrides): Promise<string>;
 
     donate(
-      tokenId: PromiseOrValue<BigNumberish>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
 
     getApproved(
-      tokenId: PromiseOrValue<BigNumberish>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<string>;
 
@@ -1548,8 +1571,8 @@ export interface HyperCertMinter extends BaseContract {
     ): Promise<void>;
 
     isApprovedForAll(
-      owner: PromiseOrValue<string>,
-      operator: PromiseOrValue<string>,
+      owner_: PromiseOrValue<string>,
+      operator_: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
@@ -1567,7 +1590,7 @@ export interface HyperCertMinter extends BaseContract {
     name(overrides?: CallOverrides): Promise<string>;
 
     ownerOf(
-      tokenId: PromiseOrValue<BigNumberish>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<string>;
 
@@ -1591,28 +1614,33 @@ export interface HyperCertMinter extends BaseContract {
     ): Promise<string>;
 
     "safeTransferFrom(address,address,uint256)"(
-      from: PromiseOrValue<string>,
-      to: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
+      from_: PromiseOrValue<string>,
+      to_: PromiseOrValue<string>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
 
     "safeTransferFrom(address,address,uint256,bytes)"(
-      from: PromiseOrValue<string>,
-      to: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      data: PromiseOrValue<BytesLike>,
+      from_: PromiseOrValue<string>,
+      to_: PromiseOrValue<string>,
+      tokenId_: PromiseOrValue<BigNumberish>,
+      data_: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<void>;
 
     setApprovalForAll(
-      operator: PromiseOrValue<string>,
-      approved: PromiseOrValue<boolean>,
+      operator_: PromiseOrValue<string>,
+      approved_: PromiseOrValue<boolean>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setMetadataGenerator(
+      metadataGenerator: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
 
     slotByIndex(
-      _index: PromiseOrValue<BigNumberish>,
+      index_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1642,24 +1670,24 @@ export interface HyperCertMinter extends BaseContract {
     symbol(overrides?: CallOverrides): Promise<string>;
 
     tokenByIndex(
-      index: PromiseOrValue<BigNumberish>,
+      index_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     tokenInSlotByIndex(
-      _slot: PromiseOrValue<BigNumberish>,
-      _index: PromiseOrValue<BigNumberish>,
+      slot_: PromiseOrValue<BigNumberish>,
+      index_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     tokenOfOwnerByIndex(
-      owner: PromiseOrValue<string>,
-      index: PromiseOrValue<BigNumberish>,
+      owner_: PromiseOrValue<string>,
+      index_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     tokenSupplyInSlot(
-      _slot: PromiseOrValue<BigNumberish>,
+      slot_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1678,9 +1706,9 @@ export interface HyperCertMinter extends BaseContract {
     ): Promise<BigNumber>;
 
     "transferFrom(address,address,uint256)"(
-      from: PromiseOrValue<string>,
-      to: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
+      from_: PromiseOrValue<string>,
+      to_: PromiseOrValue<string>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1900,8 +1928,8 @@ export interface HyperCertMinter extends BaseContract {
     ): Promise<BigNumber>;
 
     "approve(address,uint256)"(
-      to: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
+      to_: PromiseOrValue<string>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -1913,7 +1941,7 @@ export interface HyperCertMinter extends BaseContract {
     ): Promise<BigNumber>;
 
     "balanceOf(address)"(
-      owner: PromiseOrValue<string>,
+      owner_: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1923,19 +1951,19 @@ export interface HyperCertMinter extends BaseContract {
     ): Promise<BigNumber>;
 
     burn(
-      tokenId: PromiseOrValue<BigNumberish>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     contractURI(overrides?: CallOverrides): Promise<BigNumber>;
 
     donate(
-      tokenId: PromiseOrValue<BigNumberish>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     getApproved(
-      tokenId: PromiseOrValue<BigNumberish>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1986,8 +2014,8 @@ export interface HyperCertMinter extends BaseContract {
     ): Promise<BigNumber>;
 
     isApprovedForAll(
-      owner: PromiseOrValue<string>,
-      operator: PromiseOrValue<string>,
+      owner_: PromiseOrValue<string>,
+      operator_: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -2005,7 +2033,7 @@ export interface HyperCertMinter extends BaseContract {
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
     ownerOf(
-      tokenId: PromiseOrValue<BigNumberish>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -2029,28 +2057,33 @@ export interface HyperCertMinter extends BaseContract {
     ): Promise<BigNumber>;
 
     "safeTransferFrom(address,address,uint256)"(
-      from: PromiseOrValue<string>,
-      to: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
+      from_: PromiseOrValue<string>,
+      to_: PromiseOrValue<string>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     "safeTransferFrom(address,address,uint256,bytes)"(
-      from: PromiseOrValue<string>,
-      to: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      data: PromiseOrValue<BytesLike>,
+      from_: PromiseOrValue<string>,
+      to_: PromiseOrValue<string>,
+      tokenId_: PromiseOrValue<BigNumberish>,
+      data_: PromiseOrValue<BytesLike>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     setApprovalForAll(
-      operator: PromiseOrValue<string>,
-      approved: PromiseOrValue<boolean>,
+      operator_: PromiseOrValue<string>,
+      approved_: PromiseOrValue<boolean>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    setMetadataGenerator(
+      metadataGenerator: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     slotByIndex(
-      _index: PromiseOrValue<BigNumberish>,
+      index_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -2080,24 +2113,24 @@ export interface HyperCertMinter extends BaseContract {
     symbol(overrides?: CallOverrides): Promise<BigNumber>;
 
     tokenByIndex(
-      index: PromiseOrValue<BigNumberish>,
+      index_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     tokenInSlotByIndex(
-      _slot: PromiseOrValue<BigNumberish>,
-      _index: PromiseOrValue<BigNumberish>,
+      slot_: PromiseOrValue<BigNumberish>,
+      index_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     tokenOfOwnerByIndex(
-      owner: PromiseOrValue<string>,
-      index: PromiseOrValue<BigNumberish>,
+      owner_: PromiseOrValue<string>,
+      index_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     tokenSupplyInSlot(
-      _slot: PromiseOrValue<BigNumberish>,
+      slot_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -2116,9 +2149,9 @@ export interface HyperCertMinter extends BaseContract {
     ): Promise<BigNumber>;
 
     "transferFrom(address,address,uint256)"(
-      from: PromiseOrValue<string>,
-      to: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
+      from_: PromiseOrValue<string>,
+      to_: PromiseOrValue<string>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -2189,8 +2222,8 @@ export interface HyperCertMinter extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     "approve(address,uint256)"(
-      to: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
+      to_: PromiseOrValue<string>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -2202,7 +2235,7 @@ export interface HyperCertMinter extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     "balanceOf(address)"(
-      owner: PromiseOrValue<string>,
+      owner_: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -2212,19 +2245,19 @@ export interface HyperCertMinter extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     burn(
-      tokenId: PromiseOrValue<BigNumberish>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     contractURI(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     donate(
-      tokenId: PromiseOrValue<BigNumberish>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     getApproved(
-      tokenId: PromiseOrValue<BigNumberish>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -2275,8 +2308,8 @@ export interface HyperCertMinter extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     isApprovedForAll(
-      owner: PromiseOrValue<string>,
-      operator: PromiseOrValue<string>,
+      owner_: PromiseOrValue<string>,
+      operator_: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -2294,7 +2327,7 @@ export interface HyperCertMinter extends BaseContract {
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     ownerOf(
-      tokenId: PromiseOrValue<BigNumberish>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -2318,28 +2351,33 @@ export interface HyperCertMinter extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     "safeTransferFrom(address,address,uint256)"(
-      from: PromiseOrValue<string>,
-      to: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
+      from_: PromiseOrValue<string>,
+      to_: PromiseOrValue<string>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     "safeTransferFrom(address,address,uint256,bytes)"(
-      from: PromiseOrValue<string>,
-      to: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      data: PromiseOrValue<BytesLike>,
+      from_: PromiseOrValue<string>,
+      to_: PromiseOrValue<string>,
+      tokenId_: PromiseOrValue<BigNumberish>,
+      data_: PromiseOrValue<BytesLike>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     setApprovalForAll(
-      operator: PromiseOrValue<string>,
-      approved: PromiseOrValue<boolean>,
+      operator_: PromiseOrValue<string>,
+      approved_: PromiseOrValue<boolean>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setMetadataGenerator(
+      metadataGenerator: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     slotByIndex(
-      _index: PromiseOrValue<BigNumberish>,
+      index_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -2369,24 +2407,24 @@ export interface HyperCertMinter extends BaseContract {
     symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     tokenByIndex(
-      index: PromiseOrValue<BigNumberish>,
+      index_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     tokenInSlotByIndex(
-      _slot: PromiseOrValue<BigNumberish>,
-      _index: PromiseOrValue<BigNumberish>,
+      slot_: PromiseOrValue<BigNumberish>,
+      index_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     tokenOfOwnerByIndex(
-      owner: PromiseOrValue<string>,
-      index: PromiseOrValue<BigNumberish>,
+      owner_: PromiseOrValue<string>,
+      index_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     tokenSupplyInSlot(
-      _slot: PromiseOrValue<BigNumberish>,
+      slot_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -2405,9 +2443,9 @@ export interface HyperCertMinter extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     "transferFrom(address,address,uint256)"(
-      from: PromiseOrValue<string>,
-      to: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
+      from_: PromiseOrValue<string>,
+      to_: PromiseOrValue<string>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 

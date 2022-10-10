@@ -43,7 +43,7 @@ export interface ERC3525_TestingInterface extends utils.Interface {
     "getApproved(uint256)": FunctionFragment;
     "initialize()": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
-    "mintValue(address,uint256,uint256,uint256)": FunctionFragment;
+    "mintValue(address,uint256,uint256)": FunctionFragment;
     "name()": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
@@ -164,7 +164,6 @@ export interface ERC3525_TestingInterface extends utils.Interface {
     functionFragment: "mintValue",
     values: [
       PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>,
       PromiseOrValue<BigNumberish>,
       PromiseOrValue<BigNumberish>
     ]
@@ -519,8 +518,8 @@ export interface ERC3525_Testing extends BaseContract {
     ): Promise<[BigNumber]>;
 
     "approve(address,uint256)"(
-      to: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
+      to_: PromiseOrValue<string>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -539,9 +538,9 @@ export interface ERC3525_Testing extends BaseContract {
     ): Promise<ContractTransaction>;
 
     "balanceOf(address)"(
-      owner: PromiseOrValue<string>,
+      owner_: PromiseOrValue<string>,
       overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+    ): Promise<[BigNumber] & { balance: BigNumber }>;
 
     "balanceOf(uint256)"(
       tokenId_: PromiseOrValue<BigNumberish>,
@@ -556,7 +555,7 @@ export interface ERC3525_Testing extends BaseContract {
     contractURI(overrides?: CallOverrides): Promise<[string]>;
 
     getApproved(
-      tokenId: PromiseOrValue<BigNumberish>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[string]>;
 
@@ -565,14 +564,13 @@ export interface ERC3525_Testing extends BaseContract {
     ): Promise<ContractTransaction>;
 
     isApprovedForAll(
-      owner: PromiseOrValue<string>,
-      operator: PromiseOrValue<string>,
+      owner_: PromiseOrValue<string>,
+      operator_: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
     mintValue(
       to_: PromiseOrValue<string>,
-      tokenId_: PromiseOrValue<BigNumberish>,
       slot_: PromiseOrValue<BigNumberish>,
       value_: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -581,33 +579,33 @@ export interface ERC3525_Testing extends BaseContract {
     name(overrides?: CallOverrides): Promise<[string]>;
 
     ownerOf(
-      tokenId: PromiseOrValue<BigNumberish>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
-    ): Promise<[string]>;
+    ): Promise<[string] & { owner_: string }>;
 
     "safeTransferFrom(address,address,uint256)"(
-      from: PromiseOrValue<string>,
-      to: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
+      from_: PromiseOrValue<string>,
+      to_: PromiseOrValue<string>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
     "safeTransferFrom(address,address,uint256,bytes)"(
-      from: PromiseOrValue<string>,
-      to: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      data: PromiseOrValue<BytesLike>,
+      from_: PromiseOrValue<string>,
+      to_: PromiseOrValue<string>,
+      tokenId_: PromiseOrValue<BigNumberish>,
+      data_: PromiseOrValue<BytesLike>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
     setApprovalForAll(
-      operator: PromiseOrValue<string>,
-      approved: PromiseOrValue<boolean>,
+      operator_: PromiseOrValue<string>,
+      approved_: PromiseOrValue<boolean>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
     slotByIndex(
-      _index: PromiseOrValue<BigNumberish>,
+      index_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
@@ -638,24 +636,24 @@ export interface ERC3525_Testing extends BaseContract {
     symbol(overrides?: CallOverrides): Promise<[string]>;
 
     tokenByIndex(
-      index: PromiseOrValue<BigNumberish>,
+      index_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
     tokenInSlotByIndex(
-      _slot: PromiseOrValue<BigNumberish>,
-      _index: PromiseOrValue<BigNumberish>,
+      slot_: PromiseOrValue<BigNumberish>,
+      index_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
     tokenOfOwnerByIndex(
-      owner: PromiseOrValue<string>,
-      index: PromiseOrValue<BigNumberish>,
+      owner_: PromiseOrValue<string>,
+      index_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
     tokenSupplyInSlot(
-      _slot: PromiseOrValue<BigNumberish>,
+      slot_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
@@ -681,9 +679,9 @@ export interface ERC3525_Testing extends BaseContract {
     ): Promise<ContractTransaction>;
 
     "transferFrom(address,address,uint256)"(
-      from: PromiseOrValue<string>,
-      to: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
+      from_: PromiseOrValue<string>,
+      to_: PromiseOrValue<string>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -704,8 +702,8 @@ export interface ERC3525_Testing extends BaseContract {
   ): Promise<BigNumber>;
 
   "approve(address,uint256)"(
-    to: PromiseOrValue<string>,
-    tokenId: PromiseOrValue<BigNumberish>,
+    to_: PromiseOrValue<string>,
+    tokenId_: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -724,7 +722,7 @@ export interface ERC3525_Testing extends BaseContract {
   ): Promise<ContractTransaction>;
 
   "balanceOf(address)"(
-    owner: PromiseOrValue<string>,
+    owner_: PromiseOrValue<string>,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
@@ -741,7 +739,7 @@ export interface ERC3525_Testing extends BaseContract {
   contractURI(overrides?: CallOverrides): Promise<string>;
 
   getApproved(
-    tokenId: PromiseOrValue<BigNumberish>,
+    tokenId_: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<string>;
 
@@ -750,14 +748,13 @@ export interface ERC3525_Testing extends BaseContract {
   ): Promise<ContractTransaction>;
 
   isApprovedForAll(
-    owner: PromiseOrValue<string>,
-    operator: PromiseOrValue<string>,
+    owner_: PromiseOrValue<string>,
+    operator_: PromiseOrValue<string>,
     overrides?: CallOverrides
   ): Promise<boolean>;
 
   mintValue(
     to_: PromiseOrValue<string>,
-    tokenId_: PromiseOrValue<BigNumberish>,
     slot_: PromiseOrValue<BigNumberish>,
     value_: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -766,33 +763,33 @@ export interface ERC3525_Testing extends BaseContract {
   name(overrides?: CallOverrides): Promise<string>;
 
   ownerOf(
-    tokenId: PromiseOrValue<BigNumberish>,
+    tokenId_: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<string>;
 
   "safeTransferFrom(address,address,uint256)"(
-    from: PromiseOrValue<string>,
-    to: PromiseOrValue<string>,
-    tokenId: PromiseOrValue<BigNumberish>,
+    from_: PromiseOrValue<string>,
+    to_: PromiseOrValue<string>,
+    tokenId_: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
   "safeTransferFrom(address,address,uint256,bytes)"(
-    from: PromiseOrValue<string>,
-    to: PromiseOrValue<string>,
-    tokenId: PromiseOrValue<BigNumberish>,
-    data: PromiseOrValue<BytesLike>,
+    from_: PromiseOrValue<string>,
+    to_: PromiseOrValue<string>,
+    tokenId_: PromiseOrValue<BigNumberish>,
+    data_: PromiseOrValue<BytesLike>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
   setApprovalForAll(
-    operator: PromiseOrValue<string>,
-    approved: PromiseOrValue<boolean>,
+    operator_: PromiseOrValue<string>,
+    approved_: PromiseOrValue<boolean>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
   slotByIndex(
-    _index: PromiseOrValue<BigNumberish>,
+    index_: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
@@ -823,24 +820,24 @@ export interface ERC3525_Testing extends BaseContract {
   symbol(overrides?: CallOverrides): Promise<string>;
 
   tokenByIndex(
-    index: PromiseOrValue<BigNumberish>,
+    index_: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
   tokenInSlotByIndex(
-    _slot: PromiseOrValue<BigNumberish>,
-    _index: PromiseOrValue<BigNumberish>,
+    slot_: PromiseOrValue<BigNumberish>,
+    index_: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
   tokenOfOwnerByIndex(
-    owner: PromiseOrValue<string>,
-    index: PromiseOrValue<BigNumberish>,
+    owner_: PromiseOrValue<string>,
+    index_: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
   tokenSupplyInSlot(
-    _slot: PromiseOrValue<BigNumberish>,
+    slot_: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
@@ -866,9 +863,9 @@ export interface ERC3525_Testing extends BaseContract {
   ): Promise<ContractTransaction>;
 
   "transferFrom(address,address,uint256)"(
-    from: PromiseOrValue<string>,
-    to: PromiseOrValue<string>,
-    tokenId: PromiseOrValue<BigNumberish>,
+    from_: PromiseOrValue<string>,
+    to_: PromiseOrValue<string>,
+    tokenId_: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -889,8 +886,8 @@ export interface ERC3525_Testing extends BaseContract {
     ): Promise<BigNumber>;
 
     "approve(address,uint256)"(
-      to: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
+      to_: PromiseOrValue<string>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -909,7 +906,7 @@ export interface ERC3525_Testing extends BaseContract {
     ): Promise<void>;
 
     "balanceOf(address)"(
-      owner: PromiseOrValue<string>,
+      owner_: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -926,21 +923,20 @@ export interface ERC3525_Testing extends BaseContract {
     contractURI(overrides?: CallOverrides): Promise<string>;
 
     getApproved(
-      tokenId: PromiseOrValue<BigNumberish>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<string>;
 
     initialize(overrides?: CallOverrides): Promise<void>;
 
     isApprovedForAll(
-      owner: PromiseOrValue<string>,
-      operator: PromiseOrValue<string>,
+      owner_: PromiseOrValue<string>,
+      operator_: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
     mintValue(
       to_: PromiseOrValue<string>,
-      tokenId_: PromiseOrValue<BigNumberish>,
       slot_: PromiseOrValue<BigNumberish>,
       value_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -949,33 +945,33 @@ export interface ERC3525_Testing extends BaseContract {
     name(overrides?: CallOverrides): Promise<string>;
 
     ownerOf(
-      tokenId: PromiseOrValue<BigNumberish>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<string>;
 
     "safeTransferFrom(address,address,uint256)"(
-      from: PromiseOrValue<string>,
-      to: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
+      from_: PromiseOrValue<string>,
+      to_: PromiseOrValue<string>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
 
     "safeTransferFrom(address,address,uint256,bytes)"(
-      from: PromiseOrValue<string>,
-      to: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      data: PromiseOrValue<BytesLike>,
+      from_: PromiseOrValue<string>,
+      to_: PromiseOrValue<string>,
+      tokenId_: PromiseOrValue<BigNumberish>,
+      data_: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<void>;
 
     setApprovalForAll(
-      operator: PromiseOrValue<string>,
-      approved: PromiseOrValue<boolean>,
+      operator_: PromiseOrValue<string>,
+      approved_: PromiseOrValue<boolean>,
       overrides?: CallOverrides
     ): Promise<void>;
 
     slotByIndex(
-      _index: PromiseOrValue<BigNumberish>,
+      index_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1006,24 +1002,24 @@ export interface ERC3525_Testing extends BaseContract {
     symbol(overrides?: CallOverrides): Promise<string>;
 
     tokenByIndex(
-      index: PromiseOrValue<BigNumberish>,
+      index_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     tokenInSlotByIndex(
-      _slot: PromiseOrValue<BigNumberish>,
-      _index: PromiseOrValue<BigNumberish>,
+      slot_: PromiseOrValue<BigNumberish>,
+      index_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     tokenOfOwnerByIndex(
-      owner: PromiseOrValue<string>,
-      index: PromiseOrValue<BigNumberish>,
+      owner_: PromiseOrValue<string>,
+      index_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     tokenSupplyInSlot(
-      _slot: PromiseOrValue<BigNumberish>,
+      slot_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1049,9 +1045,9 @@ export interface ERC3525_Testing extends BaseContract {
     ): Promise<BigNumber>;
 
     "transferFrom(address,address,uint256)"(
-      from: PromiseOrValue<string>,
-      to: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
+      from_: PromiseOrValue<string>,
+      to_: PromiseOrValue<string>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1144,8 +1140,8 @@ export interface ERC3525_Testing extends BaseContract {
     ): Promise<BigNumber>;
 
     "approve(address,uint256)"(
-      to: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
+      to_: PromiseOrValue<string>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -1164,7 +1160,7 @@ export interface ERC3525_Testing extends BaseContract {
     ): Promise<BigNumber>;
 
     "balanceOf(address)"(
-      owner: PromiseOrValue<string>,
+      owner_: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1181,7 +1177,7 @@ export interface ERC3525_Testing extends BaseContract {
     contractURI(overrides?: CallOverrides): Promise<BigNumber>;
 
     getApproved(
-      tokenId: PromiseOrValue<BigNumberish>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1190,14 +1186,13 @@ export interface ERC3525_Testing extends BaseContract {
     ): Promise<BigNumber>;
 
     isApprovedForAll(
-      owner: PromiseOrValue<string>,
-      operator: PromiseOrValue<string>,
+      owner_: PromiseOrValue<string>,
+      operator_: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     mintValue(
       to_: PromiseOrValue<string>,
-      tokenId_: PromiseOrValue<BigNumberish>,
       slot_: PromiseOrValue<BigNumberish>,
       value_: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -1206,33 +1201,33 @@ export interface ERC3525_Testing extends BaseContract {
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
     ownerOf(
-      tokenId: PromiseOrValue<BigNumberish>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     "safeTransferFrom(address,address,uint256)"(
-      from: PromiseOrValue<string>,
-      to: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
+      from_: PromiseOrValue<string>,
+      to_: PromiseOrValue<string>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     "safeTransferFrom(address,address,uint256,bytes)"(
-      from: PromiseOrValue<string>,
-      to: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      data: PromiseOrValue<BytesLike>,
+      from_: PromiseOrValue<string>,
+      to_: PromiseOrValue<string>,
+      tokenId_: PromiseOrValue<BigNumberish>,
+      data_: PromiseOrValue<BytesLike>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     setApprovalForAll(
-      operator: PromiseOrValue<string>,
-      approved: PromiseOrValue<boolean>,
+      operator_: PromiseOrValue<string>,
+      approved_: PromiseOrValue<boolean>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     slotByIndex(
-      _index: PromiseOrValue<BigNumberish>,
+      index_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1263,24 +1258,24 @@ export interface ERC3525_Testing extends BaseContract {
     symbol(overrides?: CallOverrides): Promise<BigNumber>;
 
     tokenByIndex(
-      index: PromiseOrValue<BigNumberish>,
+      index_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     tokenInSlotByIndex(
-      _slot: PromiseOrValue<BigNumberish>,
-      _index: PromiseOrValue<BigNumberish>,
+      slot_: PromiseOrValue<BigNumberish>,
+      index_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     tokenOfOwnerByIndex(
-      owner: PromiseOrValue<string>,
-      index: PromiseOrValue<BigNumberish>,
+      owner_: PromiseOrValue<string>,
+      index_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     tokenSupplyInSlot(
-      _slot: PromiseOrValue<BigNumberish>,
+      slot_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1306,9 +1301,9 @@ export interface ERC3525_Testing extends BaseContract {
     ): Promise<BigNumber>;
 
     "transferFrom(address,address,uint256)"(
-      from: PromiseOrValue<string>,
-      to: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
+      from_: PromiseOrValue<string>,
+      to_: PromiseOrValue<string>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -1330,8 +1325,8 @@ export interface ERC3525_Testing extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     "approve(address,uint256)"(
-      to: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
+      to_: PromiseOrValue<string>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1350,7 +1345,7 @@ export interface ERC3525_Testing extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     "balanceOf(address)"(
-      owner: PromiseOrValue<string>,
+      owner_: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1367,7 +1362,7 @@ export interface ERC3525_Testing extends BaseContract {
     contractURI(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getApproved(
-      tokenId: PromiseOrValue<BigNumberish>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1376,14 +1371,13 @@ export interface ERC3525_Testing extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     isApprovedForAll(
-      owner: PromiseOrValue<string>,
-      operator: PromiseOrValue<string>,
+      owner_: PromiseOrValue<string>,
+      operator_: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     mintValue(
       to_: PromiseOrValue<string>,
-      tokenId_: PromiseOrValue<BigNumberish>,
       slot_: PromiseOrValue<BigNumberish>,
       value_: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -1392,33 +1386,33 @@ export interface ERC3525_Testing extends BaseContract {
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     ownerOf(
-      tokenId: PromiseOrValue<BigNumberish>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     "safeTransferFrom(address,address,uint256)"(
-      from: PromiseOrValue<string>,
-      to: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
+      from_: PromiseOrValue<string>,
+      to_: PromiseOrValue<string>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     "safeTransferFrom(address,address,uint256,bytes)"(
-      from: PromiseOrValue<string>,
-      to: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      data: PromiseOrValue<BytesLike>,
+      from_: PromiseOrValue<string>,
+      to_: PromiseOrValue<string>,
+      tokenId_: PromiseOrValue<BigNumberish>,
+      data_: PromiseOrValue<BytesLike>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     setApprovalForAll(
-      operator: PromiseOrValue<string>,
-      approved: PromiseOrValue<boolean>,
+      operator_: PromiseOrValue<string>,
+      approved_: PromiseOrValue<boolean>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     slotByIndex(
-      _index: PromiseOrValue<BigNumberish>,
+      index_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1449,24 +1443,24 @@ export interface ERC3525_Testing extends BaseContract {
     symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     tokenByIndex(
-      index: PromiseOrValue<BigNumberish>,
+      index_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     tokenInSlotByIndex(
-      _slot: PromiseOrValue<BigNumberish>,
-      _index: PromiseOrValue<BigNumberish>,
+      slot_: PromiseOrValue<BigNumberish>,
+      index_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     tokenOfOwnerByIndex(
-      owner: PromiseOrValue<string>,
-      index: PromiseOrValue<BigNumberish>,
+      owner_: PromiseOrValue<string>,
+      index_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     tokenSupplyInSlot(
-      _slot: PromiseOrValue<BigNumberish>,
+      slot_: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1492,9 +1486,9 @@ export interface ERC3525_Testing extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     "transferFrom(address,address,uint256)"(
-      from: PromiseOrValue<string>,
-      to: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
+      from_: PromiseOrValue<string>,
+      to_: PromiseOrValue<string>,
+      tokenId_: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 

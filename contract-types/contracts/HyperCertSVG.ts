@@ -9,7 +9,7 @@ import type {
   TypedListener,
   OnEvent,
   PromiseOrValue,
-} from "../../common";
+} from "../common";
 import type {
   FunctionFragment,
   Result,
@@ -35,8 +35,11 @@ export interface HyperCertSVGInterface extends utils.Interface {
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
     "UPGRADER_ROLE()": FunctionFragment;
     "addBackground(string)": FunctionFragment;
+    "addColorPair(string[2])": FunctionFragment;
     "backgroundCounter()": FunctionFragment;
     "backgrounds(uint256)": FunctionFragment;
+    "colorPairCounter()": FunctionFragment;
+    "colorPairs(uint256,uint256)": FunctionFragment;
     "generateSvgFraction(string,string[],uint64[2],uint64[2],uint256,uint256)": FunctionFragment;
     "generateSvgHyperCert(string,string[],uint64[2],uint64[2],uint256)": FunctionFragment;
     "getPercent(uint256,uint256)": FunctionFragment;
@@ -59,8 +62,11 @@ export interface HyperCertSVGInterface extends utils.Interface {
       | "DEFAULT_ADMIN_ROLE"
       | "UPGRADER_ROLE"
       | "addBackground"
+      | "addColorPair"
       | "backgroundCounter"
       | "backgrounds"
+      | "colorPairCounter"
+      | "colorPairs"
       | "generateSvgFraction"
       | "generateSvgHyperCert"
       | "getPercent"
@@ -91,12 +97,24 @@ export interface HyperCertSVGInterface extends utils.Interface {
     values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
+    functionFragment: "addColorPair",
+    values: [[PromiseOrValue<string>, PromiseOrValue<string>]]
+  ): string;
+  encodeFunctionData(
     functionFragment: "backgroundCounter",
     values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "backgrounds",
     values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "colorPairCounter",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "colorPairs",
+    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
     functionFragment: "generateSvgFraction",
@@ -182,6 +200,10 @@ export interface HyperCertSVGInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "addColorPair",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "backgroundCounter",
     data: BytesLike
   ): Result;
@@ -189,6 +211,11 @@ export interface HyperCertSVGInterface extends utils.Interface {
     functionFragment: "backgrounds",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "colorPairCounter",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "colorPairs", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "generateSvgFraction",
     data: BytesLike
@@ -233,6 +260,7 @@ export interface HyperCertSVGInterface extends utils.Interface {
     "AdminChanged(address,address)": EventFragment;
     "BackgroundAdded(uint256)": EventFragment;
     "BeaconUpgraded(address)": EventFragment;
+    "ColorPairAdded(uint256,string[2])": EventFragment;
     "Initialized(uint8)": EventFragment;
     "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
     "RoleGranted(bytes32,address,address)": EventFragment;
@@ -243,6 +271,7 @@ export interface HyperCertSVGInterface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "AdminChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "BackgroundAdded"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "BeaconUpgraded"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ColorPairAdded"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleAdminChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleGranted"): EventFragment;
@@ -280,6 +309,17 @@ export type BeaconUpgradedEvent = TypedEvent<
 >;
 
 export type BeaconUpgradedEventFilter = TypedEventFilter<BeaconUpgradedEvent>;
+
+export interface ColorPairAddedEventObject {
+  id: BigNumber;
+  colorPair: [string, string];
+}
+export type ColorPairAddedEvent = TypedEvent<
+  [BigNumber, [string, string]],
+  ColorPairAddedEventObject
+>;
+
+export type ColorPairAddedEventFilter = TypedEventFilter<ColorPairAddedEvent>;
 
 export interface InitializedEventObject {
   version: number;
@@ -368,10 +408,23 @@ export interface HyperCertSVG extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    addColorPair(
+      colorPair: [PromiseOrValue<string>, PromiseOrValue<string>],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     backgroundCounter(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     backgrounds(
       arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    colorPairCounter(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    colorPairs(
+      arg0: PromiseOrValue<BigNumberish>,
+      arg1: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[string]>;
 
@@ -479,10 +532,23 @@ export interface HyperCertSVG extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
+  addColorPair(
+    colorPair: [PromiseOrValue<string>, PromiseOrValue<string>],
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   backgroundCounter(overrides?: CallOverrides): Promise<BigNumber>;
 
   backgrounds(
     arg0: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  colorPairCounter(overrides?: CallOverrides): Promise<BigNumber>;
+
+  colorPairs(
+    arg0: PromiseOrValue<BigNumberish>,
+    arg1: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<string>;
 
@@ -584,10 +650,23 @@ export interface HyperCertSVG extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    addColorPair(
+      colorPair: [PromiseOrValue<string>, PromiseOrValue<string>],
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     backgroundCounter(overrides?: CallOverrides): Promise<BigNumber>;
 
     backgrounds(
       arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    colorPairCounter(overrides?: CallOverrides): Promise<BigNumber>;
+
+    colorPairs(
+      arg0: PromiseOrValue<BigNumberish>,
+      arg1: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<string>;
 
@@ -702,6 +781,12 @@ export interface HyperCertSVG extends BaseContract {
       beacon?: PromiseOrValue<string> | null
     ): BeaconUpgradedEventFilter;
 
+    "ColorPairAdded(uint256,string[2])"(
+      id?: null,
+      colorPair?: null
+    ): ColorPairAddedEventFilter;
+    ColorPairAdded(id?: null, colorPair?: null): ColorPairAddedEventFilter;
+
     "Initialized(uint8)"(version?: null): InitializedEventFilter;
     Initialized(version?: null): InitializedEventFilter;
 
@@ -756,10 +841,23 @@ export interface HyperCertSVG extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
+    addColorPair(
+      colorPair: [PromiseOrValue<string>, PromiseOrValue<string>],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     backgroundCounter(overrides?: CallOverrides): Promise<BigNumber>;
 
     backgrounds(
       arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    colorPairCounter(overrides?: CallOverrides): Promise<BigNumber>;
+
+    colorPairs(
+      arg0: PromiseOrValue<BigNumberish>,
+      arg1: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -870,10 +968,23 @@ export interface HyperCertSVG extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
+    addColorPair(
+      colorPair: [PromiseOrValue<string>, PromiseOrValue<string>],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
     backgroundCounter(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     backgrounds(
       arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    colorPairCounter(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    colorPairs(
+      arg0: PromiseOrValue<BigNumberish>,
+      arg1: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
