@@ -37,10 +37,15 @@ import { MetaDataResponse } from "../../types/MetaData";
 import { SplitFractionModal } from "../../components/Modals/SplitFractionModal";
 
 const HypercertPageWrapper = () => {
-  const { query } = useRouter();
+  const { query, isReady } = useRouter();
   const hypercertId = query["hypercertId"];
 
-  if (!hypercertId) {
+  if (!isReady) {
+    return null;
+  }
+
+  if (isReady && !hypercertId) {
+    console.log("Its not here", hypercertId, isReady);
     return (
       <Container>
         <Alert status="error">No hypercert id provided</Alert>
@@ -86,7 +91,7 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
 
   const hypercert = hypercertData?.hypercert;
 
-  if (!hypercert || !fractions || !ipfsData) {
+  if (!hypercert || !fractions) {
     return (
       <Alert status="error">
         <AlertIcon />
@@ -121,21 +126,25 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
           </Box>
         )}
 
-        <Box mb={6}>
-          <HypercertInfoBox ipfsData={ipfsData} hypercert={hypercert} />
-        </Box>
+        {ipfsData && (
+          <Box mb={6}>
+            <HypercertInfoBox ipfsData={ipfsData} hypercert={hypercert} />
+          </Box>
+        )}
 
-        <Box mb={6}>
-          <Heading mb={2}>{hypercertDetailContent.contributors}</Heading>
-          <VStack spacing={2} alignItems="flex-start">
-            {hypercert.contributors?.map((x) => (
-              <UserInfo key={x.id} nameOrAddress={x.id} />
-            ))}
-            {ipfsData.properties.contributor_names.map((x) => (
-              <UserInfo key={x} nameOrAddress={x} />
-            ))}
-          </VStack>
-        </Box>
+        {ipfsData && (
+          <Box mb={6}>
+            <Heading mb={2}>{hypercertDetailContent.contributors}</Heading>
+            <VStack spacing={2} alignItems="flex-start">
+              {hypercert.contributors?.map((x) => (
+                <UserInfo key={x.id} nameOrAddress={x.id} />
+              ))}
+              {ipfsData.properties.contributor_names.map((x) => (
+                <UserInfo key={x} nameOrAddress={x} />
+              ))}
+            </VStack>
+          </Box>
+        )}
 
         <Box mb={6}>
           <Heading mb={2}>{hypercertDetailContent.owners}</Heading>
