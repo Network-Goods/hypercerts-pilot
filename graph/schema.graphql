@@ -24,15 +24,15 @@ type Hypercert @entity {
   "unix timestamp declaring when impact ended"
   impactDateTo: BigInt!
   "array of impacts declared in claim"
-  impactScopes: [ImpactScope!]
+  impactScopes: [ImpactScope!]!
   "unix timestamp declaring when work started"
   workDateFrom: BigInt!
   "unix timestamp declaring when work ended"
   workDateTo: BigInt!
   "array of work declared in claim"
-  workScopes: [WorkScope!]
+  workScopes: [WorkScope!]!
   "array of rights an owner of the impact certificate holds"
-  rights: [Right!]
+  rights: [Right!]!
   "external reference, usually IPFS CID"
   uri: String!
   "total unit of certificate, used for splitting and merging"
