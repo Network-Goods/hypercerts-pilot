@@ -121,10 +121,7 @@ describe(HYPERCERT, () => {
         ethereum.Value.fromI32(1),
         ethereum.Value.fromI32(contributor.hypercerts.length)
       );
-      assert.stringEquals(
-        idStr,
-        contributor.hypercerts[0]
-      );
+      assert.stringEquals(idStr, contributor.hypercerts[0]);
     }
 
     assert.entityCount(HYPERCERT, 1);
@@ -170,37 +167,72 @@ describe(HYPERCERT, () => {
   });
 });
 
-describe(HYPERCERT_FRACTION, () => {
-  const id1 = 1;
-  const from1 = 0;
-  const to1 = 1;
+function assertFraction(id: i32, slot: i32, owner: string, units: i32): void {
+  const f = HypercertFraction.load(
+    BigInt.fromI32(id).toHexString()
+  );
+  assert.assertNotNull(f);
+  if (f) {
+    assert.stringEquals(
+      BigInt.fromI32(slot).toHexString(),
+      f.hypercert
+    );
+    assert.stringEquals(BigInt.fromI32(id).toHexString(), f.id);
+    assert.stringEquals(owner, f.owner);
+    assert.bigIntEquals(BigInt.fromI32(units), f.units);
+  }
+}
 
+describe(HYPERCERT_FRACTION, () => {
+  const slot = 1;
+  const id1 = 1;
+  const fraction1 = 60;
   const id2 = 2;
-  const from2 = 0;
-  const to2 = 1;
+  const fraction2 = 40;
 
   beforeAll(() => {
-    const e1 = createSlotChangedEvent(
+    const sc1 = createSlotChangedEvent(
       BigInt.fromI32(id1),
-      BigInt.fromI32(from1),
-      BigInt.fromI32(to1)
+      BigInt.fromI32(0),
+      BigInt.fromI32(slot)
     );
 
-    const e2 = createSlotChangedEvent(
+    const sc2 = createSlotChangedEvent(
       BigInt.fromI32(id2),
-      BigInt.fromI32(from2),
-      BigInt.fromI32(to2)
+      BigInt.fromI32(0),
+      BigInt.fromI32(slot)
     );
 
-    createMockedFunction(e1.address, "ownerOf", "ownerOf(uint256):(address)")
+    createMockedFunction(sc1.address, "ownerOf", "ownerOf(uint256):(address)")
       .withArgs([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(id1))])
       .returns([ethereum.Value.fromAddress(Address.fromString(contributor0))]);
-    createMockedFunction(e2.address, "ownerOf", "ownerOf(uint256):(address)")
+    createMockedFunction(sc2.address, "ownerOf", "ownerOf(uint256):(address)")
       .withArgs([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(id2))])
       .returns([ethereum.Value.fromAddress(Address.fromString(contributor0))]);
 
-    handleSlotChanged(e1);
-    handleSlotChanged(e2);
+    handleSlotChanged(sc1);
+    handleSlotChanged(sc2);
+
+    const tv1 = createTransferValueEvent(
+      BigInt.fromI32(0),
+      BigInt.fromI32(id1),
+      BigInt.fromI32(fraction1)
+    );
+    const tv2 = createTransferValueEvent(
+      BigInt.fromI32(0),
+      BigInt.fromI32(id2),
+      BigInt.fromI32(fraction2)
+    );
+
+    createMockedFunction(tv1.address, "slotOf", "slotOf(uint256):(uint256)")
+      .withArgs([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(id1))])
+      .returns([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(slot))]);
+    createMockedFunction(tv2.address, "slotOf", "slotOf(uint256):(uint256)")
+      .withArgs([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(id2))])
+      .returns([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(slot))]);
+
+    handleTransferValue(tv1);
+    handleTransferValue(tv2);
   });
 
   afterAll(() => {
@@ -209,81 +241,22 @@ describe(HYPERCERT_FRACTION, () => {
 
   test("entity created and stored", () => {
     assert.entityCount(HYPERCERT_FRACTION, 2);
-    const firstFraction = HypercertFraction.load(
-      BigInt.fromI32(id1).toHexString()
-    );
-    assert.assertNotNull(firstFraction);
-    if (firstFraction) {
-      assert.stringEquals(
-        BigInt.fromI32(to2).toHexString(),
-        firstFraction.hypercert
-      );
-      assert.stringEquals(BigInt.fromI32(id1).toHexString(), firstFraction.id);
-    }
-
-    const secondFraction = HypercertFraction.load(
-      BigInt.fromI32(id2).toHexString()
-    );
-    assert.assertNotNull(secondFraction);
-    if (secondFraction) {
-      assert.stringEquals(
-        BigInt.fromI32(to2).toHexString(),
-        secondFraction.hypercert
-      );
-      assert.stringEquals(BigInt.fromI32(id2).toHexString(), secondFraction.id);
-    }
+    assertFraction(id1, slot, contributor0, fraction1);
+    assertFraction(id2, slot, contributor0, fraction2);
   });
 
-  // test("balance updated upon burn", () => {
-  //   const e = createTransferSingleEvent(
-  //     Address.fromString(address),
-  //     Address.fromString(address),
-  //     Address.zero(),
-  //     BigInt.fromI32(id2),
-  //     BigInt.fromI32(burned20)
-  //   );
-  //   handleTransferSingle(e);
-
-  //   assert.entityCount(HYPERCERT_FRACTION, 2);
-
-  //   const balance1 = HypercertFraction.load(`${address}-${BigInt.fromI32(id1)}`);
-  //   assert.assertNotNull(balance1);
-  //   if (balance1) {
-  //     assert.bigIntEquals(BigInt.fromI32(amount1), balance1.amount);
-  //   }
-  //   const balance2 = HypercertFraction.load(`${address}-${BigInt.fromI32(id2)}`);
-  //   assert.assertNotNull(balance2);
-  //   if (balance2) {
-  //     assert.bigIntEquals(BigInt.fromI32(amount2 - burned20), balance2.amount);
-  //   }
-  // });
-
-  // test("balance updated upon batch burn", () => {
-  //   const e = createTransferBatchEvent(
-  //     Address.fromString(address),
-  //     Address.fromString(address),
-  //     Address.zero(),
-  //     [BigInt.fromI32(id1), BigInt.fromI32(id2)],
-  //     [BigInt.fromI32(burned1), BigInt.fromI32(burned21)]
-  //   );
-  //   handleTransferBatch(e);
-
-  //   assert.entityCount(HYPERCERT_FRACTION, 2);
-
-  //   const balance1 = HypercertFraction.load(`${address}-${BigInt.fromI32(id1)}`);
-  //   assert.assertNotNull(balance1);
-  //   if (balance1) {
-  //     assert.bigIntEquals(BigInt.fromI32(amount1 - burned1), balance1.amount);
-  //   }
-  //   const balance2 = HypercertFraction.load(`${address}-${BigInt.fromI32(id2)}`);
-  //   assert.assertNotNull(balance2);
-  //   if (balance2) {
-  //     assert.bigIntEquals(
-  //       BigInt.fromI32(amount2 - burned20 - burned21),
-  //       balance2.amount
-  //     );
-  //   }
-  // });
+  test("entities updated and stored", () => {
+    const amount = 10;
+    const tv3 = createTransferValueEvent(
+      BigInt.fromI32(id1),
+      BigInt.fromI32(id2),
+      BigInt.fromI32(amount)
+    );
+    handleTransferValue(tv3);
+    assert.entityCount(HYPERCERT_FRACTION, 2);
+    assertFraction(id1, slot, contributor0, fraction1 - amount);
+    assertFraction(id2, slot, contributor0, fraction2 + amount);
+  });
 });
 
 describe(IMPACT_SCOPE, () => {

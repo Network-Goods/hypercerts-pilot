@@ -238,27 +238,19 @@ export function createTransferEvent(
 }
 
 export function createTransferValueEvent(
-  operator: Address,
-  from: Address,
-  to: Address,
-  id: BigInt,
+  from: BigInt,
+  to: BigInt,
   value: BigInt
 ): TransferValue {
   let transferValueEvent = changetype<TransferValue>(newMockEvent());
 
   transferValueEvent.parameters = new Array();
-
+  
   transferValueEvent.parameters.push(
-    new ethereum.EventParam("operator", ethereum.Value.fromAddress(operator))
+    new ethereum.EventParam("from", ethereum.Value.fromUnsignedBigInt(from))
   );
   transferValueEvent.parameters.push(
-    new ethereum.EventParam("from", ethereum.Value.fromAddress(from))
-  );
-  transferValueEvent.parameters.push(
-    new ethereum.EventParam("to", ethereum.Value.fromAddress(to))
-  );
-  transferValueEvent.parameters.push(
-    new ethereum.EventParam("id", ethereum.Value.fromUnsignedBigInt(id))
+    new ethereum.EventParam("to", ethereum.Value.fromUnsignedBigInt(to))
   );
   transferValueEvent.parameters.push(
     new ethereum.EventParam("value", ethereum.Value.fromUnsignedBigInt(value))
