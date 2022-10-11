@@ -1,4 +1,4 @@
-import { newMockEvent, createMockedFunction } from "matchstick-as";
+import { newMockEvent } from "matchstick-as";
 import { ethereum, Address, BigInt, Bytes } from "@graphprotocol/graph-ts";
 import {
   ImpactClaimed,
@@ -13,7 +13,7 @@ import {
   TransferValue,
   Upgraded,
   WorkScopeAdded,
-} from "../generated/HypercertMinter/HypercertMinter";
+} from "../generated/HyperCertMinter/HyperCertMinter";
 
 export function createImpactClaimedEvent(
   id: BigInt,

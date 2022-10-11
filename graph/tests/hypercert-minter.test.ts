@@ -8,7 +8,6 @@ import {
   afterAll,
   createMockedFunction,
 } from "matchstick-as/assembly/index";
-import { ImpactClaimed } from "../generated/HypercertMinter/HypercertMinter";
 import { Contributor, Hypercert, HypercertFraction } from "../generated/schema";
 import {
   handleImpactClaimed,
@@ -37,10 +36,11 @@ const IMPACT_SCOPE = "ImpactScope";
 const RIGHT = "Right";
 const WORK_SCOPE = "WorkScope";
 
+const contributor0 = "0x0716405125cfcad8aaa4f816d2468a8898da374b";
+
 describe(HYPERCERT, () => {
   const id1 = 1;
   const claimHash = "0x307861626c6b736a6466736466736466";
-  const contributor0 = "0x0716405125cfcad8aaa4f816d2468a8898da374b";
   const workTimeframe0 = 1669849200;
   const workTimeframe1 = 1672441200;
   const impactTimeframe0 = 1672527600;
@@ -60,42 +60,47 @@ describe(HYPERCERT, () => {
       [BigInt.fromI32(50), BigInt.fromI32(30), BigInt.fromI32(20)]
     );
 
-    let contractAddress = Address.fromString(
-      "0x10Bd50f86C9e64d4FE75BEc8fd37CD84CA0C2e33"
-    );
-
     createMockedFunction(
-      contractAddress,
+      e.address,
       "getImpactCert",
-      "getImpactCert(uint256):((bytes32,uint64[2],uint64[2],bytes32[],bytes32[],bytes32[],address[],uint256,uint16,bool,string,string,string))"
+      "getImpactCert(uint256):((bytes32,uint64[2],uint64[2],bytes32[],bytes32[],bytes32[],address[],uint256,uint16,bool,string,string,string,address))"
     )
       .withArgs([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1))])
       .returns([
-        ethereum.Value.fromBytes(Bytes.fromHexString(claimHash)),
-        ethereum.Value.fromUnsignedBigIntArray([
-          BigInt.fromI32(workTimeframe0),
-          BigInt.fromI32(workTimeframe1),
-        ]),
-        ethereum.Value.fromUnsignedBigIntArray([
-          BigInt.fromI32(impactTimeframe0),
-          BigInt.fromI32(impactTimeframe1),
-        ]),
-        ethereum.Value.fromFixedBytesArray([Bytes.fromHexString(workScope0)]),
-        ethereum.Value.fromFixedBytesArray([
-          Bytes.fromHexString(impactScope0),
-          Bytes.fromHexString(impactScope1),
-        ]),
-        ethereum.Value.fromFixedBytesArray([
-          Bytes.fromHexString(right0),
-          Bytes.fromHexString(right1),
-        ]),
-        ethereum.Value.fromAddressArray([Address.fromString(contributor0)]),
-        ethereum.Value.fromI32(100),
-        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(version)),
-        ethereum.Value.fromBoolean(true),
-        ethereum.Value.fromString("MockCert"),
-        ethereum.Value.fromString("Mocked Hypercert for Matchstick testing"),
-        ethereum.Value.fromString(uri),
+        ethereum.Value.fromTuple(
+          changetype<ethereum.Tuple>([
+            ethereum.Value.fromBytes(Bytes.fromHexString(claimHash)),
+            ethereum.Value.fromUnsignedBigIntArray([
+              BigInt.fromI32(workTimeframe0),
+              BigInt.fromI32(workTimeframe1),
+            ]),
+            ethereum.Value.fromUnsignedBigIntArray([
+              BigInt.fromI32(impactTimeframe0),
+              BigInt.fromI32(impactTimeframe1),
+            ]),
+            ethereum.Value.fromFixedBytesArray([
+              Bytes.fromHexString(workScope0),
+            ]),
+            ethereum.Value.fromFixedBytesArray([
+              Bytes.fromHexString(impactScope0),
+              Bytes.fromHexString(impactScope1),
+            ]),
+            ethereum.Value.fromFixedBytesArray([
+              Bytes.fromHexString(right0),
+              Bytes.fromHexString(right1),
+            ]),
+            ethereum.Value.fromAddressArray([Address.fromString(contributor0)]),
+            ethereum.Value.fromI32(100),
+            ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(version)),
+            ethereum.Value.fromBoolean(true),
+            ethereum.Value.fromString("MockCert"),
+            ethereum.Value.fromString(
+              "Mocked Hypercert for Matchstick testing"
+            ),
+            ethereum.Value.fromString(uri),
+            ethereum.Value.fromAddress(e.address),
+          ])
+        ),
       ]);
 
     handleImpactClaimed(e);
@@ -106,6 +111,7 @@ describe(HYPERCERT, () => {
   });
 
   test("entities created and stored", () => {
+    const idStr = "0x1";
     // Contributors
     assert.entityCount(CONTRIBUTOR, 1);
     const contributor = Contributor.load(contributor0);
@@ -116,13 +122,12 @@ describe(HYPERCERT, () => {
         ethereum.Value.fromI32(contributor.hypercerts.length)
       );
       assert.stringEquals(
-        "0x307861626c6b736a6466736466736466",
+        idStr,
         contributor.hypercerts[0]
       );
     }
 
     assert.entityCount(HYPERCERT, 1);
-    const idStr = "0x307861626c6b736a6466736466736466";
     assert.fieldEquals(HYPERCERT, idStr, "claimHash", claimHash);
     assert.fieldEquals(HYPERCERT, idStr, "uri", uri);
     assert.fieldEquals(HYPERCERT, idStr, "version", version.toString());
@@ -132,11 +137,11 @@ describe(HYPERCERT, () => {
       // Hypercert data
       assert.assertTrue(hypercert.contributors.length === 1);
       assert.stringEquals(contributor0, hypercert.contributors[0]);
+      assert.bigIntEquals(BigInt.fromI32(100), hypercert.totalUnits);
       assert.bigIntEquals(
         BigInt.fromI32(workTimeframe0),
         hypercert.workDateFrom
       );
-      assert.bigIntEquals(BigInt.fromI32(100), hypercert.totalUnits);
       assert.bigIntEquals(BigInt.fromI32(workTimeframe1), hypercert.workDateTo);
       assert.bigIntEquals(
         BigInt.fromI32(impactTimeframe0),
@@ -186,6 +191,13 @@ describe(HYPERCERT_FRACTION, () => {
       BigInt.fromI32(from2),
       BigInt.fromI32(to2)
     );
+
+    createMockedFunction(e1.address, "ownerOf", "ownerOf(uint256):(address)")
+      .withArgs([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(id1))])
+      .returns([ethereum.Value.fromAddress(Address.fromString(contributor0))]);
+    createMockedFunction(e2.address, "ownerOf", "ownerOf(uint256):(address)")
+      .withArgs([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(id2))])
+      .returns([ethereum.Value.fromAddress(Address.fromString(contributor0))]);
 
     handleSlotChanged(e1);
     handleSlotChanged(e2);
