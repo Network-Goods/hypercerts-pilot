@@ -73,6 +73,8 @@ export const BurnFractionModal = ({
     await split(tokenId);
   };
 
+  const disabled = false;
+
   return (
     <>
       {render({ onClick: onOpen })}
@@ -96,17 +98,26 @@ export const BurnFractionModal = ({
                   <b>{hypercertInfo.name}</b>
                   {"'."}
                 </Text>
-                <Alert mt={4} status="warning">
-                  <AlertIcon />
-                  <AlertTitle>Burning has been temporarily disabled</AlertTitle>
-                </Alert>
+                {disabled && (
+                  <Alert mt={4} status="warning">
+                    <AlertIcon />
+                    <AlertTitle>
+                      Burning has been temporarily disabled
+                    </AlertTitle>
+                  </Alert>
+                )}
               </ModalBody>
 
               <ModalFooter>
                 <Button variant="ghost" onClick={close}>
                   {burnFractionModal.confirm.closeButton}
                 </Button>
-                <Button colorScheme="red" mr={3} onClick={onClickBurn} disabled>
+                <Button
+                  colorScheme="red"
+                  mr={3}
+                  onClick={onClickBurn}
+                  disabled={disabled}
+                >
                   {burnFractionModal.confirm.confirmButton}
                 </Button>
               </ModalFooter>

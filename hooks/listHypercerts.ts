@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
 import { graphql } from "../gql";
 
 const GET_ALL_CERTIFICATES_QUERY = graphql(`
@@ -8,6 +8,9 @@ const GET_ALL_CERTIFICATES_QUERY = graphql(`
       claimHash
       minter
       uri
+      fractions {
+        id
+      }
       contributors {
         id
       }

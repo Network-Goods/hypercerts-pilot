@@ -22,25 +22,31 @@ const BrowsePage = () => {
   >([]);
   const { isLoading: loadingCollections, data: collections } = useCollections();
 
+  // TODO: This should not be necessary anymore once hypercert entities with no fractions get removed from the graph
+  const hypercertWithFractions = hypercertsResult?.hypercerts.filter(
+    (h) => !!h.fractions.length
+  );
+
   useEffect(() => {
-    if (hypercertsResult) {
-      setFilteredHypercerts(hypercertsResult.hypercerts);
+    if (hypercertWithFractions) {
+      setFilteredHypercerts(hypercertWithFractions);
     }
   }, [loadingHypercerts]);
 
   const onChangeCollectionFilter = (collectionId: string) => {
-    if (!hypercertsResult) {
+    if (!hypercertWithFractions) {
       return;
     }
+
     if (!collections || collectionId === "all") {
-      setFilteredHypercerts(hypercertsResult.hypercerts);
+      setFilteredHypercerts(hypercertWithFractions);
     } else {
       const filteredIds = _.intersection(
-        hypercertsResult.hypercerts.map((x) => x.id),
+        hypercertWithFractions.map((x) => x.id),
         collections[collectionId]
       );
       setFilteredHypercerts(
-        hypercertsResult.hypercerts.filter((x) => filteredIds.includes(x.id))
+        hypercertWithFractions.filter((x) => filteredIds.includes(x.id))
       );
     }
   };

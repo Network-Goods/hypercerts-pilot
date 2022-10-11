@@ -63,6 +63,8 @@ export const MergeAllFractionsModal = ({
     await merge(parsedFractions);
   };
 
+  const disabled = false;
+
   return (
     <>
       {render({ onClick: onOpen })}
@@ -77,17 +79,26 @@ export const MergeAllFractionsModal = ({
               <ModalCloseButton />
               <ModalBody>
                 <Text>{mergeHypercertModalContent.confirmation.body}</Text>
-                <Alert mt={4} status="warning">
-                  <AlertIcon />
-                  <AlertTitle>Merging has been temporarily disabled</AlertTitle>
-                </Alert>
+                {disabled && (
+                  <Alert mt={4} status="warning">
+                    <AlertIcon />
+                    <AlertTitle>
+                      Merging has been temporarily disabled
+                    </AlertTitle>
+                  </Alert>
+                )}
               </ModalBody>
 
               <ModalFooter>
                 <Button variant="ghost" onClick={close}>
                   {mergeHypercertModalContent.confirmation.closeButton}
                 </Button>
-                <Button colorScheme="green" mr={3} onClick={onConfirm} disabled>
+                <Button
+                  colorScheme="green"
+                  mr={3}
+                  onClick={onConfirm}
+                  disabled={disabled}
+                >
                   {mergeHypercertModalContent.confirmation.confirmButton}
                 </Button>
               </ModalFooter>
