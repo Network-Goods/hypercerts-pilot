@@ -212,7 +212,6 @@ export function createSlotChangedEvent(
 }
 
 export function createTransferEvent(
-  operator: Address,
   from: Address,
   to: Address,
   id: BigInt
@@ -221,9 +220,6 @@ export function createTransferEvent(
 
   transferEvent.parameters = new Array();
 
-  transferEvent.parameters.push(
-    new ethereum.EventParam("operator", ethereum.Value.fromAddress(operator))
-  );
   transferEvent.parameters.push(
     new ethereum.EventParam("from", ethereum.Value.fromAddress(from))
   );
@@ -245,7 +241,7 @@ export function createTransferValueEvent(
   let transferValueEvent = changetype<TransferValue>(newMockEvent());
 
   transferValueEvent.parameters = new Array();
-  
+
   transferValueEvent.parameters.push(
     new ethereum.EventParam("from", ethereum.Value.fromUnsignedBigInt(from))
   );

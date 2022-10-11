@@ -168,19 +168,18 @@ describe(HYPERCERT, () => {
 });
 
 function assertFraction(id: i32, slot: i32, owner: string, units: i32): void {
-  const f = HypercertFraction.load(
-    BigInt.fromI32(id).toHexString()
-  );
+  const f = HypercertFraction.load(BigInt.fromI32(id).toHexString());
   assert.assertNotNull(f);
-  if (f) {
-    assert.stringEquals(
-      BigInt.fromI32(slot).toHexString(),
-      f.hypercert
-    );
-    assert.stringEquals(BigInt.fromI32(id).toHexString(), f.id);
-    assert.stringEquals(owner, f.owner);
-    assert.bigIntEquals(BigInt.fromI32(units), f.units);
-  }
+  if (!f) return;
+  assert.stringEquals(
+    slot > 0
+      ? BigInt.fromI32(slot).toHexString()
+      : Address.zero().toHexString(),
+    f.hypercert
+  );
+  assert.stringEquals(BigInt.fromI32(id).toHexString(), f.id);
+  assert.stringEquals(owner, f.owner);
+  assert.bigIntEquals(BigInt.fromI32(units), f.units);
 }
 
 describe(HYPERCERT_FRACTION, () => {
@@ -245,8 +244,9 @@ describe(HYPERCERT_FRACTION, () => {
     assertFraction(id2, slot, contributor0, fraction2);
   });
 
-  test("entities updated and stored", () => {
-    const amount = 10;
+  const amount = 10;
+
+  test("entities updated on transfer value", () => {
     const tv3 = createTransferValueEvent(
       BigInt.fromI32(id1),
       BigInt.fromI32(id2),
@@ -255,6 +255,41 @@ describe(HYPERCERT_FRACTION, () => {
     handleTransferValue(tv3);
     assert.entityCount(HYPERCERT_FRACTION, 2);
     assertFraction(id1, slot, contributor0, fraction1 - amount);
+    assertFraction(id2, slot, contributor0, fraction2 + amount);
+  });
+
+  test("entities updated on burn", () => {
+    const tv4 = createTransferValueEvent(
+      BigInt.fromI32(id1),
+      BigInt.fromI32(0),
+      BigInt.fromI32(fraction1 - amount)
+    );
+    createMockedFunction(tv4.address, "slotOf", "slotOf(uint256):(uint256)")
+      .withArgs([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0))])
+      .reverts();
+    createMockedFunction(tv4.address, "ownerOf", "ownerOf(uint256):(address)")
+      .withArgs([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0))])
+      .reverts();
+    handleTransferValue(tv4);
+    handleTransfer(
+      createTransferEvent(
+        Address.fromString(contributor0),
+        Address.zero(),
+        BigInt.fromI32(id1)
+      )
+    );
+    const sc3 = createSlotChangedEvent(
+      BigInt.fromI32(id1),
+      BigInt.fromI32(slot),
+      BigInt.fromI32(0)
+    );
+    createMockedFunction(sc3.address, "ownerOf", "ownerOf(uint256):(address)")
+      .withArgs([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0))])
+      .reverts();
+    handleSlotChanged(sc3);
+
+    assert.entityCount(HYPERCERT_FRACTION, 2);
+    assertFraction(id1, 0, Address.zero().toHexString(), 0);
     assertFraction(id2, slot, contributor0, fraction2 + amount);
   });
 });
