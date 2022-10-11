@@ -41,14 +41,20 @@ import { isAddress } from "ethers/lib/utils";
 import { uploadCertificateToIpfs } from "../../utils/ipfsClient";
 import dayjs from "dayjs";
 
+const nameMinimumLength = 2;
+const nameMaximumLength = 50;
+
+const descriptionMinimumLength = 20;
+const descriptionMaximumLength = 500;
+
 const ValidationSchema = Yup.object().shape({
   name: Yup.string()
-    .min(2, "Too Short!")
-    .max(50, "Too Long!")
+    .min(nameMinimumLength, "Too Short!")
+    .max(nameMaximumLength, "Too Long!")
     .required("Required"),
   description: Yup.string()
-    .min(20, "Too Short!")
-    .max(500, "Too Long!")
+    .min(descriptionMinimumLength, "Too Short!")
+    .max(descriptionMaximumLength, "Too Long!")
     .required("Required"),
   external_link: Yup.string()
     .required()
@@ -289,6 +295,13 @@ const ClaimHypercertPage = () => {
                       placeholder={placeholders.name}
                       disabled={disabled}
                     />
+                    <FormHelperText>
+                      {helperTexts.minMaxLength(
+                        values.name.length,
+                        nameMinimumLength,
+                        nameMaximumLength
+                      )}
+                    </FormHelperText>
                   </FormControl>
                   <FormControl isRequired>
                     <Flex>
@@ -304,6 +317,13 @@ const ClaimHypercertPage = () => {
                       size="sm"
                       disabled={disabled}
                     />
+                    <FormHelperText>
+                      {helperTexts.minMaxLength(
+                        values.description.length,
+                        descriptionMinimumLength,
+                        descriptionMaximumLength
+                      )}
+                    </FormHelperText>
                   </FormControl>
                   <FormControl isRequired>
                     <Flex>
