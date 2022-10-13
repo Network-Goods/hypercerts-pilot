@@ -36,7 +36,6 @@ import { useIpfsMetadata } from "../../hooks/ipfs";
 import { MetaDataResponse } from "../../types/MetaData";
 import { SplitFractionModal } from "../../components/Modals/SplitFractionModal";
 import { BurnFractionModal } from "../../components/Modals/BurnFractionModal";
-import _ from "lodash";
 
 const HypercertPageWrapper = () => {
   const { query, isReady } = useRouter();
@@ -112,8 +111,8 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
   const showBurnButton =
     otherFractions.length === 0 &&
     ownedFractions.length === 1 &&
-    _.sum(ownedFractions.map((f) => f.units)) ===
-      ownedFractions[0].hypercert.totalUnits;
+    ownedFractions[0].units === ownedFractions[0].hypercert.totalUnits &&
+    ownedFractions[0].units !== 1;
 
   return (
     <>
