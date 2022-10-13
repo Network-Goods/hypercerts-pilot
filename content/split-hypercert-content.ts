@@ -7,6 +7,7 @@ export const splitFractionModal = {
     valueTooLow: "Combined value is too low",
     notOneValue: "You need at least two fractions",
     notANumber: "Incorrect value",
+    noNegativeValues: "No negative values allowed",
     ready: "You are ready to split",
 
     inputLabel: "Fractions (one per line)",

@@ -86,6 +86,32 @@ export const SplitFractionModal = ({
   const onlyOneFraction = value?.split(",").length === 1;
   const disabled = valueIncorrect || onlyOneFraction;
 
+  const getErrorMessage = () => {
+    if (isNaN(totalValue)) {
+      return splitFractionModal.define.notANumber;
+    }
+
+    if (formatValues(value).some((x) => x <= 0)) {
+      return splitFractionModal.define.noNegativeValues;
+    }
+
+    if (!isNaN(totalValue) && onlyOneFraction) {
+      return splitFractionModal.define.notOneValue;
+    }
+
+    if (!data.hypercertFraction) {
+      return null;
+    }
+
+    if (!onlyOneFraction && totalValue > data.hypercertFraction.units) {
+      return splitFractionModal.define.valueTooHigh;
+    }
+
+    if (!onlyOneFraction && totalValue < data.hypercertFraction.units) {
+      return splitFractionModal.define.valueTooLow;
+    }
+  };
+
   return (
     <>
       {render({ onClick: onOpen })}
@@ -107,21 +133,7 @@ export const SplitFractionModal = ({
                 {valueIncorrect || onlyOneFraction ? (
                   <Alert borderRadius="sm" my={4} status="error">
                     <AlertIcon />
-                    <AlertTitle>
-                      {!isNaN(totalValue) &&
-                        onlyOneFraction &&
-                        splitFractionModal.define.notOneValue}
-                      {isNaN(totalValue) &&
-                        splitFractionModal.define.notANumber}
-                      {!onlyOneFraction &&
-                        totalValue >
-                          data.hypercertFraction.hypercert.totalUnits &&
-                        splitFractionModal.define.valueTooHigh}
-                      {!onlyOneFraction &&
-                        totalValue <
-                          data.hypercertFraction.hypercert.totalUnits &&
-                        splitFractionModal.define.valueTooLow}
-                    </AlertTitle>
+                    <AlertTitle>{getErrorMessage()}</AlertTitle>
                   </Alert>
                 ) : (
                   <Alert borderRadius="sm" my={4} status="success">
