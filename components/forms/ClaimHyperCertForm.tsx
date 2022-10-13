@@ -331,7 +331,6 @@ const ClaimHypercertPage = () => {
                   <FormControl isRequired>
                     <Flex>
                       <FormLabel>{labels.contributors}</FormLabel>
-                      <ErrorMessage name="description" render={DisplayError} />
                     </Flex>
                     <Textarea
                       name="contributors"
