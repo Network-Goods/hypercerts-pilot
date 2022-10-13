@@ -154,6 +154,8 @@ const ClaimHypercertPage = () => {
 
   const query = currentQuery !== undefined ? qs.parse(currentQuery) : {};
 
+  const [impactEndInfinite, setImpactEndInfinite] = useState(false);
+
   return (
     <Container>
       <Formik
@@ -231,9 +233,10 @@ const ClaimHypercertPage = () => {
           const impactTimeStart = val.impactTimeStart
             ? new Date(val.impactTimeStart).getTime() / 1000
             : 0;
-          const impactTimeEnd = val.impactTimeEnd
-            ? new Date(val.impactTimeEnd).getTime() / 1000
-            : 0;
+          const impactTimeEnd =
+            !impactEndInfinite && val.impactTimeEnd
+              ? new Date(val.impactTimeEnd).getTime() / 1000
+              : 0;
 
           try {
             toast({
@@ -388,7 +391,7 @@ const ClaimHypercertPage = () => {
                 </VStack>
                 <Divider my={3} />
                 <HStack>
-                  <FormControl>
+                  <FormControl isRequired>
                     <FormLabel>{placeholders.workTimeStartLabel}</FormLabel>
                     <Input
                       type="date"
@@ -408,7 +411,7 @@ const ClaimHypercertPage = () => {
                       </FormErrorMessage>
                     )}
                   </FormControl>
-                  <FormControl>
+                  <FormControl isRequired>
                     <FormLabel>{placeholders.workTimeEndLabel}</FormLabel>
                     <Input
                       type="date"
@@ -449,16 +452,28 @@ const ClaimHypercertPage = () => {
                       </FormErrorMessage>
                     )}
                   </FormControl>
-                  <FormControl>
+                  <FormControl isRequired>
                     <FormLabel>{placeholders.impactTimeEndLabel}</FormLabel>
-                    <Input
-                      type="date"
-                      name="impactTimeEnd"
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      value={values.impactTimeEnd}
-                      disabled={disabled}
-                    />
+                    <Flex>
+                      <Input
+                        type="date"
+                        name="impactTimeEnd"
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        value={values.impactTimeEnd}
+                        disabled={disabled || impactEndInfinite}
+                      />
+                      <Button
+                        onClick={() => setImpactEndInfinite((x) => !x)}
+                        ml={2}
+                        colorScheme="green"
+                        variant={impactEndInfinite ? "solid" : "ghost"}
+                        fontSize="24px"
+                        disabled={disabled}
+                      >
+                        &infin;
+                      </Button>
+                    </Flex>
                     {!errors.impactTimeEnd ? (
                       <FormHelperText>
                         {placeholders.impactTimeEndLabel}
