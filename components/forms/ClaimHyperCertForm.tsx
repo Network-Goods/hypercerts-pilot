@@ -77,6 +77,18 @@ const ValidationSchema = Yup.object().shape({
   workScopes: Yup.array().min(1),
   impactScopes: Yup.array().min(1),
   rights: Yup.array().min(1),
+  workTimeEnd: Yup.date().when("workTimeStart", (workTimeStart) => {
+    return Yup.date().min(workTimeStart, "End date must be after start date");
+  }),
+  impactTimeEnd: Yup.date().when(
+    ["impactTimeStart", "impactTimeInfinite"],
+    (impactTimeStart, impactTimeInfinite) => {
+      return Yup.date().min(
+        impactTimeInfinite ? 0 : impactTimeStart,
+        "End date must be after start date"
+      );
+    }
+  ),
 });
 
 const testValues = {
@@ -118,6 +130,7 @@ const defaultValues = {
   rights: [] as Option[],
   uri: "",
   fractions: "1000",
+  impactTimeInfinite: false,
 };
 
 const ClaimHypercertPage = () => {
@@ -153,8 +166,6 @@ const ClaimHypercertPage = () => {
   };
 
   const query = currentQuery !== undefined ? qs.parse(currentQuery) : {};
-
-  const [impactEndInfinite, setImpactEndInfinite] = useState(false);
 
   return (
     <Container>
@@ -234,7 +245,7 @@ const ClaimHypercertPage = () => {
             ? new Date(val.impactTimeStart).getTime() / 1000
             : 0;
           const impactTimeEnd =
-            !impactEndInfinite && val.impactTimeEnd
+            !val.impactTimeInfinite && val.impactTimeEnd
               ? new Date(val.impactTimeEnd).getTime() / 1000
               : 0;
 
@@ -287,7 +298,7 @@ const ClaimHypercertPage = () => {
                   <FormControl isRequired>
                     <Flex>
                       <FormLabel>{labels.name}</FormLabel>
-                      <ErrorMessage name="name" render={DisplayError} />
+                      <ErrorMessage name="name" render={displayError} />
                     </Flex>
                     <Input
                       type="text"
@@ -309,7 +320,7 @@ const ClaimHypercertPage = () => {
                   <FormControl isRequired>
                     <Flex>
                       <FormLabel>{labels.description}</FormLabel>
-                      <ErrorMessage name="description" render={DisplayError} />
+                      <ErrorMessage name="description" render={displayError} />
                     </Flex>
                     <Textarea
                       name="description"
@@ -348,7 +359,7 @@ const ClaimHypercertPage = () => {
                       <FormLabel>{labels.externalLink}</FormLabel>
                       <ErrorMessage
                         name="external_link"
-                        render={DisplayError}
+                        render={displayError}
                       />
                     </Flex>
                     <Input
@@ -375,7 +386,7 @@ const ClaimHypercertPage = () => {
                   <FormControl isRequired>
                     <Flex>
                       <FormLabel>{labels.fractions}</FormLabel>
-                      <ErrorMessage name="fractions" render={DisplayError} />
+                      <ErrorMessage name="fractions" render={displayError} />
                     </Flex>
                     <Input
                       type="text"
@@ -400,18 +411,12 @@ const ClaimHypercertPage = () => {
                       value={values.workTimeStart}
                       disabled={disabled}
                     />
-                    {!errors.workTimeStart ? (
-                      <FormHelperText>
-                        {placeholders.workTimeStartDescription}
-                      </FormHelperText>
-                    ) : (
-                      <FormErrorMessage>
-                        {errors.workTimeStart}
-                      </FormErrorMessage>
-                    )}
                   </FormControl>
                   <FormControl isRequired>
-                    <FormLabel>{placeholders.workTimeEndLabel}</FormLabel>
+                    <Flex>
+                      <FormLabel>{placeholders.workTimeEndLabel}</FormLabel>
+                    </Flex>
+
                     <Input
                       type="date"
                       name="workTimeEnd"
@@ -420,15 +425,21 @@ const ClaimHypercertPage = () => {
                       value={values.workTimeEnd}
                       disabled={disabled}
                     />
-                    {!errors.workTimeEnd ? (
-                      <FormHelperText>
-                        {placeholders.workTimeEndDescription}
-                      </FormHelperText>
-                    ) : (
-                      <FormErrorMessage>{errors.workTimeEnd}</FormErrorMessage>
-                    )}
                   </FormControl>
                 </HStack>
+                <FormControl
+                  isInvalid={!!(errors.workTimeStart || errors.workTimeEnd)}
+                >
+                  {!errors.workTimeStart && !errors.workTimeEnd ? (
+                    <FormHelperText>
+                      {placeholders.workTimeDescription}
+                    </FormHelperText>
+                  ) : (
+                    <FormErrorMessage>
+                      {errors.workTimeStart || errors.workTimeEnd}
+                    </FormErrorMessage>
+                  )}
+                </FormControl>
                 <Divider my={3} />
                 <HStack>
                   <FormControl isRequired>
@@ -441,15 +452,6 @@ const ClaimHypercertPage = () => {
                       value={values.impactTimeStart}
                       disabled={disabled}
                     />
-                    {!errors.impactTimeStart ? (
-                      <FormHelperText>
-                        {placeholders.impactTimeStartDescription}
-                      </FormHelperText>
-                    ) : (
-                      <FormErrorMessage>
-                        {errors.impactTimeStart}
-                      </FormErrorMessage>
-                    )}
                   </FormControl>
                   <FormControl isRequired>
                     <FormLabel>{placeholders.impactTimeEndLabel}</FormLabel>
@@ -460,35 +462,44 @@ const ClaimHypercertPage = () => {
                         onChange={handleChange}
                         onBlur={handleBlur}
                         value={values.impactTimeEnd}
-                        disabled={disabled || impactEndInfinite}
+                        disabled={disabled || !!values.impactTimeInfinite}
                       />
                       <Button
-                        onClick={() => setImpactEndInfinite((x) => !x)}
+                        onClick={() =>
+                          setFieldValue(
+                            "impactTimeInfinite",
+                            !values.impactTimeInfinite
+                          )
+                        }
                         ml={2}
                         colorScheme="green"
-                        variant={impactEndInfinite ? "solid" : "ghost"}
+                        variant={values.impactTimeInfinite ? "solid" : "ghost"}
                         fontSize="24px"
                         disabled={disabled}
                       >
                         &infin;
                       </Button>
                     </Flex>
-                    {!errors.impactTimeEnd ? (
-                      <FormHelperText>
-                        {placeholders.impactTimeEndLabel}
-                      </FormHelperText>
-                    ) : (
-                      <FormErrorMessage>
-                        {errors.impactTimeEnd}
-                      </FormErrorMessage>
-                    )}
                   </FormControl>
                 </HStack>
+                <FormControl
+                  isInvalid={!!(errors.impactTimeStart || errors.impactTimeEnd)}
+                >
+                  {!errors.impactTimeStart && !errors.impactTimeEnd ? (
+                    <FormHelperText>
+                      {placeholders.impactTimeDescription}
+                    </FormHelperText>
+                  ) : (
+                    <FormErrorMessage>
+                      {errors.impactTimeStart || errors.impactTimeEnd}
+                    </FormErrorMessage>
+                  )}
+                </FormControl>
                 <Divider my={3} />
                 <FormControl isRequired>
                   <Flex>
                     <FormLabel>{placeholders.workScopesLabel}</FormLabel>
-                    <ErrorMessage name="workScopes" render={DisplayError} />
+                    <ErrorMessage name="workScopes" render={displayError} />
                   </Flex>
                   <Field name="workScopes">
                     {({ form }: FieldProps) => (
@@ -509,7 +520,7 @@ const ClaimHypercertPage = () => {
                 <FormControl isRequired>
                   <Flex>
                     <FormLabel>{placeholders.impactScopesLabel}</FormLabel>
-                    <ErrorMessage name="impactScopes" render={DisplayError} />
+                    <ErrorMessage name="impactScopes" render={displayError} />
                   </Flex>
                   <Field name="impactScopes">
                     {({ form }: FieldProps) => (
@@ -530,7 +541,7 @@ const ClaimHypercertPage = () => {
                 <FormControl isRequired>
                   <Flex>
                     <FormLabel>{placeholders.rightsLabel}</FormLabel>
-                    <ErrorMessage name="rights" render={DisplayError} />
+                    <ErrorMessage name="rights" render={displayError} />
                   </Flex>
                   <Field name="rights">
                     {({ form }: FieldProps) => (
@@ -565,7 +576,7 @@ const ClaimHypercertPage = () => {
   );
 };
 
-const DisplayError = (message: string) => (
+const displayError = (message: string) => (
   <span style={{ color: "red" }}>- {message}</span>
 );
 

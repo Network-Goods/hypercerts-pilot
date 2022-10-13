@@ -47,10 +47,8 @@ export const placeholders = {
   workTimeEndLabel: "Work time end",
   impactTimeStartLabel: "Impact time start",
   impactTimeEndLabel: "Impact time end",
-  workTimeStartDescription: "The moment at which work started",
-  workTimeEndDescription: "The moment at which work ended",
-  impactTimeStartDescription: "The moment at which impact started",
-  impactTimeEndDescription: "The moment at which impact ended",
+  workTimeDescription: "The time in which work took place",
+  impactTimeDescription: "The time in which impact took place",
   uploadImage: "Drag and drop some files here, or click to select files",
 };
 
