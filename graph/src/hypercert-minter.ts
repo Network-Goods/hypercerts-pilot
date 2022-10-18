@@ -147,6 +147,12 @@ export function handleSlotChanged(event: SlotChanged): void {
       fraction.save();
       return;
     }
+
+    const cert = Hypercert.load(event.params._oldSlot.toHexString());
+    if (cert) {
+      cert.lastUpdated = event.block.timestamp;
+      cert.save();
+    }
   }
 
   if (!fraction) {
@@ -168,6 +174,12 @@ export function handleSlotChanged(event: SlotChanged): void {
       fraction.owner = owner.id;
       fraction.hypercert = event.params._newSlot.toHexString();
       fraction.save();
+
+      const cert = Hypercert.load(fraction.hypercert);
+      if (cert) {
+        cert.lastUpdated = event.block.timestamp;
+        cert.save();
+      }
     }
   }
 }
@@ -232,6 +244,12 @@ export function handleTransferValue(event: TransferValue): void {
     fractionTo.units = value;
     fractionTo.hypercert = hypercertID;
     fractionTo.owner = owner.id;
+  }
+
+  const cert = Hypercert.load(hypercertID);
+  if (cert) {
+    cert.lastUpdated = event.block.timestamp;
+    cert.save();
   }
 
   fractionTo.save();
