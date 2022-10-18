@@ -35,6 +35,8 @@ type Hypercert @entity {
   rights: [Right!]!
   "external reference, usually IPFS CID"
   uri: String!
+  "base64 formatted json string including SVG image"
+  metadata: String!
   "total unit of certificate, used for splitting and merging"
   totalUnits: BigInt!
   "fractions of certificate"

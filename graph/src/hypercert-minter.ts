@@ -31,6 +31,7 @@ export function handleImpactClaimed(event: ImpactClaimed): void {
   let contract = HyperCertMinter.bind(event.address);
 
   let claim = contract.getImpactCert(event.params.id);
+  let metadata = contract.slotURI(event.params.id);
 
   const hypercertId = event.params.id.toHexString();
   let entity = new Hypercert(hypercertId);
@@ -100,6 +101,7 @@ export function handleImpactClaimed(event: ImpactClaimed): void {
   entity.workDateTo = claim.workTimeframe[1];
 
   entity.uri = claim.uri;
+  entity.metadata = metadata;
   entity.version = BigInt.fromI32(claim.version);
   entity.lastUpdated = event.block.timestamp;
 

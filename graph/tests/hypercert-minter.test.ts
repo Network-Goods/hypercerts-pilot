@@ -60,6 +60,10 @@ describe(HYPERCERT, () => {
       [BigInt.fromI32(50), BigInt.fromI32(30), BigInt.fromI32(20)]
     );
 
+    createMockedFunction(e.address, "slotURI", "slotURI(uint256):(string)")
+      .withArgs([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1))])
+      .returns([ethereum.Value.fromString("MockSVGString")]);
+
     createMockedFunction(
       e.address,
       "getImpactCert",
