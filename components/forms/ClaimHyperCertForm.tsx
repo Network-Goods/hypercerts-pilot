@@ -47,6 +47,8 @@ const nameMaximumLength = 50;
 const descriptionMinimumLength = 20;
 const descriptionMaximumLength = 500;
 
+const defaultFractions = "100";
+
 const ValidationSchema = Yup.object().shape({
   name: Yup.string()
     .min(nameMinimumLength, "Too Short!")
@@ -129,7 +131,7 @@ const defaultValues = {
   impactScopes: [] as Option[],
   rights: [] as Option[],
   uri: "",
-  fractions: "1000",
+  fractions: defaultFractions,
   impactTimeInfinite: false,
 };
 
@@ -388,6 +390,10 @@ const ClaimHypercertPage = () => {
                       <FormLabel>{labels.fractions}</FormLabel>
                       <ErrorMessage name="fractions" render={displayError} />
                     </Flex>
+                    <Alert status="info" borderRadius="md" mb={3}>
+                      <AlertIcon />
+                      <AlertTitle>{helperTexts.fractions}</AlertTitle>
+                    </Alert>
                     <Input
                       type="text"
                       name="fractions"

@@ -24,6 +24,8 @@ export const helperTexts = {
   contributors: "Names and/or addresses of contributors, comma-separated",
   minMaxLength: (currentLength: number, minLength: number, maxLength: number) =>
     `${currentLength} characters currently - min ${minLength}, max ${maxLength}`,
+  fractions:
+    "We recommend creating 100 fractions on mint. This makes it easy to split and transfer hypercerts at a later point in time.",
 };
 
 export const placeholders = {

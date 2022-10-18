@@ -35,7 +35,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-dropzone": "^14.2.2",
-    "react-select": "^5.4.0",
+    "react-select": "^5.5.2",
     "web3modal": "^1.9.8",
     "yup": "^0.32.11"
   },
