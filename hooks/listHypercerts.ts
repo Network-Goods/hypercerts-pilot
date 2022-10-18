@@ -28,6 +28,7 @@ export const useGetAllHypercertsMintedBy = (address: string) => {
       hypercerts(where: { minter: $minter }) {
         id
         minter
+        lastUpdated
         fractions {
           id
           owner {

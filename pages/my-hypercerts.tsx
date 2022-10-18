@@ -83,8 +83,9 @@ const MyHypercertsPage = ({ userAddress }: { userAddress: string }) => {
 
   const uniqBurnedIds = _.chain(hypercertsMintedBy.hypercerts)
     .filter((x) => !x.fractions.length)
+    .sortBy((x) => x.lastUpdated)
+    .reverse()
     .map((x) => x.id)
-    .uniq()
     .value();
 
   return (
