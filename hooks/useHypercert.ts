@@ -1,6 +1,4 @@
 import { useQuery } from "@apollo/client";
-import { useHypercertContract } from "./contracts";
-import { useReadContract } from "@raidguild/quiver";
 import { graphql } from "../gql";
 
 export interface Hypercert {
@@ -82,45 +80,27 @@ interface HypercertInfo {
 }
 
 export const useHypercertInfo = (hypercertId: string) => {
-  const contract = useHypercertContract();
+  const GET_HYPERCERT_METADATA_QUERY = graphql(`
+    query GetHypercertMetadata($hypercertId: ID!) {
+      hypercert(id: $hypercertId) {
+        id
+        metadata
+      }
+    }
+  `);
+  const { loading, data: response } = useQuery(GET_HYPERCERT_METADATA_QUERY, {
+    variables: {
+      hypercertId,
+    },
+  });
 
-  const { response, loading } = useReadContract(contract, "slotURI", [
-    hypercertId,
-  ]);
-
-  if (!response) {
+  if (!response?.hypercert) {
     return { data: undefined, loading };
   }
 
   try {
-    const responseWithoutPrefix = response.replace(
-      "data:application/json;base64,",
-      ""
-    );
-    const decodedB64Json = atob(responseWithoutPrefix);
-    return {
-      data: JSON.parse(decodedB64Json) as HypercertInfo,
-      loading,
-    };
-  } catch (error) {
-    console.error(error);
-    return { data: undefined, loading };
-  }
-};
-
-export const useFractionInfo = (fractionId: string) => {
-  const contract = useHypercertContract();
-
-  const { response, loading } = useReadContract(contract, "tokenURI", [
-    fractionId,
-  ]);
-
-  if (!response) {
-    return { data: undefined, loading };
-  }
-
-  try {
-    const responseWithoutPrefix = response.replace(
+    const metadata = response?.hypercert.metadata;
+    const responseWithoutPrefix = metadata.replace(
       "data:application/json;base64,",
       ""
     );

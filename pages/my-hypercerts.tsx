@@ -9,6 +9,7 @@ import {
   SimpleGrid,
   Spinner,
   Text,
+  VStack,
 } from "@chakra-ui/react";
 import { useFractionsListForUser } from "../hooks/fractions";
 import { myHypercertsContent } from "../content/my-hypercerts-content";
@@ -17,6 +18,7 @@ import _ from "lodash";
 import { HypercertTile } from "../components/HypercertTile";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
+import { useGetAllHypercertsMintedBy } from "../hooks/listHypercerts";
 
 const MyHypercertsPageWrapper = () => {
   const { address } = useWallet();
@@ -41,17 +43,25 @@ const MyHypercertsPage = ({ userAddress }: { userAddress: string }) => {
   } = useRouter();
   const { data, loading, startPolling, stopPolling } =
     useFractionsListForUser(userAddress);
+  const {
+    data: hypercertsMintedBy,
+    loading: loadingHypercertsMintedBy,
+    startPolling: startPollingHypercertsMintedBy,
+    stopPolling: stopPollingHypercertsMintedBy,
+  } = useGetAllHypercertsMintedBy(userAddress);
 
   useEffect(() => {
     if (withPolling) {
       startPolling(10000);
+      startPollingHypercertsMintedBy(10000);
     }
     return () => {
       stopPolling();
+      stopPollingHypercertsMintedBy();
     };
   }, [withPolling]);
 
-  if (loading || !data) {
+  if (loading || loadingHypercertsMintedBy || !data || !hypercertsMintedBy) {
     return (
       <Center>
         <Spinner />
@@ -59,33 +69,27 @@ const MyHypercertsPage = ({ userAddress }: { userAddress: string }) => {
     );
   }
 
-  const fractions = data.hypercertFractions
+  const uniqIds = _.chain(data.hypercertFractions)
     .filter((f) => f.owner.id !== ethers.constants.AddressZero)
     .map((fraction) => ({
       hypercertId: fraction.hypercert.id,
       lastUpdated: fraction.hypercert.lastUpdated,
-    }));
-  const burnedFractions = data.hypercertFractions
-    .filter((f) => f.owner.id === ethers.constants.AddressZero)
-    .map((fraction) => ({
-      hypercertId: fraction.hypercert.id,
-      lastUpdated: fraction.hypercert.lastUpdated,
-    }));
+    }))
+    .sortBy((x) => x.lastUpdated)
+    .reverse()
+    .map((x) => x.hypercertId)
+    .uniq()
+    .value();
 
-  const processFractions = (xs: { hypercertId: string; lastUpdated: any }[]) =>
-    _.chain(xs)
-      .sortBy((x) => x.lastUpdated)
-      .reverse()
-      .map((x) => x.hypercertId)
-      .uniq()
-      .value();
-
-  const uniqIds = processFractions(fractions);
-  const uniqBurnedIds = processFractions(burnedFractions);
+  const uniqBurnedIds = _.chain(hypercertsMintedBy.hypercerts)
+    .filter((x) => !x.fractions.length)
+    .map((x) => x.id)
+    .uniq()
+    .value();
 
   return (
     <Container maxWidth={1000}>
-      {!uniqIds.length && !burnedFractions.length && (
+      {!uniqIds.length && !uniqBurnedIds.length && (
         <Alert status="info">
           <AlertIcon />
           <AlertTitle>{myHypercertsContent.noHypercertsOwned}</AlertTitle>
@@ -102,15 +106,15 @@ const MyHypercertsPage = ({ userAddress }: { userAddress: string }) => {
         </>
       )}
       {!!uniqBurnedIds.length && (
-        <>
-          <Heading my={4}>{myHypercertsContent.burnedHypercertsHeader}</Heading>
+        <VStack spacing={4} alignItems="flex-start">
+          <Heading>{myHypercertsContent.burnedHypercertsHeader}</Heading>
           <Text>{myHypercertsContent.burnedHypercertsText}</Text>
           <SimpleGrid columns={[2, 2, 3]} spacing={4}>
             {uniqBurnedIds.map((id) => (
               <HypercertTile hoverEffect key={id} id={id} />
             ))}
           </SimpleGrid>
-        </>
+        </VStack>
       )}
     </Container>
   );
