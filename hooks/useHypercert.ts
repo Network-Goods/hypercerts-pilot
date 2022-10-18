@@ -1,6 +1,4 @@
-import { gql, useQuery } from "@apollo/client";
-import { useHypercertContract } from "./contracts";
-import { useReadContract } from "@raidguild/quiver";
+import { useQuery } from "@apollo/client";
 import { graphql } from "../gql";
 
 export interface Hypercert {
