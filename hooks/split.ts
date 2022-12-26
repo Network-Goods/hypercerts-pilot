@@ -15,7 +15,7 @@ export const useSplitFraction = ({
   const parseBlockchainError = useParseBlockchainError();
   const toast = useToast();
 
-  const { mutate: split } = useWriteContract(contract, "split", {
+  const { mutate: split } = useWriteContract(contract, "splitValue", {
     onConfirmation: () => {
       toast({
         status: "success",

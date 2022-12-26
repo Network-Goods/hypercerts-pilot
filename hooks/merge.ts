@@ -15,7 +15,7 @@ export const useMergeFractions = ({
   const parseBlockchainError = useParseBlockchainError();
   const toast = useToast();
 
-  const { mutate: merge } = useWriteContract(contract, "merge", {
+  const { mutate: merge } = useWriteContract(contract, "mergeValue", {
     onConfirmation: () => {
       toast({
         status: "success",

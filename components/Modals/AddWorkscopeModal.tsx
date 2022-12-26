@@ -12,45 +12,52 @@ import {
   Spinner,
   useToast,
 } from "@chakra-ui/react";
-import { useHypercertContract } from "../../hooks/contracts";
-import { useWriteContract } from "@raidguild/quiver";
+// import { useHypercertContract } from "../../hooks/contracts";
+// import { useWriteContract } from "@raidguild/quiver";
 import { useState } from "react";
 import { addWorkScopeModal } from "../../content/claim-hypercert-content";
 import { formatScope } from "../../utils/formatting";
 import { useWorkScopes } from "../../hooks/listWorkscopes";
-import { useParseBlockchainError } from "../../utils/parseBlockchainError";
+// import { useParseBlockchainError } from "../../utils/parseBlockchainError";
 
 export const AddWorkscopeModal = ({
   isOpen,
   onClose,
 }: Omit<ModalProps, "children">) => {
-  const contract = useHypercertContract();
-  const parseBlockchainError = useParseBlockchainError();
+  // const contract = useHypercertContract();
+  // const parseBlockchainError = useParseBlockchainError();
   const toast = useToast();
   const { startPolling } = useWorkScopes();
   const [value, setValue] = useState<string>("");
   const [addingScope, setAddingScope] = useState(false);
-  const { mutate } = useWriteContract(contract, "addWorkScope", {
-    onError: (error) => {
-      toast({
-        description: parseBlockchainError(error, addWorkScopeModal.toastError),
-        status: "error",
-      });
-      console.error(error);
-    },
-    onConfirmation: (receipt) => {
-      toast({
-        description: addWorkScopeModal.toastSuccess(
-          value,
-          receipt.transactionHash
-        ),
-        status: "success",
-        isClosable: true,
-      });
-      setAddingScope(false);
-      onClose();
-    },
-  });
+  // TODO: Update to the new method for creating work scopes
+  const mutate = async (formattedValue: string) => {
+    toast({
+      description: `Creating work scopes is currently not implemented, could not add ${formattedValue}`,
+      status: "error",
+    });
+  };
+  // const { mutate } = useWriteContract(contract, "addWorkScope", {
+  //   onError: (error) => {
+  //     toast({
+  //       description: parseBlockchainError(error, addWorkScopeModal.toastError),
+  //       status: "error",
+  //     });
+  //     console.error(error);
+  //   },
+  //   onConfirmation: (receipt) => {
+  //     toast({
+  //       description: addWorkScopeModal.toastSuccess(
+  //         value,
+  //         receipt.transactionHash
+  //       ),
+  //       status: "success",
+  //       isClosable: true,
+  //     });
+  //     setAddingScope(false);
+  //     onClose();
+  //   },
+  // });
 
   const onConfirm = async () => {
     setAddingScope(true);

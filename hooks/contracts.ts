@@ -1,11 +1,11 @@
 import { useTypedContract } from "@raidguild/quiver";
-import { HyperCertMinter__factory } from "../contract-types";
 import { CONTRACT_ADDRESS, DEFAULT_CHAIN_ID } from "../constants";
+import { HyperCertMinterFactory } from '@network-goods/hypercerts-protocol';
 
 export const useHypercertContract = () => {
   const { contract } = useTypedContract(
     CONTRACT_ADDRESS,
-    HyperCertMinter__factory,
+    HyperCertMinterFactory,
     {
       staticProvider: {
         enable: true,

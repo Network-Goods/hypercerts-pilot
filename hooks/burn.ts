@@ -1,8 +1,9 @@
 import { useHypercertContract } from "./contracts";
-import { useWriteContract } from "@raidguild/quiver";
+import { useWallet, useWriteContract } from "@raidguild/quiver";
 import { useToast } from "@chakra-ui/react";
 import { burnInteractionLabels } from "../content/chainInteractions";
 import { useParseBlockchainError } from "../utils/parseBlockchainError";
+import { burnFractionModal } from "../content/burn-hypercert-content";
 
 export const useBurnFraction = ({
   onComplete,
@@ -11,6 +12,7 @@ export const useBurnFraction = ({
   onComplete?: () => void;
   onError?: () => void;
 }) => {
+  const { address } = useWallet();
   const contract = useHypercertContract();
   const parseBlockchainError = useParseBlockchainError();
   const toast = useToast();
@@ -38,5 +40,14 @@ export const useBurnFraction = ({
     },
   });
 
-  return async (tokenId: string) => mutate(tokenId);
+  return async (tokenId: string, valueBurned: number) => {
+    if (!address) {
+      toast({
+        description: burnFractionModal.error.noWalletConnected,
+        status: 'error',
+      })
+      return;
+    }
+    return mutate(address, tokenId, valueBurned);
+  }
 };

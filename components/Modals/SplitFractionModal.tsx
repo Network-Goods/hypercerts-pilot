@@ -15,13 +15,14 @@ import {
   Spinner,
   Text,
   Textarea,
-  useDisclosure,
+  useDisclosure, useToast
 } from "@chakra-ui/react";
 import { splitFractionModal } from "../../content/split-hypercert-content";
 import { useFractionById } from "../../hooks/fractions";
 import { useSplitFraction } from "../../hooks/split";
 import _ from "lodash";
 import { useHypercertFractions } from "../../hooks/useHypercert";
+import { useWallet } from "@raidguild/quiver";
 
 type C = (args: { onClick: () => void }) => JSX.Element;
 
@@ -34,6 +35,8 @@ export const SplitFractionModal = ({
   tokenId: string;
   hypercertId: string;
 }) => {
+  const { address } = useWallet();
+  const toast = useToast();
   const { isOpen, onClose, onOpen } = useDisclosure();
   const { startPolling } = useHypercertFractions(hypercertId);
 
@@ -75,9 +78,16 @@ export const SplitFractionModal = ({
   };
 
   const onClickSplit = async () => {
+    if (!address) {
+      toast({
+        description: splitFractionModal.error.noWalletConnected,
+        status: 'error'
+      });
+      return;
+    }
     setStep("splitting");
     const formattedValues = formatValues(value);
-    await split(tokenId, formattedValues);
+    await split(address, tokenId, formattedValues);
   };
 
   const fractionUnits = parseInt(data?.hypercertFraction?.units, 10);

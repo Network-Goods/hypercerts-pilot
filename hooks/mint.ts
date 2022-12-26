@@ -18,7 +18,7 @@ export const useMintHyperCertificate = ({
 
   const parseError = useParseBlockchainError();
 
-  const { mutate } = useWriteContract(contract, "mint", {
+  const { mutate } = useWriteContract(contract, "mintClaim", {
     onError: (error) => {
       parseError(error, "the fallback");
       toast({
