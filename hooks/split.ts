@@ -1,8 +1,8 @@
 import { splitInteractionLabels } from "../content/chainInteractions";
 import { useHypercertContract } from "./contracts";
-import { useWriteContract } from "@raidguild/quiver";
 import { useToast } from "@chakra-ui/react";
 import { useParseBlockchainError } from "../utils/parseBlockchainError";
+import { useContractWrite } from "wagmi";
 
 export const useSplitFraction = ({
   onComplete,
@@ -15,26 +15,29 @@ export const useSplitFraction = ({
   const parseBlockchainError = useParseBlockchainError();
   const toast = useToast();
 
-  const { mutate: split } = useWriteContract(contract, "splitValue", {
-    onConfirmation: () => {
-      toast({
-        status: "success",
-        description: splitInteractionLabels.toastSuccess,
-      });
-      onComplete?.();
-    },
-    onError: (error) => {
-      toast({
-        description: parseBlockchainError(
-          error,
-          splitInteractionLabels.toastError
-        ),
-        status: "error",
-      });
-      console.error(error);
-      onError?.();
-    },
-  });
+  // const { mutate: split } = useContractWrite(contract, "splitValue", {
+  //   onConfirmation: () => {
+  //     toast({
+  //       status: "success",
+  //       description: splitInteractionLabels.toastSuccess,
+  //     });
+  //     onComplete?.();
+  //   },
+  //   onError: (error) => {
+  //     toast({
+  //       description: parseBlockchainError(
+  //         error,
+  //         splitInteractionLabels.toastError
+  //       ),
+  //       status: "error",
+  //     });
+  //     console.error(error);
+  //     onError?.();
+  //   },
+  // });
 
-  return split;
+  // return split;
+  return () => {
+    console.log("Splitting");
+  };
 };

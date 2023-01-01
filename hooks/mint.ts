@@ -1,24 +1,43 @@
-import { MintCertificateData } from "../types/MintCertificateData";
-import { useWallet, useWriteContract } from "@raidguild/quiver";
 import { useToast } from "@chakra-ui/react";
-import { ethers } from "ethers";
+import { BigNumber, BigNumberish } from "ethers";
 import { useParseBlockchainError } from "../utils/parseBlockchainError";
-import { useHypercertContract } from "./contracts";
 import { mintInteractionLabels } from "../content/chainInteractions";
+import {
+  useContractWrite,
+  usePrepareContractWrite,
+  useWaitForTransaction,
+} from "wagmi";
+import { HyperCertMinterFactory } from "@network-goods/hypercerts-sdk";
+import { CONTRACT_ADDRESS } from "../constants";
+
+export interface MintHypercertArgs {
+  units: BigNumberish;
+  uri: string;
+}
 
 export const useMintHyperCertificate = ({
   onComplete,
+  args,
+  enabled,
 }: {
   onComplete?: () => void;
+  args: MintHypercertArgs;
+  enabled: boolean;
 }) => {
-  const { address } = useWallet();
-  const contract = useHypercertContract();
   const parseBlockchainError = useParseBlockchainError();
   const toast = useToast();
 
   const parseError = useParseBlockchainError();
-
-  const { mutate } = useWriteContract(contract, "mintClaim", {
+  const {
+    config,
+    error: prepareError,
+    isError: isPrepareError,
+    isLoading: isLoadingPrepareContractWrite,
+  } = usePrepareContractWrite({
+    address: CONTRACT_ADDRESS,
+    args: [BigNumber.from(args.units), args.uri],
+    abi: HyperCertMinterFactory.abi,
+    functionName: "mintClaim",
     onError: (error) => {
       parseError(error, "the fallback");
       toast({
@@ -30,48 +49,45 @@ export const useMintHyperCertificate = ({
       });
       console.error(error);
     },
-    onConfirmation: (receipt) => {
+    onSuccess: () => {
       toast({
-        description: mintInteractionLabels.toastSuccess(
-          receipt.transactionHash
-        ),
+        description: mintInteractionLabels.toastSuccess("Success"),
+        status: "success",
+      });
+    },
+    enabled,
+  });
+
+  const {
+    data,
+    write,
+    error: writeError,
+    isError: isWriteError,
+    isLoading: isLoadingContractWrite,
+  } = useContractWrite(config);
+
+  const {
+    isLoading: isLoadingWaitForTransaction,
+    isError: isWaitError,
+    error: waitError,
+  } = useWaitForTransaction({
+    hash: data?.hash,
+    onSuccess: () => {
+      toast({
+        description: mintInteractionLabels.toastSuccess("Success"),
         status: "success",
       });
       onComplete?.();
     },
   });
 
-  const encodeData = (data: MintCertificateData) => {
-    const abiCoder = new ethers.utils.AbiCoder();
-    const types = [
-      "uint256[]",
-      "uint256[]",
-      "uint256[]",
-      "uint64[2]",
-      "uint64[2]",
-      "address[]",
-      "string",
-      "string",
-      "string",
-      "uint64[]",
-    ];
-    const values = [
-      data.rightsIds,
-      data.workScopeIds,
-      data.impactScopeIds,
-      data.workTime,
-      data.impactTime,
-      data.contributors,
-      data.name,
-      data.description,
-      data.uri,
-      data.fractions,
-    ];
-
-    return abiCoder.encode(types, values);
-  };
-
-  return (data: MintCertificateData) => {
-    return mutate(address!, encodeData(data));
+  return {
+    write,
+    isLoading:
+      isLoadingPrepareContractWrite ||
+      isLoadingContractWrite ||
+      isLoadingWaitForTransaction,
+    isError: isPrepareError || isWriteError || isWaitError,
+    error: prepareError || writeError || waitError,
   };
 };

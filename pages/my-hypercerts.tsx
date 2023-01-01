@@ -1,4 +1,3 @@
-import { useWallet } from "@raidguild/quiver";
 import {
   Alert,
   AlertIcon,
@@ -19,9 +18,10 @@ import { HypercertTile } from "../components/HypercertTile";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useGetAllHypercertsMintedBy } from "../hooks/listHypercerts";
+import { useAccount } from "wagmi";
 
 const MyHypercertsPageWrapper = () => {
-  const { address } = useWallet();
+  const { address } = useAccount();
 
   if (!address) {
     return (

@@ -60,7 +60,7 @@ export const MergeAllFractionsModal = ({
     );
     console.log("Merging tokens with id", parsedFractions);
     setStep("merging");
-    await merge(parsedFractions);
+    // await merge(parsedFractions);
   };
 
   const disabled = false;

@@ -3,7 +3,14 @@ import type { AppProps } from "next/app";
 import { ChakraProvider } from "@chakra-ui/react";
 import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 
-import { WalletProvider, NetworkConfig } from "@raidguild/quiver";
+import {
+  WagmiConfig,
+  createClient,
+  configureChains,
+  mainnet,
+  goerli,
+} from "wagmi";
+import { publicProvider } from "wagmi/providers/public";
 
 // If using Frame provider
 // @ts-ignore
@@ -17,8 +24,9 @@ import { DEFAULT_CHAIN_ID } from "../constants";
 import { QueryClient } from "@tanstack/query-core";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { sepolia } from "@wagmi/chains";
 
-export const SUPPORTED_NETWORKS: NetworkConfig = {
+export const SUPPORTED_NETWORKS = {
   "0x1": {
     chainId: "0x1",
     name: "Mainnet",
@@ -94,6 +102,17 @@ const apolloClient = new ApolloClient({
 
 const queryClient = new QueryClient({});
 
+const { provider, webSocketProvider } = configureChains(
+  [mainnet, goerli, sepolia],
+  [publicProvider()]
+);
+
+const wagmiClient = createClient({
+  autoConnect: true,
+  provider,
+  webSocketProvider,
+});
+
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ApolloProvider client={apolloClient}>
@@ -105,24 +124,20 @@ function MyApp({ Component, pageProps }: AppProps) {
             },
           }}
         >
-          <WalletProvider
-            web3modalOptions={web3modalOptions}
-            networks={SUPPORTED_NETWORKS}
-            // Optional if you want to auto switch the network
-            defaultChainId={DEFAULT_CHAIN_ID}
-            // Optional but useful to handle events.
-            handleModalEvents={(eventName, error) => {
-              console.error(error);
-              console.log(eventName);
-            }}
-          >
+          <WagmiConfig client={wagmiClient}>
             <Head>
               <title>HyperCert v0.2</title>
+              <link rel="preconnect" href="https://fonts.googleapis.com" />
+              <link rel="preconnect" href="https://fonts.gstatic.com" />
+              <link
+                href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Ubuntu+Mono:wght@400;700&family=Work+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+                rel="stylesheet"
+              />
             </Head>
             <Layout>
               <Component {...pageProps} />
             </Layout>
-          </WalletProvider>
+          </WagmiConfig>
         </ChakraProvider>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>

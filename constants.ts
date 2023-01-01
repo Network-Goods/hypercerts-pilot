@@ -27,11 +27,11 @@ export const urls = {
   claim: {
     label: headerLinkLabels.claim,
     href: "/claim-hypercert",
-    showOnlyWhenConnected: true,
+    showOnlyWhenConnected: false,
   },
   myHypercerts: {
     label: headerLinkLabels.myHypercerts,
     href: "/my-hypercerts",
-    showOnlyWhenConnected: true,
+    showOnlyWhenConnected: false,
   },
 };

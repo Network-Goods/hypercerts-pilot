@@ -20,7 +20,6 @@ import {
   useHypercertFractions,
   useHypercertInfo,
 } from "../../hooks/useHypercert";
-import { useWallet } from "@raidguild/quiver";
 import {
   formatFractionPercentage,
   formatTime,
@@ -36,6 +35,7 @@ import { useIpfsMetadata } from "../../hooks/ipfs";
 import { MetaDataResponse } from "../../types/MetaData";
 import { SplitFractionModal } from "../../components/Modals/SplitFractionModal";
 import { BurnFractionModal } from "../../components/Modals/BurnFractionModal";
+import { useAccount } from "wagmi";
 
 const HypercertPageWrapper = () => {
   const { query, isReady } = useRouter();
@@ -66,7 +66,7 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
     useHyperCertById(hypercertId);
   const { data: fractions, loading: fractionsLoading } =
     useHypercertFractions(hypercertId);
-  const { address } = useWallet();
+  const { address } = useAccount();
   const { data: hypercertInfo, loading: hypercertInfoLoading } =
     useHypercertInfo(hypercertId);
 
@@ -295,7 +295,7 @@ const FractionLine = ({
   tokenId: string;
   hypercertId: string;
 }) => {
-  const { address } = useWallet();
+  const { address } = useAccount();
   return (
     <ListItem display="flex" alignItems="center">
       <UserInfo nameOrAddress={ownerId} />

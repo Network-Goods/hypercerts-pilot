@@ -1,16 +1,17 @@
 import React, { PropsWithChildren } from "react";
 import Link from "next/link";
 import { Box, Center, Flex, HStack, Text } from "@chakra-ui/react";
-import { ConnectWallet } from "../ConnectWallet";
 import { useRouter } from "next/router";
 import { FORMAT_VERSION, urls } from "../../constants";
 import { WrongNetworkBanner } from "./WrongNetworkBanner";
-import { useWallet } from "@raidguild/quiver";
 import Image from "next/image";
+import { useAccount } from "wagmi";
+import dynamic from "next/dynamic";
+
+const ConnectWallet = dynamic(() => import("../ConnectWallet"), { ssr: false });
 
 export const Layout = ({ children }: PropsWithChildren) => {
   const { pathname } = useRouter();
-  const { isConnected } = useWallet();
   return (
     <Box position="relative">
       <Center
@@ -48,9 +49,6 @@ export const Layout = ({ children }: PropsWithChildren) => {
             </Link>
             <HStack pl={5} spacing={4}>
               {Object.values(urls).map((headerLink) => {
-                if (headerLink.showOnlyWhenConnected && !isConnected) {
-                  return null;
-                }
                 return (
                   <Text
                     key={headerLink.href}
