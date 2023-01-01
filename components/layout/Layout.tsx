@@ -5,7 +5,6 @@ import { useRouter } from "next/router";
 import { FORMAT_VERSION, urls } from "../../constants";
 import { WrongNetworkBanner } from "./WrongNetworkBanner";
 import Image from "next/image";
-import { useAccount } from "wagmi";
 import dynamic from "next/dynamic";
 
 const ConnectWallet = dynamic(() => import("../ConnectWallet"), { ssr: false });

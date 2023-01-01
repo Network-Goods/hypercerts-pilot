@@ -3,9 +3,8 @@ import {
   Alert,
   AlertIcon,
   AlertTitle,
+  Box,
   Button,
-  Center,
-  Container,
   Divider,
   Flex,
   FormControl,
@@ -173,122 +172,123 @@ const ClaimHypercertPage = ({
   const query = currentQuery !== undefined ? qs.parse(currentQuery) : {};
 
   return (
-    <Formik
-      validationSchema={ValidationSchema}
-      validateOnMount={true}
-      validate={(values) => {
-        updateQueryString(values);
-      }}
-      initialValues={{
-        ...defaultValues,
-        ...query,
-      }}
-      enableReinitialize
-      onSubmit={async (val) => {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        /**
-         * Steps:
-         * 1. (optional) Upload image to IPFS and get the cid for the image
-         * 2. Create the metadata json and upload to IPFS as file, including the (optional) cid for the image
-         * 3. Call the mint function on the contract with the required parameters, including the cid for the metadata json.
-         */
+    <Box overflow="hidden">
+      <Formik
+        validationSchema={ValidationSchema}
+        validateOnMount={true}
+        validate={(values) => {
+          updateQueryString(values);
+        }}
+        initialValues={{
+          ...defaultValues,
+          ...query,
+        }}
+        enableReinitialize
+        onSubmit={async (val) => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+          /**
+           * Steps:
+           * 1. (optional) Upload image to IPFS and get the cid for the image
+           * 2. Create the metadata json and upload to IPFS as file, including the (optional) cid for the image
+           * 3. Call the mint function on the contract with the required parameters, including the cid for the metadata json.
+           */
 
-        // Split contributor names and addresses. Addresses are stored on-chain, while names will be stored on IPFS.
-        const contributorNamesAndAddresses = val.contributors
-          .split(",")
-          .map((name) => name.trim());
-        const contributorNames = contributorNamesAndAddresses.filter(
-          (x) => !isAddress(x)
-        );
-        const contributorAddresses = contributorNamesAndAddresses.filter((x) =>
-          isAddress(x)
-        );
-
-        // Mint certificate using contract
-        const workTimeStart = val.workTimeStart
-          ? new Date(val.workTimeStart).getTime() / 1000
-          : 0;
-        const workTimeEnd = val.workTimeEnd
-          ? new Date(val.workTimeEnd).getTime() / 1000
-          : 0;
-        const impactTimeStart = val.impactTimeStart
-          ? new Date(val.impactTimeStart).getTime() / 1000
-          : 0;
-        const impactTimeEnd =
-          !val.impactTimeInfinite && val.impactTimeEnd
-            ? new Date(val.impactTimeEnd).getTime() / 1000
-            : 0;
-
-        try {
-          toast({
-            description: toastMessages.mintingStart,
-            status: "info",
-          });
-          const fractions = val.fractions
+          // Split contributor names and addresses. Addresses are stored on-chain, while names will be stored on IPFS.
+          const contributorNamesAndAddresses = val.contributors
             .split(",")
-            .map((x) => parseInt(x, 10));
-          const claimData = {
-            contributors: _.uniq([address!, ...contributorAddresses]),
-            workTimeframe: [workTimeStart, workTimeEnd],
-            impactTimeframe: [impactTimeStart, impactTimeEnd],
-            workScopes: val.workScopes[0]?.label || "",
-            impactScopes: val.impactScopes[0]?.value || "",
-            rightsIds: val.rights.map((right) => right.value),
-          };
-          const claimDataIsValid = validateClaimData(claimData);
-          if (claimDataIsValid) {
+            .map((name) => name.trim());
+          const contributorNames = contributorNamesAndAddresses.filter(
+            (x) => !isAddress(x)
+          );
+          const contributorAddresses = contributorNamesAndAddresses.filter(
+            (x) => isAddress(x)
+          );
+
+          // Mint certificate using contract
+          const workTimeStart = val.workTimeStart
+            ? new Date(val.workTimeStart).getTime() / 1000
+            : 0;
+          const workTimeEnd = val.workTimeEnd
+            ? new Date(val.workTimeEnd).getTime() / 1000
+            : 0;
+          const impactTimeStart = val.impactTimeStart
+            ? new Date(val.impactTimeStart).getTime() / 1000
+            : 0;
+          const impactTimeEnd =
+            !val.impactTimeInfinite && val.impactTimeEnd
+              ? new Date(val.impactTimeEnd).getTime() / 1000
+              : 0;
+
+          try {
             toast({
-              description: "Validation successful, uploading metadata to IPFS",
-              status: "success",
+              description: toastMessages.mintingStart,
+              status: "info",
             });
-            const metaData = {
-              name: val.name,
-              description: val.description,
-              image: "",
-              properties: claimData,
+            const fractions = val.fractions
+              .split(",")
+              .map((x) => parseInt(x, 10));
+            const claimData = {
+              contributors: _.uniq([address!, ...contributorAddresses]),
+              workTimeframe: [workTimeStart, workTimeEnd],
+              impactTimeframe: [impactTimeStart, impactTimeEnd],
+              workScopes: val.workScopes[0]?.label || "",
+              impactScopes: val.impactScopes[0]?.value || "",
+              rightsIds: val.rights.map((right) => right.value),
             };
+            const claimDataIsValid = validateClaimData(claimData);
+            if (claimDataIsValid) {
+              toast({
+                description:
+                  "Validation successful, uploading metadata to IPFS",
+                status: "success",
+              });
+              const metaData = {
+                name: val.name,
+                description: val.description,
+                image: "",
+                properties: claimData,
+              };
 
-            const metaDataIsValid = validateMetaData(metaData);
+              const metaDataIsValid = validateMetaData(metaData);
 
-            if (metaDataIsValid) {
-              try {
-                const addResult = await storeMetadata(metaData);
-                onMetadataUploadedToIpfs({
-                  uri: addResult.cid.toString(),
-                  units: _.sum(fractions),
-                });
-              } catch (e) {
-                console.error(e);
-                toast({
-                  description: "Something went wrong while uploading to IPFS",
-                  status: "error",
-                });
+              if (metaDataIsValid) {
+                try {
+                  const addResult = await storeMetadata(metaData);
+                  onMetadataUploadedToIpfs({
+                    uri: addResult.cid.toString(),
+                    units: _.sum(fractions),
+                  });
+                } catch (e) {
+                  console.error(e);
+                  toast({
+                    description: "Something went wrong while uploading to IPFS",
+                    status: "error",
+                  });
+                }
               }
             }
+          } catch (error) {
+            toast({
+              description: toastMessages.mintingError,
+            });
+            console.error(error);
           }
-        } catch (error) {
-          toast({
-            description: toastMessages.mintingError,
-          });
-          console.error(error);
-        }
-      }}
-    >
-      {({
-        values,
-        errors,
-        handleChange,
-        handleBlur,
-        handleSubmit,
-        isValid,
-        isSubmitting,
-        setFieldValue,
-      }) => {
-        const disabled = isSubmitting || !isConnected;
-        return (
-          <>
-            <HStack overflowY="hidden" height="100%">
-              <Flex flexBasis="50%" p={4} overflowY="scroll">
+        }}
+      >
+        {({
+          values,
+          errors,
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          isValid,
+          isSubmitting,
+          setFieldValue,
+        }) => {
+          const disabled = isSubmitting || !isConnected;
+          return (
+            <Flex>
+              <Box maxWidth="calc(100vw - 580px)" p={4} px={8}>
                 {isSubmitting && (
                   <Alert status="info" my={4}>
                     <AlertIcon />
@@ -583,24 +583,26 @@ const ClaimHypercertPage = ({
                     {buttons.submit}
                   </Button>
                 </form>
-              </Flex>
-              <Center width="100%">
-                <SVGPreview
-                  name={values.name}
-                  impactScopeLabel={values.impactScopes
-                    .map((x) => x.label)
-                    .join(", ")}
-                  workScopeLabels={values.workScopes.map((x) => x.label)}
-                  workTimeStart={values.workTimeStart}
-                  workTimeEnd={values.workTimeEnd}
-                  collectionLogoSrc={getCollectionLogoSrc()}
-                />
-              </Center>
-            </HStack>
-          </>
-        );
-      }}
-    </Formik>
+              </Box>
+              <Box width="566px">
+                <Box position="fixed" top="120px" right="16px">
+                  <SVGPreview
+                    name={values.name}
+                    impactScopeLabel={values.impactScopes
+                      .map((x) => x.label)
+                      .join(", ")}
+                    workScopeLabels={values.workScopes.map((x) => x.label)}
+                    workTimeStart={values.workTimeStart}
+                    workTimeEnd={values.workTimeEnd}
+                    collectionLogoSrc={getCollectionLogoSrc()}
+                  />
+                </Box>
+              </Box>
+            </Flex>
+          );
+        }}
+      </Formik>
+    </Box>
   );
 };
 

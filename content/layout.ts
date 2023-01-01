@@ -1,3 +1,5 @@
+import { formatAddress } from "../utils/formatting";
+
 export const headerLinkLabels = {
   claim: "Claim",
   donate: "Donate",
@@ -9,5 +11,5 @@ export const connectButtonLabels = {
   connecting: "Connecting...",
   connected: "Connected",
   connect: "Connect Wallet",
-  disconnect: (address: string) => `Disconnect ${address}`,
+  disconnect: (address: string) => `Disconnect ${formatAddress(address)}`,
 };
