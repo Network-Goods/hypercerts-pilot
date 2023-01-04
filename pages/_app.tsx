@@ -20,7 +20,6 @@ import WalletConnectProvider from "@walletconnect/web3-provider";
 import { IProviderOptions } from "web3modal";
 import { Layout } from "../components/layout/Layout";
 import Head from "next/head";
-import { DEFAULT_CHAIN_ID } from "../constants";
 import { QueryClient } from "@tanstack/query-core";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
@@ -88,12 +87,6 @@ const providerOptions: IProviderOptions = {
   },
 };
 
-const web3modalOptions = {
-  cacheProvider: true,
-  providerOptions,
-  theme: "dark",
-};
-
 const apolloClient = new ApolloClient({
   uri: "https://api.thegraph.com/subgraphs/name/bitbeckers/hypercerts-goerli",
   cache: new InMemoryCache(),
@@ -127,12 +120,6 @@ function MyApp({ Component, pageProps }: AppProps) {
           <WagmiConfig client={wagmiClient}>
             <Head>
               <title>HyperCert v0.2</title>
-              <link rel="preconnect" href="https://fonts.googleapis.com" />
-              <link rel="preconnect" href="https://fonts.gstatic.com" />
-              {/*<link*/}
-              {/*  href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Ubuntu+Mono:wght@400;700&family=Work+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"*/}
-              {/*  rel="stylesheet"*/}
-              {/*/>*/}
             </Head>
             <Layout>
               <Component {...pageProps} />

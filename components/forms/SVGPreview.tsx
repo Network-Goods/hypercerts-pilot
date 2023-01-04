@@ -2,7 +2,7 @@ import _ from "lodash";
 
 import SVGPattern1 from "./svgPatterns/pattern-1.svg";
 
-import { useEffect, useState } from "react";
+import { Ref, useEffect, useState } from "react";
 import { Box, Flex, HStack, Image, Text, VStack } from "@chakra-ui/react";
 import dayjs from "dayjs";
 
@@ -23,18 +23,22 @@ const paddingY = "42px";
 
 export const SVGPreview = ({
   name,
+  imageSrc,
   impactScopeLabel,
   workScopeLabels = [],
   workTimeStart,
   workTimeEnd,
   collectionLogoSrc,
+  imageRef,
 }: {
   name: string;
+  imageSrc?: string;
   impactScopeLabel?: string;
   workScopeLabels?: string[];
   workTimeStart?: string;
   workTimeEnd?: string;
   collectionLogoSrc?: string;
+  imageRef?: Ref<HTMLDivElement>;
 }) => {
   const [bg, setBg] = useState("");
   const [fg, setFg] = useState("");
@@ -53,6 +57,7 @@ export const SVGPreview = ({
 
   return (
     <Flex
+      ref={imageRef}
       backgroundColor={bg}
       minHeight={height}
       height={height}
@@ -64,6 +69,7 @@ export const SVGPreview = ({
     >
       {backgroundPatternSrc && (
         <img
+          alt="Image background pattern"
           src={backgroundPatternSrc}
           style={{
             position: "absolute",
@@ -77,7 +83,7 @@ export const SVGPreview = ({
         />
       )}
       <Image
-        src="/hypercerts_tile_background.png"
+        src={imageSrc || "/hypercerts_tile_background.png"}
         borderRadius={2000}
         height={imageSize}
         width={imageSize}
@@ -110,6 +116,7 @@ export const SVGPreview = ({
             color={fg}
             fontWeight={400}
             fontFamily="Ubuntu Mono"
+            className="impact-scope-label"
           >
             {impactScopeLabel}
           </Text>
@@ -118,12 +125,19 @@ export const SVGPreview = ({
       </Flex>
       <Flex px={paddingX} py={paddingY} flexDirection="column" height="100%">
         <VStack alignItems="flex-start" spacing="32px">
-          <Text color={fg} fontSize="22px" textTransform="uppercase">
+          <Text
+            color={fg}
+            fontSize="22px"
+            textTransform="uppercase"
+            className="title"
+          >
             {name}
           </Text>
           <HStack justifyContent="flex-start" spacing="18px">
             {workScopeLabels.map((label) => (
-              <Box
+              <Flex
+                alignItems="center"
+                key={label}
                 color={bg}
                 bgColor={fg}
                 borderRadius="10px"
@@ -131,8 +145,8 @@ export const SVGPreview = ({
                 fontSize="18px"
                 fontFamily="Ubuntu Mono"
               >
-                {label}
-              </Box>
+                <div className="work-scope-label">{label}</div>
+              </Flex>
             ))}
           </HStack>
         </VStack>
@@ -142,10 +156,18 @@ export const SVGPreview = ({
             textTransform="uppercase"
             fontSize="16px"
             lineHeight="16px"
+            className="work-time"
+            fontWeight={500}
           >
             work period
           </Text>
-          <Text color="white" fontSize="22px" lineHeight="24px">
+          <Text
+            color="white"
+            fontSize="22px"
+            lineHeight="24px"
+            className="work-time"
+            fontWeight={500}
+          >
             {workTimeStartFormatted} to {workTimeEndFormatted}
           </Text>
         </Flex>

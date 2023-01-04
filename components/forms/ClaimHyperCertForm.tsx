@@ -12,7 +12,10 @@ import {
   FormHelperText,
   FormLabel,
   HStack,
+  Icon,
   Input,
+  InputGroup,
+  InputRightElement,
   Textarea,
   useToast,
   VStack,
@@ -34,7 +37,7 @@ import { RightsAutoComplete } from "../AutoComplete/RightsAutoComplete";
 import { Option } from "../AutoComplete/AutoComplete";
 import { useRouter } from "next/router";
 import qs from "qs";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import _ from "lodash";
 import { isAddress } from "ethers/lib/utils";
 import {
@@ -46,6 +49,8 @@ import dayjs from "dayjs";
 import { useAccount } from "wagmi";
 import { SVGPreview } from "./SVGPreview";
 import CollectionLogo1 from "./collection_logos/collection_logo.png";
+import { FiUpload } from "react-icons/all";
+import exportAsImage from "../../utils/exportRefAsImage";
 
 const nameMinimumLength = 2;
 const nameMaximumLength = 50;
@@ -56,6 +61,8 @@ const descriptionMaximumLength = 500;
 const defaultFractions = "100";
 
 const getCollectionLogoSrc = () => CollectionLogo1.src as string;
+
+const previewWidth = "580px";
 
 const ValidationSchema = Yup.object().shape({
   name: Yup.string()
@@ -161,6 +168,30 @@ const ClaimHypercertPage = ({
     }
   }, [currentQuery]);
 
+  const fileUploadRef = useRef<HTMLInputElement | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string>();
+  useEffect(() => {
+    // create the preview
+    if (selectedFile) {
+      const objectUrl = URL.createObjectURL(selectedFile);
+      setPreview(objectUrl);
+
+      // free memory when ever this component is unmounted
+      return () => URL.revokeObjectURL(objectUrl);
+    }
+  }, [selectedFile]);
+
+  const onSelectFile = (e: ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) {
+      setSelectedFile(null);
+      return;
+    }
+
+    // I've kept this example simple by using the first image instead of multiple
+    setSelectedFile(e.target.files[0]);
+  };
+
   const updateQueryString = (values: Record<string, unknown>) => {
     const filteredValues = _.pickBy(values);
     const formattedQueryString = qs.stringify(filteredValues);
@@ -170,6 +201,15 @@ const ClaimHypercertPage = ({
   };
 
   const query = currentQuery !== undefined ? qs.parse(currentQuery) : {};
+
+  const previewRef = useRef<HTMLDivElement | null>(null);
+
+  const saveImageFromPreview = useCallback(async () => {
+    if (!previewRef?.current) {
+      throw new Error("No preview ref found, aborting");
+    }
+    await exportAsImage(previewRef.current, "test-image");
+  }, [previewRef]);
 
   return (
     <Box overflow="hidden">
@@ -185,6 +225,7 @@ const ClaimHypercertPage = ({
         }}
         enableReinitialize
         onSubmit={async (val) => {
+          saveImageFromPreview();
           window.scrollTo({ top: 0, behavior: "smooth" });
           /**
            * Steps:
@@ -288,7 +329,7 @@ const ClaimHypercertPage = ({
           const disabled = isSubmitting || !isConnected;
           return (
             <Flex>
-              <Box maxWidth="calc(100vw - 580px)" p={4} px={8}>
+              <Box maxWidth={`calc(100vw - ${previewWidth})`} p={4} px={8}>
                 {isSubmitting && (
                   <Alert status="info" my={4}>
                     <AlertIcon />
@@ -343,6 +384,29 @@ const ClaimHypercertPage = ({
                           descriptionMaximumLength
                         )}
                       </FormHelperText>
+                    </FormControl>
+                    <FormControl>
+                      <Flex>
+                        <InputGroup
+                          onClick={() => fileUploadRef.current?.click()}
+                        >
+                          <Input
+                            type="text"
+                            value={selectedFile?.name || ""}
+                            readOnly
+                          />
+                          <InputRightElement
+                            children={<Icon as={FiUpload} color="green.500" />}
+                          />
+                        </InputGroup>
+                        <Input
+                          ref={fileUploadRef}
+                          display="none"
+                          onChange={(e) => onSelectFile(e)}
+                          type="file"
+                          accept="image/*"
+                        />
+                      </Flex>
                     </FormControl>
                     <FormControl isRequired>
                       <Flex>
@@ -584,10 +648,12 @@ const ClaimHypercertPage = ({
                   </Button>
                 </form>
               </Box>
-              <Box width="566px">
+              <Box width={previewWidth}>
                 <Box position="fixed" top="120px" right="16px">
                   <SVGPreview
+                    imageRef={previewRef}
                     name={values.name}
+                    imageSrc={preview}
                     impactScopeLabel={values.impactScopes
                       .map((x) => x.label)
                       .join(", ")}
