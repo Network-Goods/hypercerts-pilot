@@ -30,8 +30,13 @@ export const Layout = ({ children }: PropsWithChildren) => {
         >
           <HStack justifyContent="start">
             <Link href={urls.browse.href}>
-              <Flex alignItems="flex-end" as="a" cursor="pointer">
-                <Image src="/logo.svg" width={30} height={30} />
+              <Flex alignItems="flex-end" cursor="pointer">
+                <Image
+                  src="/logo.svg"
+                  width={30}
+                  height={30}
+                  alt="Hypercerts logo"
+                />
                 <Text ml={2} fontSize="xl">
                   HyperCert
                 </Text>
@@ -54,7 +59,9 @@ export const Layout = ({ children }: PropsWithChildren) => {
                     fontWeight={headerLink.href === pathname ? 600 : 400}
                     color={headerLink.href === pathname ? "green" : "black"}
                   >
-                    <Link href={headerLink.href}>{headerLink.label}</Link>
+                    <Link href={headerLink.href}>
+                      <span>{headerLink.label}</span>
+                    </Link>
                   </Text>
                 );
               })}

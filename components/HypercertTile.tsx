@@ -14,9 +14,7 @@ export const HypercertTile = ({
 
   return (
     <Link href={`/hypercerts/${id}`} passHref>
-      <a>
-        <Tile src={data.image} hoverEffect={hoverEffect} />
-      </a>
+      <Tile src={data.image} hoverEffect={hoverEffect} />
     </Link>
   );
 };

@@ -22,7 +22,7 @@ import {
 } from "@chakra-ui/react";
 import { MintHypercertArgs } from "../../hooks/mint";
 import * as Yup from "yup";
-import { FORMAT_VERSION, urls } from "../../constants";
+import { FORMAT_VERSION } from "../../constants";
 import {
   alerts,
   buttons,
@@ -48,8 +48,7 @@ import {
 import dayjs from "dayjs";
 import { useAccount } from "wagmi";
 import { SVGPreview } from "./SVGPreview";
-import CollectionLogo1 from "./collection_logos/collection_logo.png";
-import { FiUpload } from "react-icons/all";
+import { FiUpload } from "react-icons/fi";
 import exportAsImage from "../../utils/exportRefAsImage";
 
 const nameMinimumLength = 2;
@@ -60,7 +59,7 @@ const descriptionMaximumLength = 500;
 
 const defaultFractions = "100";
 
-const getCollectionLogoSrc = () => CollectionLogo1.src as string;
+const getCollectionLogoSrc = () => "/collection_logos/collection_logo.png";
 
 const previewWidth = "580px";
 
@@ -208,7 +207,7 @@ const ClaimHypercertPage = ({
     if (!previewRef?.current) {
       throw new Error("No preview ref found, aborting");
     }
-    await exportAsImage(previewRef.current, "test-image");
+    return await exportAsImage(previewRef.current, "test-image");
   }, [previewRef]);
 
   return (
@@ -225,7 +224,7 @@ const ClaimHypercertPage = ({
         }}
         enableReinitialize
         onSubmit={async (val) => {
-          saveImageFromPreview();
+          const image = await saveImageFromPreview();
           window.scrollTo({ top: 0, behavior: "smooth" });
           /**
            * Steps:
@@ -286,7 +285,7 @@ const ClaimHypercertPage = ({
               const metaData = {
                 name: val.name,
                 description: val.description,
-                image: "",
+                image,
                 properties: claimData,
               };
 
@@ -294,9 +293,9 @@ const ClaimHypercertPage = ({
 
               if (metaDataIsValid) {
                 try {
-                  const addResult = await storeMetadata(metaData);
+                  const cid = await storeMetadata(metaData);
                   onMetadataUploadedToIpfs({
-                    uri: addResult.cid.toString(),
+                    uri: cid,
                     units: _.sum(fractions),
                   });
                 } catch (e) {
@@ -395,9 +394,9 @@ const ClaimHypercertPage = ({
                             value={selectedFile?.name || ""}
                             readOnly
                           />
-                          <InputRightElement
-                            children={<Icon as={FiUpload} color="green.500" />}
-                          />
+                          <InputRightElement>
+                            <Icon as={FiUpload} color="green.500" />
+                          </InputRightElement>
                         </InputGroup>
                         <Input
                           ref={fileUploadRef}

@@ -9,6 +9,7 @@ import {
 } from "wagmi";
 import { HyperCertMinterFactory } from "@network-goods/hypercerts-sdk";
 import { CONTRACT_ADDRESS } from "../constants";
+import { useState } from "react";
 
 export interface MintHypercertArgs {
   units: BigNumberish;
@@ -24,6 +25,9 @@ export const useMintHyperCertificate = ({
   args: MintHypercertArgs;
   enabled: boolean;
 }) => {
+  const [step, setStep] = useState<
+    "initial" | "preparing" | "writing" | "awaiting" | "complete"
+  >("initial");
   const parseBlockchainError = useParseBlockchainError();
   const toast = useToast();
 
@@ -54,6 +58,7 @@ export const useMintHyperCertificate = ({
         description: mintInteractionLabels.toastSuccess("Success"),
         status: "success",
       });
+      setStep("writing");
     },
     enabled,
   });
@@ -77,17 +82,22 @@ export const useMintHyperCertificate = ({
         description: mintInteractionLabels.toastSuccess("Success"),
         status: "success",
       });
+      setStep("complete");
       onComplete?.();
     },
   });
 
   return {
-    write,
+    write: async () => {
+      setStep("preparing");
+      await write?.();
+    },
     isLoading:
       isLoadingPrepareContractWrite ||
       isLoadingContractWrite ||
       isLoadingWaitForTransaction,
     isError: isPrepareError || isWriteError || isWaitError,
     error: prepareError || writeError || waitError,
+    step,
   };
 };

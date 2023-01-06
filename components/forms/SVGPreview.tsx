@@ -1,13 +1,11 @@
 import _ from "lodash";
 
-import SVGPattern1 from "./svgPatterns/pattern-1.svg";
-
 import { Ref, useEffect, useState } from "react";
 import { Box, Flex, HStack, Image, Text, VStack } from "@chakra-ui/react";
 import dayjs from "dayjs";
 
 const colorPairs = [{ bg: "#25316D", fg: "#FFEEA8" }] as const;
-const backgroundPatterns = [SVGPattern1];
+const backgroundPatterns = ["/svgPatterns/pattern-1.svg"];
 
 const height = "850px";
 const width = 550;
@@ -49,7 +47,7 @@ export const SVGPreview = ({
     setBg(colorPair.bg);
     setFg(colorPair.fg);
 
-    setBackgroundPatternSrc(_.sample(backgroundPatterns)!.src);
+    setBackgroundPatternSrc(_.sample(backgroundPatterns)!);
   }, []);
 
   const workTimeStartFormatted = dayjs(workTimeStart).format("YYYY-MM-DD");

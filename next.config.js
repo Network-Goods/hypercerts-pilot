@@ -2,9 +2,10 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  typescript: {
+  typescript: {},
+  env: {
+    NFT_STORAGE_TOKEN: process.env.NEXT_PUBLIC_NFT_STORAGE_TOKEN,
+  },
+};
 
-  }
-}
-
-module.exports = nextConfig
+module.exports = nextConfig;

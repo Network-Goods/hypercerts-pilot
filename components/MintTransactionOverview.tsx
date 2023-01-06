@@ -1,5 +1,6 @@
 import { MintHypercertArgs, useMintHyperCertificate } from "../hooks/mint";
 import { useEffect } from "react";
+import { Text } from "@chakra-ui/react";
 
 export const MintTransactionOverview = ({
   args,
@@ -8,7 +9,7 @@ export const MintTransactionOverview = ({
   args: MintHypercertArgs;
   onComplete?: () => void;
 }) => {
-  const { write } = useMintHyperCertificate({
+  const { write, step, error } = useMintHyperCertificate({
     args,
     enabled: true,
     onComplete,
@@ -18,7 +19,12 @@ export const MintTransactionOverview = ({
     write?.();
   }, []);
 
-  return <div>Minting</div>;
+  return (
+    <>
+      <div>{step}</div>
+      {error && <Text color="red">{error.message}</Text>}
+    </>
+  );
 };
 
 export default MintTransactionOverview;

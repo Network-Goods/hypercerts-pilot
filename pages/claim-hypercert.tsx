@@ -1,10 +1,7 @@
 import dynamic from "next/dynamic";
-import { useState } from "react";
+import React, { useState } from "react";
 import { MintHypercertArgs } from "../hooks/mint";
-const MintTransactionOverview = dynamic(
-  () => import("../components/MintTransactionOverview"),
-  { ssr: false }
-);
+import MintTransactionOverview from "../components/MintTransactionOverview";
 
 const DynamicClaimHyperCertForm = dynamic(
   () => import("../components/forms/ClaimHyperCertForm"),
