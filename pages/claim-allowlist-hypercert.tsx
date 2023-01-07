@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { MintHypercertArgs } from "../hooks/mint";
 import MintTransactionOverview from "../components/MintTransactionOverview";
-import { RegularClaimForm } from "../components/forms/RegularClaimForm";
+import { AllowlistClaimForm } from "../components/forms/AllowlistClaimForm";
 
 const ClaimHyperCertPage = () => {
   const [step, setStep] = useState<"form" | "minting" | "complete">("form");
@@ -20,7 +20,9 @@ const ClaimHyperCertPage = () => {
   return (
     <>
       {step === "form" && (
-        <RegularClaimForm onMetadataUploadedToIpfs={onMetadataUploadedToIpfs} />
+        <AllowlistClaimForm
+          onMetadataUploadedToIpfs={onMetadataUploadedToIpfs}
+        />
       )}
       {step === "minting" && claimMetadataArgs && (
         <MintTransactionOverview
