@@ -1,79 +1,46 @@
 import { useQuery } from "@apollo/client";
+import {
+  getMetadata,
+  claimById,
+  fractionsByClaim,
+} from "@network-goods/hypercerts-sdk";
 import { useQuery as useReactQuery } from "@tanstack/react-query";
 import { graphql } from "../gql";
-import { getMetadata } from "../../hypercerts-sdk";
+import { Claim, QueryResult } from "./listHypercerts";
 
-export interface Hypercert {
-  id: string;
-  claimHash: string;
-  totalUnits: string;
-  minter: string;
-  uri: string;
-  contributors: {
-    id: string;
-  }[];
-}
+export const useHyperCertById = (id: string) =>
+  useReactQuery(
+    ["graph", "claim", id],
+    () => claimById(id) as unknown as QueryResult<{ claim: Claim }>
+  );
 
-export const useHyperCertById = (id: string) => {
-  const query = graphql(`
-    query GetHypercertById($id: ID!) {
-      hypercert(id: $id) {
-        id
-        claimHash
-        totalUnits
-        minter
-        uri
-        rights {
-          id
-          text
-        }
-        impactDateFrom
-        impactDateTo
-        impactScopes {
-          id
-          text
-        }
-        workDateFrom
-        workDateTo
-        workScopes {
-          id
-          text
-        }
-        contributors {
-          id
-        }
-      }
-    }
-  `);
-  return useQuery(query, {
-    variables: {
-      id,
-    },
-  });
-};
-
-export const useHypercertFractions = (id: string) => {
-  const query = graphql(`
-    query GetHypercertFractions($hypercertId: String!) {
-      hypercertFractions(where: { hypercert: $hypercertId }) {
-        id
-        hypercert {
-          id
-          totalUnits
-        }
-        owner {
-          id
-        }
-        units
-      }
-    }
-  `);
-  return useQuery(query, {
-    variables: {
-      hypercertId: id.toLowerCase(),
-    },
-  });
-};
+export const useHypercertFractions = (claimId: string) =>
+  useReactQuery(["graph", "hypercert", "fractions", claimId], () =>
+    fractionsByClaim(claimId)
+  );
+//
+// export const useHypercertFractions = (id: string) => {
+//   const query = graphql(`
+//     query GetHypercertFractions($hypercertId: String!) {
+//       hypercertFractions(where: { hypercert: $hypercertId }) {
+//         id
+//         hypercert {
+//           id
+//           totalUnits
+//         }
+//         owner {
+//           id
+//         }
+//         units
+//       }
+//     }
+//   `);
+//   return useQuery(query, {
+//     variables: {
+//       hypercertId: id.toLowerCase(),
+//     },
+//   });
+// };
 
 interface HypercertInfo {
   name: string;
@@ -117,5 +84,7 @@ export const useHypercertInfo = (hypercertId: string) => {
   }
 };
 
-export const useClaimMetadata = (cid: string) =>
-  useReactQuery(["claim", "metadata", cid], () => getMetadata(cid));
+export const useClaimMetadata = (cid?: string) =>
+  useReactQuery(["claim", "metadata", cid], async () =>
+    cid ? getMetadata(cid) : null
+  );

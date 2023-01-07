@@ -16,6 +16,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import {
+  useClaimMetadata,
   useHyperCertById,
   useHypercertFractions,
   useHypercertInfo,
@@ -31,11 +32,11 @@ import { MergeAllFractionsModal } from "../../components/Modals/MergeAllFraction
 import { GetHypercertByIdQuery } from "../../gql/graphql";
 import { UserInfo } from "../../components/UserInfo";
 import { hypercertDetailContent } from "../../content/hypercert-detail-content";
-import { useIpfsMetadata } from "../../hooks/ipfs";
 import { MetaDataResponse } from "../../types/MetaData";
 import { SplitFractionModal } from "../../components/Modals/SplitFractionModal";
 import { BurnFractionModal } from "../../components/Modals/BurnFractionModal";
 import { useAccount } from "wagmi";
+import { Claim } from "../../hooks/listHypercerts";
 
 const HypercertPageWrapper = () => {
   const { query, isReady } = useRouter();
@@ -62,24 +63,15 @@ const HypercertPageWrapper = () => {
 };
 
 const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
-  const { data: hypercertData, loading: hypercertLoading } =
+  const { data: hypercertData, isLoading: hypercertLoading } =
     useHyperCertById(hypercertId);
-  const { data: fractions, loading: fractionsLoading } =
+  const { data: fractions, isLoading: fractionsLoading } =
     useHypercertFractions(hypercertId);
   const { address } = useAccount();
-  const { data: hypercertInfo, loading: hypercertInfoLoading } =
-    useHypercertInfo(hypercertId);
+  const { data: hypercertInfo, isLoading: hypercertInfoLoading } =
+    useClaimMetadata(hypercertData?.data.claim.uri);
 
-  const { data: ipfsData, isLoading: ipfsDataLoading } = useIpfsMetadata(
-    hypercertData?.hypercert?.uri
-  );
-
-  if (
-    hypercertLoading ||
-    fractionsLoading ||
-    hypercertInfoLoading ||
-    ipfsDataLoading
-  ) {
+  if (hypercertLoading || fractionsLoading || hypercertInfoLoading) {
     return (
       <Center height="100">
         <Spinner />
@@ -90,9 +82,9 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
     );
   }
 
-  const hypercert = hypercertData?.hypercert;
+  const hypercert = hypercertData?.data.claim;
 
-  if (!hypercert || !fractions) {
+  if (!hypercert) {
     return (
       <Alert status="error">
         <AlertIcon />
@@ -100,19 +92,19 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
       </Alert>
     );
   }
-
-  const ownedFractions = fractions.hypercertFractions.filter(
-    (fraction) => fraction.owner.id === address?.toLowerCase()
-  );
-  const otherFractions = fractions.hypercertFractions.filter(
-    (fraction) => fraction.owner.id !== address?.toLowerCase()
-  );
-
-  const showBurnButton =
-    otherFractions.length === 0 &&
-    ownedFractions.length === 1 &&
-    ownedFractions[0].units === ownedFractions[0].hypercert.totalUnits &&
-    ownedFractions[0].units !== 1;
+  //
+  // const ownedFractions = fractions.hypercertFractions.filter(
+  //   (fraction) => fraction.owner.id === address?.toLowerCase()
+  // );
+  // const otherFractions = fractions.hypercertFractions.filter(
+  //   (fraction) => fraction.owner.id !== address?.toLowerCase()
+  // );
+  //
+  // const showBurnButton =
+  //   otherFractions.length === 0 &&
+  //   ownedFractions.length === 1 &&
+  //   ownedFractions[0].units === ownedFractions[0].hypercert.totalUnits &&
+  //   ownedFractions[0].units !== 1;
 
   return (
     <>
@@ -122,7 +114,10 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
             <Heading flexGrow={1}>{hypercertInfo?.name}</Heading>
           </Flex>
           <Center>
-            <HypercertTile id={hypercertId} />
+            <HypercertTile
+              id={hypercertId}
+              uri={hypercertData.data.claim.uri}
+            />
           </Center>
         </Box>
 
@@ -133,142 +128,145 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
           </Box>
         )}
 
-        {ipfsData && (
-          <Box mb={6}>
-            <HypercertInfoBox ipfsData={ipfsData} hypercert={hypercert} />
-          </Box>
-        )}
+        {/*{hypercertInfo && (*/}
+        {/*  <Box mb={6}>*/}
+        {/*    <HypercertInfoBox*/}
+        {/*      ipfsData={hypercertInfo}*/}
+        {/*      hypercert={hypercertData}*/}
+        {/*    />*/}
+        {/*  </Box>*/}
+        {/*)}*/}
 
-        {ipfsData && (
-          <Box mb={6}>
-            <Heading mb={2}>{hypercertDetailContent.contributors}</Heading>
-            <VStack spacing={2} alignItems="flex-start">
-              {hypercert.contributors?.map((x) => (
-                <UserInfo key={x.id} nameOrAddress={x.id} />
-              ))}
-              {ipfsData.properties.contributor_names.map((x) => (
-                <UserInfo key={x} nameOrAddress={x} />
-              ))}
-            </VStack>
-          </Box>
-        )}
+        {/*{ipfsData && (*/}
+        {/*  <Box mb={6}>*/}
+        {/*    <Heading mb={2}>{hypercertDetailContent.contributors}</Heading>*/}
+        {/*    <VStack spacing={2} alignItems="flex-start">*/}
+        {/*      {hypercert.contributors?.map((x) => (*/}
+        {/*        <UserInfo key={x.id} nameOrAddress={x.id} />*/}
+        {/*      ))}*/}
+        {/*      {ipfsData.properties.contributor_names.map((x) => (*/}
+        {/*        <UserInfo key={x} nameOrAddress={x} />*/}
+        {/*      ))}*/}
+        {/*    </VStack>*/}
+        {/*  </Box>*/}
+        {/*)}*/}
 
-        {!!(ownedFractions.length || otherFractions.length) && (
-          <Box mb={6}>
-            <Heading mb={2}>{hypercertDetailContent.owners}</Heading>
-            <UnorderedList ml={0} spacing={2}>
-              {ownedFractions.map((fraction) => (
-                <FractionLine
-                  key={fraction.id}
-                  ownerId={fraction.owner.id}
-                  tokenId={fraction.id}
-                  hypercertId={hypercertId}
-                  percentage={formatFractionPercentage(
-                    fraction.units,
-                    fraction.hypercert.totalUnits
-                  )}
-                />
-              ))}
-              {otherFractions.map((fraction) => (
-                <FractionLine
-                  key={fraction.id}
-                  ownerId={fraction.owner.id}
-                  tokenId={fraction.id}
-                  hypercertId={hypercertId}
-                  percentage={formatFractionPercentage(
-                    fraction.units,
-                    fraction.hypercert.totalUnits
-                  )}
-                />
-              ))}
-            </UnorderedList>
+        {/*{!!(ownedFractions.length || otherFractions.length) && (*/}
+        {/*  <Box mb={6}>*/}
+        {/*    <Heading mb={2}>{hypercertDetailContent.owners}</Heading>*/}
+        {/*    <UnorderedList ml={0} spacing={2}>*/}
+        {/*      {ownedFractions.map((fraction) => (*/}
+        {/*        <FractionLine*/}
+        {/*          key={fraction.id}*/}
+        {/*          ownerId={fraction.owner.id}*/}
+        {/*          tokenId={fraction.id}*/}
+        {/*          hypercertId={hypercertId}*/}
+        {/*          percentage={formatFractionPercentage(*/}
+        {/*            fraction.units,*/}
+        {/*            fraction.hypercert.totalUnits*/}
+        {/*          )}*/}
+        {/*        />*/}
+        {/*      ))}*/}
+        {/*      {otherFractions.map((fraction) => (*/}
+        {/*        <FractionLine*/}
+        {/*          key={fraction.id}*/}
+        {/*          ownerId={fraction.owner.id}*/}
+        {/*          tokenId={fraction.id}*/}
+        {/*          hypercertId={hypercertId}*/}
+        {/*          percentage={formatFractionPercentage(*/}
+        {/*            fraction.units,*/}
+        {/*            fraction.hypercert.totalUnits*/}
+        {/*          )}*/}
+        {/*        />*/}
+        {/*      ))}*/}
+        {/*    </UnorderedList>*/}
 
-            {ownedFractions.length > 1 && (
-              <MergeAllFractionsModal
-                hypercertId={hypercertId}
-                fractionIds={ownedFractions.map((f) => f.id)}
-                render={({ onClick }) => (
-                  <Button mt={6} onClick={onClick}>
-                    Merge all my fractions
-                  </Button>
-                )}
-              />
-            )}
-            {showBurnButton && (
-              <BurnFractionModal
-                render={({ onClick }) => (
-                  <Button mt={6} colorScheme="red" mr={2} onClick={onClick}>
-                    Burn HyperCert
-                  </Button>
-                )}
-                tokenId={ownedFractions[0].id}
-                hypercertId={hypercertId}
-              />
-            )}
-          </Box>
-        )}
+        {/*    {ownedFractions.length > 1 && (*/}
+        {/*      <MergeAllFractionsModal*/}
+        {/*        hypercertId={hypercertId}*/}
+        {/*        fractionIds={ownedFractions.map((f) => f.id)}*/}
+        {/*        render={({ onClick }) => (*/}
+        {/*          <Button mt={6} onClick={onClick}>*/}
+        {/*            Merge all my fractions*/}
+        {/*          </Button>*/}
+        {/*        )}*/}
+        {/*      />*/}
+        {/*    )}*/}
+        {/*    {showBurnButton && (*/}
+        {/*      <BurnFractionModal*/}
+        {/*        render={({ onClick }) => (*/}
+        {/*          <Button mt={6} colorScheme="red" mr={2} onClick={onClick}>*/}
+        {/*            Burn HyperCert*/}
+        {/*          </Button>*/}
+        {/*        )}*/}
+        {/*        tokenId={ownedFractions[0].id}*/}
+        {/*        hypercertId={hypercertId}*/}
+        {/*      />*/}
+        {/*    )}*/}
+        {/*  </Box>*/}
+        {/*)}*/}
       </Flex>
     </>
   );
 };
-
-const HypercertInfoBox = ({
-  hypercert,
-  ipfsData,
-}: {
-  hypercert: GetHypercertByIdQuery["hypercert"];
-  ipfsData: MetaDataResponse;
-}) => {
-  if (!hypercert) {
-    return (
-      <Alert status="error">
-        <AlertIcon />
-        <AlertTitle>HyperCert info incomplete</AlertTitle>
-      </Alert>
-    );
-  }
-
-  return (
-    <VStack
-      spacing={4}
-      alignItems="flex-start"
-      padding={4}
-      borderRadius="sm"
-      backgroundColor="lightgoldenrodyellow"
-    >
-      <InfoBoxLine title={hypercertDetailContent.infoBox.timeOfWork}>
-        {formatTime(hypercert.workDateFrom, hypercert.workDateTo)}
-      </InfoBoxLine>
-      {hypercert.workScopes && (
-        <InfoBoxLine title={hypercertDetailContent.infoBox.scopeOfWork}>
-          {hypercert.workScopes.map((w) => w.text).join(", ")}
-        </InfoBoxLine>
-      )}
-      <InfoBoxLine title={hypercertDetailContent.infoBox.timeOfImpact}>
-        {formatTime(hypercert.impactDateFrom, hypercert.impactDateTo)}
-      </InfoBoxLine>
-      {hypercert.impactScopes && (
-        <InfoBoxLine title={hypercertDetailContent.infoBox.scopeOfImpact}>
-          {hypercert.impactScopes.map((i) => i.text).join(", ")}
-        </InfoBoxLine>
-      )}
-      {hypercert.rights && (
-        <InfoBoxLine title={hypercertDetailContent.infoBox.rights}>
-          {hypercert.rights.map((r) => r.text).join(", ")}
-        </InfoBoxLine>
-      )}
-      <InfoBoxLine title={hypercertDetailContent.infoBox.externalLink}>
-        <a
-          href={ipfsData.properties.external_url}
-          target="_blank"
-          rel="noreferrer noopener"
-        >
-          {ipfsData.properties.external_url}
-        </a>
-      </InfoBoxLine>
-    </VStack>
-  );
-};
+//
+// const HypercertInfoBox = ({
+//   hypercert,
+//   ipfsData,
+// }: {
+//   hypercert: Claim;
+//   ipfsData: HypInfo;
+// }) => {
+//   if (!hypercert) {
+//     return (
+//       <Alert status="error">
+//         <AlertIcon />
+//         <AlertTitle>HyperCert info incomplete</AlertTitle>
+//       </Alert>
+//     );
+//   }
+//
+//   return (
+//     <VStack
+//       spacing={4}
+//       alignItems="flex-start"
+//       padding={4}
+//       borderRadius="sm"
+//       backgroundColor="lightgoldenrodyellow"
+//     >
+//       <InfoBoxLine title={hypercertDetailContent.infoBox.timeOfWork}>
+//         {formatTime(hypercert.workDateFrom, hypercert.workDateTo)}
+//       </InfoBoxLine>
+//       {hypercert.workScopes && (
+//         <InfoBoxLine title={hypercertDetailContent.infoBox.scopeOfWork}>
+//           {hypercert.workScopes.map((w) => w.text).join(", ")}
+//         </InfoBoxLine>
+//       )}
+//       <InfoBoxLine title={hypercertDetailContent.infoBox.timeOfImpact}>
+//         {formatTime(hypercert.impactDateFrom, hypercert.impactDateTo)}
+//       </InfoBoxLine>
+//       {hypercert.impactScopes && (
+//         <InfoBoxLine title={hypercertDetailContent.infoBox.scopeOfImpact}>
+//           {hypercert.impactScopes.map((i) => i.text).join(", ")}
+//         </InfoBoxLine>
+//       )}
+//       {hypercert.rights && (
+//         <InfoBoxLine title={hypercertDetailContent.infoBox.rights}>
+//           {hypercert.rights.map((r) => r.text).join(", ")}
+//         </InfoBoxLine>
+//       )}
+//       <InfoBoxLine title={hypercertDetailContent.infoBox.externalLink}>
+//         <a
+//           href={ipfsData.properties.external_url}
+//           target="_blank"
+//           rel="noreferrer noopener"
+//         >
+//           {ipfsData.properties.external_url}
+//         </a>
+//       </InfoBoxLine>
+//     </VStack>
+//   );
+// };
 
 const InfoBoxLine = ({
   title,

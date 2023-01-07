@@ -24,7 +24,7 @@ export const useListAllHypercerts = () => {
   return useQuery(GET_ALL_CERTIFICATES_QUERY);
 };
 
-type QueryResult<T> = {
+export type QueryResult<T> = {
   data: T;
 };
 

@@ -44,6 +44,7 @@ import {
   validateMetaData,
   validateClaimData,
   storeMetadata,
+  HypercertMetadata,
 } from "@network-goods/hypercerts-sdk";
 import dayjs from "dayjs";
 import { useAccount } from "wagmi";
@@ -149,10 +150,13 @@ const defaultValues = {
   impactTimeInfinite: false,
 };
 
-const ClaimHypercertPage = ({
-  onMetadataUploadedToIpfs,
+const ClaimHypercertForm = ({
+  onSubmit,
 }: {
-  onMetadataUploadedToIpfs: (args: MintHypercertArgs) => void;
+  onSubmit: (args: {
+    metaData: HypercertMetadata;
+    fractions: number[];
+  }) => void;
 }) => {
   const { address, isConnected } = useAccount();
   const { push } = useRouter();
@@ -292,19 +296,10 @@ const ClaimHypercertPage = ({
               const metaDataIsValid = validateMetaData(metaData);
 
               if (metaDataIsValid) {
-                try {
-                  const cid = await storeMetadata(metaData);
-                  onMetadataUploadedToIpfs({
-                    uri: cid,
-                    units: _.sum(fractions),
-                  });
-                } catch (e) {
-                  console.error(e);
-                  toast({
-                    description: "Something went wrong while uploading to IPFS",
-                    status: "error",
-                  });
-                }
+                onSubmit({
+                  metaData,
+                  fractions,
+                });
               }
             }
           } catch (error) {
@@ -675,4 +670,4 @@ const displayError = (message: string) => (
   <span style={{ color: "red" }}>- {message}</span>
 );
 
-export default ClaimHypercertPage;
+export default ClaimHypercertForm;
