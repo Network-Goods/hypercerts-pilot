@@ -1,5 +1,7 @@
 import { useQuery } from "@apollo/client";
+import { useQuery as useReactQuery } from "@tanstack/react-query";
 import { graphql } from "../gql";
+import { getMetadata } from "../../hypercerts-sdk";
 
 export interface Hypercert {
   id: string;
@@ -114,3 +116,6 @@ export const useHypercertInfo = (hypercertId: string) => {
     return { data: undefined, loading };
   }
 };
+
+export const useClaimMetadata = (cid: string) =>
+  useReactQuery(["claim", "metadata", cid], () => getMetadata(cid));

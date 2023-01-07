@@ -90,9 +90,9 @@ const ValidationSchema = Yup.object().shape({
         return false;
       }
     }),
-  workScopes: Yup.array().min(1),
-  impactScopes: Yup.array().min(1),
-  rights: Yup.array().min(1),
+  workScopes: Yup.array().min(0),
+  impactScopes: Yup.array().min(0),
+  rights: Yup.array().min(0),
   workTimeEnd: Yup.date().when("workTimeStart", (workTimeStart) => {
     return Yup.date().min(workTimeStart, "End date must be after start date");
   }),
@@ -207,7 +207,7 @@ const ClaimHypercertPage = ({
     if (!previewRef?.current) {
       throw new Error("No preview ref found, aborting");
     }
-    return await exportAsImage(previewRef.current, "test-image");
+    return await exportAsImage(previewRef.current);
   }, [previewRef]);
 
   return (
@@ -574,7 +574,7 @@ const ClaimHypercertPage = ({
                     )}
                   </FormControl>
                   <Divider my={3} />
-                  <FormControl isRequired>
+                  <FormControl>
                     <Flex>
                       <FormLabel>{placeholders.workScopesLabel}</FormLabel>
                       <ErrorMessage name="workScopes" render={displayError} />
@@ -595,7 +595,7 @@ const ClaimHypercertPage = ({
                     </FormHelperText>
                   </FormControl>
                   <Divider my={3} />
-                  <FormControl isRequired>
+                  <FormControl>
                     <Flex>
                       <FormLabel>{placeholders.impactScopesLabel}</FormLabel>
                       <ErrorMessage name="impactScopes" render={displayError} />
@@ -616,7 +616,7 @@ const ClaimHypercertPage = ({
                     </FormHelperText>
                   </FormControl>
                   <Divider my={3} />
-                  <FormControl isRequired>
+                  <FormControl>
                     <Flex>
                       <FormLabel>{placeholders.rightsLabel}</FormLabel>
                       <ErrorMessage name="rights" render={displayError} />

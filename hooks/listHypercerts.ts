@@ -24,8 +24,24 @@ export const useListAllHypercerts = () => {
   return useQuery(GET_ALL_CERTIFICATES_QUERY);
 };
 
+type QueryResult<T> = {
+  data: T;
+};
+
+export interface Claim {
+  id: string;
+  owner: string;
+  totalUnits: string;
+  uri: string;
+  contract: string;
+  creator: string;
+}
+
 export const useListFirstClaims = () => {
-  return useReactQuery(["firstClaims"], firstClaims);
+  return useReactQuery(
+    ["firstClaims"],
+    () => firstClaims(10) as Promise<QueryResult<{ claims: Claim[] }>>
+  );
 };
 
 export const useGetAllHypercertsMintedBy = (address: string) => {

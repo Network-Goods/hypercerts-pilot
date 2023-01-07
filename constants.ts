@@ -18,6 +18,11 @@ export const CONTRACT_ADDRESS = requireEnv(
   "NEXT_PUBLIC_CONTRACT_ADDRESS"
 );
 
+export const GRAPH_ENDPOINT = requireEnv(
+  process.env.NEXT_PUBLIC_GRAPH_ENDPOINT,
+  "NEXT_PUBLIC_GRAPH_ENDPOINT"
+);
+
 export const urls = {
   browse: {
     label: headerLinkLabels.browse,

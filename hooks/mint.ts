@@ -69,7 +69,9 @@ export const useMintHyperCertificate = ({
     error: writeError,
     isError: isWriteError,
     isLoading: isLoadingContractWrite,
+    status,
   } = useContractWrite(config);
+  console.log(status);
 
   const {
     isLoading: isLoadingWaitForTransaction,

@@ -16,14 +16,13 @@ import { publicProvider } from "wagmi/providers/public";
 // @ts-ignore
 import ethProvider from "eth-provider";
 // If using wallet connect
-import WalletConnectProvider from "@walletconnect/web3-provider";
-import { IProviderOptions } from "web3modal";
 import { Layout } from "../components/layout/Layout";
 import Head from "next/head";
 import { QueryClient } from "@tanstack/query-core";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { sepolia } from "@wagmi/chains";
+import { GRAPH_ENDPOINT } from "../constants";
 
 export const SUPPORTED_NETWORKS = {
   "0x1": {
@@ -70,25 +69,8 @@ export const SUPPORTED_NETWORKS = {
   },
 };
 
-const providerOptions: IProviderOptions = {
-  frame: {
-    package: ethProvider,
-  },
-  walletconnect: {
-    package: WalletConnectProvider,
-    options: {
-      rpc: {
-        1: SUPPORTED_NETWORKS["0x1"].rpc,
-        4: SUPPORTED_NETWORKS["0x4"].rpc,
-        5: SUPPORTED_NETWORKS["0x5"].rpc,
-        31337: SUPPORTED_NETWORKS["0x7A69"].rpc,
-      },
-    },
-  },
-};
-
 const apolloClient = new ApolloClient({
-  uri: "https://api.thegraph.com/subgraphs/name/bitbeckers/hypercerts-goerli",
+  uri: GRAPH_ENDPOINT,
   cache: new InMemoryCache(),
   connectToDevTools: true,
 });

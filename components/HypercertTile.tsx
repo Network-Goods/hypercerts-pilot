@@ -1,12 +1,14 @@
-import { Hypercert, useHypercertInfo } from "../hooks/useHypercert";
+import { useClaimMetadata } from "../hooks/useHypercert";
 import { Tile } from "./Tile";
 import Link from "next/link";
+import { Claim } from "../hooks/listHypercerts";
 
 export const HypercertTile = ({
   id,
+  uri,
   hoverEffect,
-}: Pick<Hypercert, "id"> & { hoverEffect?: boolean }) => {
-  const { data } = useHypercertInfo(id);
+}: Pick<Claim, "id" | "uri"> & { hoverEffect?: boolean }) => {
+  const { data } = useClaimMetadata(uri);
 
   if (!data) {
     return null;
