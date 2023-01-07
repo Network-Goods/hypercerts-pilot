@@ -1,12 +1,37 @@
 import { HyperCertMetadata } from "../../contract-types";
 import dynamic from "next/dynamic";
-import React from "react";
-import { storeMetadata } from "../../../hypercerts-sdk";
+import React, { useState } from "react";
+import { storeMetadata, storeData } from "@network-goods/hypercerts-sdk";
 import _ from "lodash";
 import {
-  MintHypercertArgs,
   MintHypercertWithAllowlistArgs,
 } from "../../hooks/mint";
+import {
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  Box,
+  Button,
+  ButtonGroup,
+  Divider,
+  FormControl,
+  FormLabel,
+  HStack,
+  Input,
+  useToast,
+  VStack,
+} from "@chakra-ui/react";
+import {
+  FieldArray,
+  Form,
+  Formik,
+} from "formik";
+import { StandardMerkleTree } from "@openzeppelin/merkle-tree";
+import { BigNumber, ethers } from "ethers";
+import { CID } from "nft.storage/dist/src/lib/interface";
+import { client } from "../../utils/ipfsClient";
+
+const previewWidth = "580px";
 
 const DynamicClaimHyperCertForm = dynamic(
   () => import("./ClaimHyperCertForm"),
@@ -15,11 +40,82 @@ const DynamicClaimHyperCertForm = dynamic(
   }
 );
 
-const calculateMerkleRoot = (allowlistEntries: {
-  address: string;
-  fractions: number;
+type AllowlistEntry = { address: string; fraction: string };
+
+const initialValues = {
+  contributors: [
+    {
+      address: "",
+      fraction: "",
+    },
+    {
+      address: "",
+      fraction: "",
+    },
+    {
+      address: "",
+      fraction: "",
+    },
+  ],
+};
+
+const AllowlistForm = ({
+  onStore,
+}: {
+  onStore: (args: { contributors: AllowlistEntry[] }) => void;
 }) => {
-  return "THIS IS NOT A VALID MERKLE ROOT";
+  return (
+    <Formik
+      initialValues={initialValues}
+      onSubmit={({ contributors }) => onStore({ contributors })}
+    >
+      {({ values, handleChange }) => (
+        <Box maxWidth={`calc(100vw - ${previewWidth})`} p={4} px={8}>
+          <Form>
+            <FieldArray name="contributors">
+              {({ remove, push }) => (
+                <div>
+                  {values.contributors.map((contributor, index) => (
+                    <HStack key={index}>
+                      <FormControl isRequired>
+                        <FormLabel>{"Address"}</FormLabel>
+                        <Input
+                          type="text"
+                          name={`contributors.${index}.address`}
+                          onChange={handleChange}
+                        />
+                      </FormControl>
+                      <FormControl isRequired>
+                        <FormLabel>{"Fraction"}</FormLabel>
+                        <Input
+                          type="text"
+                          name={`contributors.${index}.fraction`}
+                          onChange={handleChange}
+                        />
+                      </FormControl>
+                      <Button
+                        onClick={() => remove(index)}
+                        colorScheme="red"
+                        w={"125px"}
+                      >
+                        Remove
+                      </Button>
+                    </HStack>
+                  ))}
+                  <ButtonGroup width={"100%"} mt="1em" colorScheme="green">
+                    <Button onClick={() => push({ address: "", fraction: "" })}>
+                      Add
+                    </Button>
+                    <Button type="submit">Store</Button>
+                  </ButtonGroup>
+                </div>
+              )}
+            </FieldArray>
+          </Form>
+        </Box>
+      )}
+    </Formik>
+  );
 };
 
 export const AllowlistClaimForm = ({
@@ -27,6 +123,47 @@ export const AllowlistClaimForm = ({
 }: {
   onMetadataUploadedToIpfs: (args: MintHypercertWithAllowlistArgs) => void;
 }) => {
+  const toast = useToast();
+  const [merkleTree, setMerkleTree] =
+    useState<StandardMerkleTree<(string | BigNumber)[]>>();
+  const [merkleCID, setMerkleCID] = useState<CID>();
+
+  const onStore = async ({
+    contributors,
+  }: {
+    contributors: AllowlistEntry[];
+  }) => {
+    //TODO data validation
+    // 100% total
+    console.log("Contributors: ", contributors);
+
+    // Entries to arrays
+    const mappedEntries = contributors
+      .filter(
+        (entry) =>
+          ethers.utils.isAddress(entry.address) &&
+          BigNumber.from(entry.fraction)
+      )
+      .map((validEntry) => [
+        validEntry.address,
+        BigNumber.from(validEntry.fraction),
+      ]);
+
+    if (mappedEntries.length === 0) {
+      toast({
+        description: "No valid data submitted",
+        status: "error",
+      });
+      return;
+    }
+
+    const tree = StandardMerkleTree.of(mappedEntries, ["address", "uint256"]);
+    const cid = await storeData(tree, client);
+
+    setMerkleTree(tree);
+    setMerkleCID(cid);
+  };
+
   const onSubmit = async ({
     metaData,
     fractions,
@@ -34,12 +171,46 @@ export const AllowlistClaimForm = ({
     metaData: HyperCertMetadata;
     fractions: number[];
   }) => {
-    const cid = await storeMetadata(metaData);
+    if (!merkleCID) {
+      toast({
+        description: "No allowlist ID found",
+        status: "error",
+      });
+      console.error("No allowlist ID found");
+      return;
+    }
+
+    if (!merkleTree?.root) {
+      toast({
+        description: "Merkle root not found",
+        status: "error",
+      });
+      console.error("Merkle root not found");
+      return;
+    }
+
+    const cid = await storeMetadata(
+      { ...metaData, allowList: merkleCID },
+      client
+    );
     onMetadataUploadedToIpfs({
-      uri: cid,
       units: _.sum(fractions),
+      merkleRoot: merkleTree?.root,
+      uri: cid,
     });
   };
 
-  return <DynamicClaimHyperCertForm onSubmit={onSubmit} />;
+  return (
+    <VStack>
+      <AllowlistForm onStore={onStore} />
+      {merkleCID ? (
+        <Alert status="info" borderRadius="md" mb={3}>
+          <AlertIcon />
+          <AlertTitle>{`Uploaded allowlist to IPFS with CID: ${merkleCID}`}</AlertTitle>
+        </Alert>
+      ) : undefined}
+      <Divider />
+      <DynamicClaimHyperCertForm onSubmit={onSubmit} />
+    </VStack>
+  );
 };

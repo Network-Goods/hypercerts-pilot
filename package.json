@@ -21,6 +21,7 @@
     "@graphprotocol/graph-ts": "^0.27.0",
     "@network-goods/hypercerts-protocol": "^0.0.6",
     "@network-goods/hypercerts-sdk": "0.0.4",
+    "@openzeppelin/merkle-tree": "^1.0.1",
     "@tanstack/react-query": "^4.10.1",
     "@tanstack/react-query-devtools": "^4.10.1",
     "@types/react-no-ssr": "^1.1.3",

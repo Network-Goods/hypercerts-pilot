@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import {
-  MintHypercertArgs,
   MintHypercertWithAllowlistArgs,
 } from "../hooks/mint";
-import MintTransactionOverview from "../components/MintTransactionOverview";
 import { AllowlistClaimForm } from "../components/forms/AllowlistClaimForm";
 import MintTransactionAllowlistOverview from "../components/MintTransactionAllowlistOverview";
 

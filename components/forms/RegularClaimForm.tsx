@@ -1,9 +1,10 @@
 import { HyperCertMetadata } from "../../contract-types";
 import dynamic from "next/dynamic";
 import React from "react";
-import { storeMetadata } from "../../../hypercerts-sdk";
+import { storeMetadata } from "@network-goods/hypercerts-sdk";
 import _ from "lodash";
 import { MintHypercertArgs } from "../../hooks/mint";
+import { client } from "../../utils/ipfsClient";
 
 const DynamicClaimHyperCertForm = dynamic(
   () => import("./ClaimHyperCertForm"),
@@ -24,7 +25,7 @@ export const RegularClaimForm = ({
     metaData: HyperCertMetadata;
     fractions: number[];
   }) => {
-    const cid = await storeMetadata(metaData);
+    const cid = await storeMetadata(metaData, client);
     onMetadataUploadedToIpfs({
       uri: cid,
       units: _.sum(fractions),

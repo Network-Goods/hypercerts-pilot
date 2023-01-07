@@ -643,7 +643,7 @@ const ClaimHypercertForm = ({
                 </form>
               </Box>
               <Box width={previewWidth}>
-                <Box position="fixed" top="120px" right="16px">
+                <Box top="120px" right="16px">
                   <SVGPreview
                     imageRef={previewRef}
                     name={values.name}
