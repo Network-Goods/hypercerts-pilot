@@ -3,7 +3,10 @@ import dynamic from "next/dynamic";
 import React from "react";
 import { storeMetadata } from "../../../hypercerts-sdk";
 import _ from "lodash";
-import { MintHypercertArgs } from "../../hooks/mint";
+import {
+  MintHypercertArgs,
+  MintHypercertWithAllowlistArgs,
+} from "../../hooks/mint";
 
 const DynamicClaimHyperCertForm = dynamic(
   () => import("./ClaimHyperCertForm"),
@@ -22,7 +25,7 @@ const calculateMerkleRoot = (allowlistEntries: {
 export const AllowlistClaimForm = ({
   onMetadataUploadedToIpfs,
 }: {
-  onMetadataUploadedToIpfs: (args: MintHypercertArgs) => void;
+  onMetadataUploadedToIpfs: (args: MintHypercertWithAllowlistArgs) => void;
 }) => {
   const onSubmit = async ({
     metaData,
