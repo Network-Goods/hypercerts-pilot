@@ -3,9 +3,7 @@ import dynamic from "next/dynamic";
 import React, { useState } from "react";
 import { storeMetadata, storeData } from "@network-goods/hypercerts-sdk";
 import _ from "lodash";
-import {
-  MintHypercertWithAllowlistArgs,
-} from "../../hooks/mint";
+import { MintHypercertWithAllowlistArgs } from "../../hooks/mint";
 import {
   Alert,
   AlertIcon,
@@ -21,11 +19,7 @@ import {
   useToast,
   VStack,
 } from "@chakra-ui/react";
-import {
-  FieldArray,
-  Form,
-  Formik,
-} from "formik";
+import { FieldArray, Form, Formik } from "formik";
 import { StandardMerkleTree } from "@openzeppelin/merkle-tree";
 import { BigNumber, ethers } from "ethers";
 import { CID } from "nft.storage/dist/src/lib/interface";
@@ -125,8 +119,9 @@ export const AllowlistClaimForm = ({
 }) => {
   const toast = useToast();
   const [merkleTree, setMerkleTree] =
-    useState<StandardMerkleTree<(string | BigNumber)[]>>();
+    useState<StandardMerkleTree<(string | number)[]>>();
   const [merkleCID, setMerkleCID] = useState<CID>();
+  const [units, setUnits] = useState<number>();
 
   const onStore = async ({
     contributors,
@@ -136,20 +131,12 @@ export const AllowlistClaimForm = ({
     //TODO data validation
     // 100% total
     console.log("Contributors: ", contributors);
+    const validEntries = contributors.filter(
+      (entry) =>
+        ethers.utils.isAddress(entry.address) && parseInt(entry.fraction, 10)
+    );
 
-    // Entries to arrays
-    const mappedEntries = contributors
-      .filter(
-        (entry) =>
-          ethers.utils.isAddress(entry.address) &&
-          BigNumber.from(entry.fraction)
-      )
-      .map((validEntry) => [
-        validEntry.address,
-        BigNumber.from(validEntry.fraction),
-      ]);
-
-    if (mappedEntries.length === 0) {
+    if (validEntries.length === 0) {
       toast({
         description: "No valid data submitted",
         status: "error",
@@ -157,11 +144,24 @@ export const AllowlistClaimForm = ({
       return;
     }
 
+    // Entries to arrays
+    const mappedEntries = validEntries.map((validEntry) => [
+      validEntry.address,
+      parseInt(validEntry.fraction, 10),
+    ]);
+
+    const sum = validEntries
+      .map((entry) => parseInt(entry.fraction, 10))
+      .reduce((acc, curr) => acc + curr);
+
     const tree = StandardMerkleTree.of(mappedEntries, ["address", "uint256"]);
     const cid = await storeData(tree, client);
 
+    console.log("SUM: ", sum);
+
     setMerkleTree(tree);
     setMerkleCID(cid);
+    setUnits(sum);
   };
 
   const onSubmit = async ({
@@ -200,17 +200,24 @@ export const AllowlistClaimForm = ({
     });
   };
 
+  console.log("UNITS: ", units);
+
   return (
     <VStack>
       <AllowlistForm onStore={onStore} />
       {merkleCID ? (
-        <Alert status="info" borderRadius="md" mb={3}>
+        <Alert
+          status="info"
+          borderRadius="md"
+          mb={3}
+          maxW={`calc(100vw - ${previewWidth})`}
+        >
           <AlertIcon />
           <AlertTitle>{`Uploaded allowlist to IPFS with CID: ${merkleCID}`}</AlertTitle>
         </Alert>
       ) : undefined}
       <Divider />
-      <DynamicClaimHyperCertForm onSubmit={onSubmit} />
+      <DynamicClaimHyperCertForm onSubmit={onSubmit} units={units} />
     </VStack>
   );
 };

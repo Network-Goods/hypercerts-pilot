@@ -152,11 +152,13 @@ const defaultValues = {
 
 const ClaimHypercertForm = ({
   onSubmit,
+  units,
 }: {
   onSubmit: (args: {
     metaData: HypercertMetadata;
     fractions: number[];
   }) => void;
+  units?: number;
 }) => {
   const { address, isConnected } = useAccount();
   const { push } = useRouter();
@@ -214,6 +216,17 @@ const ClaimHypercertForm = ({
     return await exportAsImage(previewRef.current);
   }, [previewRef]);
 
+  const _initialValues = units
+    ? {
+        ...defaultValues,
+        ...query,
+        fractions: units.toString(),
+      }
+    : {
+        ...defaultValues,
+        ...query,
+      };
+
   return (
     <Box overflow="hidden">
       <Formik
@@ -222,10 +235,7 @@ const ClaimHypercertForm = ({
         validate={(values) => {
           updateQueryString(values);
         }}
-        initialValues={{
-          ...defaultValues,
-          ...query,
-        }}
+        initialValues={_initialValues}
         enableReinitialize
         onSubmit={async (val) => {
           const image = await saveImageFromPreview();
@@ -463,7 +473,10 @@ const ClaimHypercertForm = ({
                         onChange={handleChange}
                         onBlur={handleBlur}
                         value={values.fractions}
-                        placeholder={placeholders.external_link}
+                        placeholder={
+                          units ? units.toString() : placeholders.fractions
+                        }
+                        isReadOnly={units !== undefined}
                         disabled={disabled}
                       />
                     </FormControl>

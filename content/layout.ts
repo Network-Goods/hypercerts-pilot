@@ -1,6 +1,7 @@
 import { formatAddress } from "../utils/formatting";
 
 export const headerLinkLabels = {
+  allowlist: "Allowlist",
   claim: "Claim",
   donate: "Donate",
   browse: "Browse",
