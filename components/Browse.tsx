@@ -1,14 +1,7 @@
 import { Claim, useListFirstClaims } from "../hooks/listHypercerts";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useCollections } from "../hooks/useCollections";
-import {
-  Container,
-  Flex,
-  ScaleFade,
-  SimpleGrid,
-  Spinner,
-} from "@chakra-ui/react";
-import Link from "next/link";
+import { Container, Flex, SimpleGrid, Spinner } from "@chakra-ui/react";
 import { HypercertTile } from "./HypercertTile";
 
 export const BrowsePage = () => {
@@ -17,9 +10,11 @@ export const BrowsePage = () => {
   const [filteredHypercerts, setFilteredHypercerts] = useState<Claim[]>([]);
   const { isLoading: loadingCollections, data: collections } = useCollections();
 
+  console.log(hypercertsResult);
+
   useEffect(() => {
-    if (hypercertsResult) {
-      setFilteredHypercerts(hypercertsResult.data.claims);
+    if (hypercertsResult?.claims) {
+      setFilteredHypercerts(hypercertsResult.claims);
     }
   }, [loadingHypercerts]);
 
@@ -63,11 +58,7 @@ export const BrowsePage = () => {
       </Flex>
       <SimpleGrid columns={{ sm: 2, md: 2 }} spacing={8}>
         {filteredHypercerts.map((cert) => (
-          <Link key={cert.id} href={`hypercerts/${cert.id}`}>
-            <ScaleFade initialScale={0.9} in>
-              <HypercertTile {...cert} hoverEffect />
-            </ScaleFade>
-          </Link>
+          <HypercertTile key={cert.id} {...cert} hoverEffect />
         ))}
       </SimpleGrid>
     </Container>

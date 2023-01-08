@@ -3,27 +3,6 @@ import { useQuery } from "@apollo/client";
 import { useQuery as useReactQuery } from "@tanstack/react-query";
 import { graphql } from "../gql";
 
-const GET_ALL_CERTIFICATES_QUERY = graphql(`
-  query GetAllHypercerts {
-    hypercerts {
-      id
-      claimHash
-      minter
-      uri
-      fractions {
-        id
-      }
-      contributors {
-        id
-      }
-    }
-  }
-`);
-
-export const useListAllHypercerts = () => {
-  return useQuery(GET_ALL_CERTIFICATES_QUERY);
-};
-
 export type QueryResult<T> = {
   data: T;
 };
@@ -38,10 +17,7 @@ export interface Claim {
 }
 
 export const useListFirstClaims = () => {
-  return useReactQuery(
-    ["firstClaims"],
-    () => firstClaims(10) as Promise<QueryResult<{ claims: Claim[] }>>
-  );
+  return useReactQuery(["firstClaims"], () => firstClaims(10));
 };
 
 export const useGetAllHypercertsMintedBy = (address: string) => {
