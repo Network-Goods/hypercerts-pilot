@@ -24,6 +24,10 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { sepolia } from "@wagmi/chains";
 import { GRAPH_ENDPOINT } from "../constants";
 
+import "@rainbow-me/rainbowkit/styles.css";
+
+import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
+
 export const SUPPORTED_NETWORKS = {
   "0x1": {
     chainId: "0x1",
@@ -77,15 +81,21 @@ const apolloClient = new ApolloClient({
 
 const queryClient = new QueryClient({});
 
-const { provider, webSocketProvider } = configureChains(
+const { provider, webSocketProvider, chains } = configureChains(
   [mainnet, goerli, sepolia],
   [publicProvider()]
 );
+
+const { connectors } = getDefaultWallets({
+  appName: "Hypercerts Pilot",
+  chains,
+});
 
 const wagmiClient = createClient({
   autoConnect: true,
   provider,
   webSocketProvider,
+  connectors,
 });
 
 function MyApp({ Component, pageProps }: AppProps) {
@@ -100,12 +110,14 @@ function MyApp({ Component, pageProps }: AppProps) {
           }}
         >
           <WagmiConfig client={wagmiClient}>
-            <Head>
-              <title>HyperCert v0.2</title>
-            </Head>
-            <Layout>
-              <Component {...pageProps} />
-            </Layout>
+            <RainbowKitProvider chains={chains}>
+              <Head>
+                <title>HyperCert v0.2</title>
+              </Head>
+              <Layout>
+                <Component {...pageProps} />
+              </Layout>
+            </RainbowKitProvider>
           </WagmiConfig>
         </ChakraProvider>
         <ReactQueryDevtools initialIsOpen={false} />
