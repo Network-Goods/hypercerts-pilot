@@ -1,14 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { MintHypercertAllowlistEntryArgs } from "../hooks/mint";
 import MintTransactionAllowlistFraction from "../components/MintTransactionAllowlistFraction";
-import { BigNumber, Bytes, BytesLike } from "ethers";
-import { Box, Button, Heading, useToast } from "@chakra-ui/react";
+import { BigNumber, BytesLike } from "ethers";
+import {
+  Box,
+  Button,
+  Heading,
+  useToast,
+  Text,
+  Center,
+  HStack,
+  VStack,
+} from "@chakra-ui/react";
 import { getMetadata, claimById, getData } from "@network-goods/hypercerts-sdk";
 import { StandardMerkleTree } from "@openzeppelin/merkle-tree";
-import { CID } from "nft.storage/dist/src/lib/interface";
 import { useAccount } from "wagmi";
-import { add } from "lodash";
-import { Entity } from "@graphprotocol/graph-ts";
 
 const FindAllowlistProof = ({
   onProofFound,
@@ -26,10 +32,21 @@ const FindAllowlistProof = ({
   const [merkleTree, setMerkleTree] =
     useState<StandardMerkleTree<(string | number)[]>>();
   const [merkleProofs, setMerkleProofs] = useState<string[]>();
+  const [units, setUnits] = useState<number>();
+  const [claimIDContract, setClaimIDContract] = useState<BigNumber>();
+
+  const onClick = () => {
+    if (!merkleProofs || !claimIDContract || !units) {
+      toast({ description: "Missing data", status: "error" });
+      return;
+    }
+
+    onProofFound(merkleProofs, claimIDContract, units);
+  };
 
   //Claim for user
   const claimID =
-    "0xcc08266250930e98256182734913bf1b361020720x800000000000000000000000000000000";
+    "0xcc08266250930e98256182734913bf1b361020720x900000000000000000000000000000000";
 
   useEffect(() => {
     const _fetchMerkleCID = async (claimID: string) => {
@@ -44,6 +61,10 @@ const FindAllowlistProof = ({
       }
 
       const claim = claimByIdRes.claim;
+
+      // ClaimID
+      const _id = claim.tokenID;
+      setClaimIDContract(_id);
 
       //Metadata
       const metadata = await getMetadata(claim.uri);
@@ -65,16 +86,13 @@ const FindAllowlistProof = ({
 
   useEffect(() => {
     const _fetchMerkleTree = async (merkleCID: string) => {
-      // Allowlist for claim from metadata
       const treeResponse = await getData(merkleCID);
 
       if (!treeResponse) {
         return;
       }
 
-      const tree = StandardMerkleTree.load(treeResponse);
-
-      setMerkleTree(tree);
+      setMerkleTree(StandardMerkleTree.load(JSON.parse(treeResponse)));
     };
     if (merkleCID) {
       _fetchMerkleTree(merkleCID);
@@ -83,32 +101,51 @@ const FindAllowlistProof = ({
 
   // Proofs for user
   useEffect(() => {
-    console.log(`Tree `, merkleTree);
-
     const findProof = (tree: StandardMerkleTree<(string | number)[]>) => {
-      let proof = [];
-
-      console.log("Entries: ", tree.values());
-      // for (const item of tree.entries()) {
-      //   console.log("Entry: ", item);
-      //   if (v[0] === address) {
-      //     proof = tree.getProof(i);
-      //     console.log("Value:", v);
-      //     console.log("Proof:", proof);
-      //   }
-      // }
+      console.log("Entries: ", tree.entries());
+      for (const [i, v] of tree.entries()) {
+        console.log("Entry: ", i);
+        if (v[0] === address) {
+          const proof = tree.getProof(i);
+          setMerkleProofs(proof);
+          setUnits(Number(v[1]));
+          console.log(`proof `, proof);
+        }
+      }
     };
+    if (!merkleTree || !address) {
+      return;
+    }
+
     if (merkleTree && address) {
-      const proof = findProof(merkleTree);
+      findProof(merkleTree);
     }
   }, [merkleTree, address]);
 
   // Return
   return (
-    <Box>
-      <Heading>AllowList Find step</Heading>
-      <Button onClick={() => onProofFound}> Continue</Button>
-    </Box>
+    <Center>
+      <VStack maxW={"50%"}>
+        <Heading>Mint your share of a hypercert</Heading>
+
+        <Heading size={"md"}>Claim ID</Heading>
+        <Text>{claimID}</Text>
+
+        <Heading size={"md"}>Proofs</Heading>
+        <Text noOfLines={3}>
+          {merkleProofs?.map((line, index) => (
+            <Text key={index}>{line}</Text>
+          ))}
+        </Text>
+        <Heading size={"md"}>Units to receive</Heading>
+
+        <Text>{units}</Text>
+
+        <Button onClick={onClick} colorScheme="green">
+          Continue
+        </Button>
+      </VStack>
+    </Center>
   );
 };
 

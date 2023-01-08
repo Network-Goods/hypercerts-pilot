@@ -155,7 +155,7 @@ export const AllowlistClaimForm = ({
       .reduce((acc, curr) => acc + curr);
 
     const tree = StandardMerkleTree.of(mappedEntries, ["address", "uint256"]);
-    const cid = await storeData(tree, client);
+    const cid = await storeData(JSON.stringify(tree.dump()), client);
 
     setMerkleTree(tree);
     setMerkleCID(cid);
