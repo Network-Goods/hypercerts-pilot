@@ -1,10 +1,8 @@
 import {
-  MintHypercertArgs,
   MintHypercertWithAllowlistArgs,
-  useMintHyperCertificate,
   useMintHyperCertificateWithAllowlist,
 } from "../hooks/mint";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Text } from "@chakra-ui/react";
 
 export const MintTransactionAllowlistOverview = ({
@@ -14,15 +12,20 @@ export const MintTransactionAllowlistOverview = ({
   args: MintHypercertWithAllowlistArgs;
   onComplete?: () => void;
 }) => {
-  const { write, step, error } = useMintHyperCertificateWithAllowlist({
-    args,
-    enabled: true,
-    onComplete,
-  });
+  const [initiatedWrite, setInitiatedWrite] = useState(false);
+  const { write, step, error, isReadyToWrite } =
+    useMintHyperCertificateWithAllowlist({
+      args,
+      enabled: true,
+      onComplete,
+    });
 
   useEffect(() => {
-    write?.();
-  }, []);
+    if (isReadyToWrite && !initiatedWrite) {
+      write?.();
+      setInitiatedWrite(true);
+    }
+  }, [isReadyToWrite]);
 
   return (
     <>

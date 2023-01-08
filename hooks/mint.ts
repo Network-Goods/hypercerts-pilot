@@ -1,5 +1,5 @@
 import { useToast } from "@chakra-ui/react";
-import { BigNumber, BigNumberish, Bytes, BytesLike } from "ethers";
+import { BigNumber, BigNumberish } from "ethers";
 import { useParseBlockchainError } from "../utils/parseBlockchainError";
 import { mintInteractionLabels } from "../content/chainInteractions";
 import {
@@ -10,7 +10,6 @@ import {
 import { HyperCertMinterFactory } from "@network-goods/hypercerts-sdk";
 import { CONTRACT_ADDRESS } from "../constants";
 import { useState } from "react";
-import { encodeBytes } from "cborg/lib/2bytes";
 
 export interface MintHypercertArgs {
   units: BigNumberish;
@@ -44,6 +43,7 @@ export const useMintHyperCertificate = ({
     error: prepareError,
     isError: isPrepareError,
     isLoading: isLoadingPrepareContractWrite,
+    isSuccess: isReadyToWrite,
   } = usePrepareContractWrite({
     address: CONTRACT_ADDRESS,
     args: [BigNumber.from(args.units), args.uri],
@@ -94,6 +94,7 @@ export const useMintHyperCertificate = ({
       setStep("complete");
       onComplete?.();
     },
+    enabled,
   });
 
   return {
@@ -107,6 +108,7 @@ export const useMintHyperCertificate = ({
       isLoadingWaitForTransaction,
     isError: isPrepareError || isWriteError || isWaitError,
     error: prepareError || writeError || waitError,
+    isReadyToWrite,
     step,
   };
 };
@@ -132,6 +134,7 @@ export const useMintHyperCertificateWithAllowlist = ({
     error: prepareError,
     isError: isPrepareError,
     isLoading: isLoadingPrepareContractWrite,
+    isSuccess: isReadyToWrite,
   } = usePrepareContractWrite({
     address: CONTRACT_ADDRESS,
     args: [
@@ -146,6 +149,7 @@ export const useMintHyperCertificateWithAllowlist = ({
       toast({
         description: parseBlockchainError(
           error,
+
           mintInteractionLabels.toastError
         ),
         status: "error",
@@ -164,11 +168,11 @@ export const useMintHyperCertificateWithAllowlist = ({
 
   const {
     data,
-    write,
     error: writeError,
     isError: isWriteError,
     isLoading: isLoadingContractWrite,
     status,
+    writeAsync,
   } = useContractWrite(config);
   console.log(status);
 
@@ -191,7 +195,8 @@ export const useMintHyperCertificateWithAllowlist = ({
   return {
     write: async () => {
       setStep("preparing");
-      await write?.();
+      console.log("Started writing");
+      await writeAsync?.();
     },
     isLoading:
       isLoadingPrepareContractWrite ||
@@ -200,5 +205,6 @@ export const useMintHyperCertificateWithAllowlist = ({
     isError: isPrepareError || isWriteError || isWaitError,
     error: prepareError || writeError || waitError,
     step,
+    isReadyToWrite,
   };
 };

@@ -1,23 +1,27 @@
 import { MintHypercertArgs, useMintHyperCertificate } from "../hooks/mint";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Text } from "@chakra-ui/react";
 
-export const MintTransactionOverview = ({
+export const MintTransactionDialog = ({
   args,
   onComplete,
 }: {
   args: MintHypercertArgs;
   onComplete?: () => void;
 }) => {
-  const { write, step, error } = useMintHyperCertificate({
+  const [initiatedWrite, setInitiatedWrite] = useState(false);
+  const { write, step, error, isReadyToWrite } = useMintHyperCertificate({
     args,
     enabled: true,
     onComplete,
   });
 
   useEffect(() => {
-    write?.();
-  }, []);
+    if (isReadyToWrite && !initiatedWrite) {
+      write?.();
+      setInitiatedWrite(true);
+    }
+  }, [isReadyToWrite]);
 
   return (
     <>
@@ -27,4 +31,4 @@ export const MintTransactionOverview = ({
   );
 };
 
-export default MintTransactionOverview;
+export default MintTransactionDialog;

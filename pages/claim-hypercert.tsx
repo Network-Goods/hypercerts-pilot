@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { MintHypercertArgs } from "../hooks/mint";
-import MintTransactionOverview from "../components/MintTransactionOverview";
+import MintTransactionDialog from "../components/MintTransactionDialog";
 import { RegularClaimForm } from "../components/forms/RegularClaimForm";
 
 const ClaimHyperCertPage = () => {
@@ -23,7 +23,7 @@ const ClaimHyperCertPage = () => {
         <RegularClaimForm onMetadataUploadedToIpfs={onMetadataUploadedToIpfs} />
       )}
       {step === "minting" && claimMetadataArgs && (
-        <MintTransactionOverview
+        <MintTransactionDialog
           args={claimMetadataArgs}
           onComplete={onMintComplete}
         />
