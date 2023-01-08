@@ -1,5 +1,5 @@
 import { useToast } from "@chakra-ui/react";
-import { BigNumber, BigNumberish, BytesLike } from "ethers";
+import { BigNumber, BigNumberish, Bytes, BytesLike } from "ethers";
 import { useParseBlockchainError } from "../utils/parseBlockchainError";
 import { mintInteractionLabels } from "../content/chainInteractions";
 import {
@@ -23,9 +23,9 @@ export interface MintHypercertWithAllowlistArgs {
 }
 
 export interface MintHypercertAllowlistEntryArgs {
-  proofs: BytesLike[];
-  claimId: BigNumber;
-  units: number;
+  proof: string[];
+  claimID: BigNumberish;
+  units: BigNumberish;
 }
 
 export const useMintHyperCertificate = ({
@@ -230,6 +230,8 @@ export const useMintHyperCertificateAllowlistEntry = ({
   const parseBlockchainError = useParseBlockchainError();
   const toast = useToast();
 
+  console.log("args: ", args);
+
   const parseError = useParseBlockchainError();
   const {
     config,
@@ -240,12 +242,12 @@ export const useMintHyperCertificateAllowlistEntry = ({
   } = usePrepareContractWrite({
     address: CONTRACT_ADDRESS,
     args: [
-      args.proofs,
-      args.claimId,
-      args.units,
+      args.proof as `0x${string}`[],
+      BigNumber.from(args.claimID),
+      BigNumber.from(args.units),
     ],
     abi: HyperCertMinterFactory.abi,
-    functionName: "mintClaimFromAllowList",
+    functionName: "mintClaimFromAllowlist",
     onError: (error) => {
       parseError(error, "the fallback");
       toast({

@@ -13,6 +13,7 @@ export const MintTransactionAllowlistFraction = ({
   onComplete?: () => void;
 }) => {
   const [initiatedWrite, setInitiatedWrite] = useState(false);
+
   const { write, step, error, isReadyToWrite } =
     useMintHyperCertificateAllowlistEntry({
       args,

@@ -20,9 +20,9 @@ const FindAllowlistProof = ({
   onProofFound,
 }: {
   onProofFound: (
-    proofs: BytesLike[],
+    proofs: string[],
     claimId: BigNumber,
-    units: number
+    units: BigNumber
   ) => void;
 }) => {
   const toast = useToast();
@@ -41,7 +41,7 @@ const FindAllowlistProof = ({
       return;
     }
 
-    onProofFound(merkleProofs, claimIDContract, units);
+    onProofFound(merkleProofs, claimIDContract, BigNumber.from(units));
   };
 
   //Claim for user
@@ -67,7 +67,7 @@ const FindAllowlistProof = ({
       setClaimIDContract(_id);
 
       //Metadata
-      const metadata = await getMetadata(claim.uri);
+      const metadata = await getMetadata(claim.uri || "");
 
       if (!metadata?.allowList) {
         toast({
@@ -129,14 +129,15 @@ const FindAllowlistProof = ({
         <Heading>Mint your share of a hypercert</Heading>
 
         <Heading size={"md"}>Claim ID</Heading>
-        <Text>{claimID}</Text>
+        <Text>{claimIDContract?.toString() || "..."}</Text>
 
         <Heading size={"md"}>Proofs</Heading>
-        <Text noOfLines={3}>
+        <span>
           {merkleProofs?.map((line, index) => (
             <Text key={index}>{line}</Text>
           ))}
-        </Text>
+        </span>
+
         <Heading size={"md"}>Units to receive</Heading>
 
         <Text>{units}</Text>
@@ -155,11 +156,11 @@ const MintAllowlistFractionPage = () => {
     useState<MintHypercertAllowlistEntryArgs>();
 
   const onProofFound = (
-    proofs: BytesLike[],
-    claimId: BigNumber,
-    units: number
+    proof: string[],
+    claimID: BigNumber,
+    units: BigNumber
   ) => {
-    setAllowlistMintArgs({ proofs, claimId, units });
+    setAllowlistMintArgs({ proof, claimID, units });
     setStep("minting");
   };
 
