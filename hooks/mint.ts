@@ -1,5 +1,5 @@
 import { useToast } from "@chakra-ui/react";
-import { BigNumber, BigNumberish } from "ethers";
+import { BigNumber, BigNumberish, BytesLike } from "ethers";
 import { useParseBlockchainError } from "../utils/parseBlockchainError";
 import { mintInteractionLabels } from "../content/chainInteractions";
 import {
@@ -20,6 +20,12 @@ export interface MintHypercertWithAllowlistArgs {
   units: BigNumberish;
   merkleRoot: string;
   uri: string;
+}
+
+export interface MintHypercertAllowlistEntryArgs {
+  proofs: BytesLike[];
+  claimId: BigNumber;
+  units: number;
 }
 
 export const useMintHyperCertificate = ({
@@ -144,6 +150,102 @@ export const useMintHyperCertificateWithAllowlist = ({
     ],
     abi: HyperCertMinterFactory.abi,
     functionName: "createAllowlist",
+    onError: (error) => {
+      parseError(error, "the fallback");
+      toast({
+        description: parseBlockchainError(
+          error,
+
+          mintInteractionLabels.toastError
+        ),
+        status: "error",
+      });
+      console.error(error);
+    },
+    onSuccess: () => {
+      toast({
+        description: mintInteractionLabels.toastSuccess("Success"),
+        status: "success",
+      });
+      setStep("writing");
+    },
+    enabled,
+  });
+
+  const {
+    data,
+    error: writeError,
+    isError: isWriteError,
+    isLoading: isLoadingContractWrite,
+    status,
+    writeAsync,
+  } = useContractWrite(config);
+  console.log(status);
+
+  const {
+    isLoading: isLoadingWaitForTransaction,
+    isError: isWaitError,
+    error: waitError,
+  } = useWaitForTransaction({
+    hash: data?.hash,
+    onSuccess: () => {
+      toast({
+        description: mintInteractionLabels.toastSuccess("Success"),
+        status: "success",
+      });
+      setStep("complete");
+      onComplete?.();
+    },
+  });
+
+  return {
+    write: async () => {
+      setStep("preparing");
+      console.log("Started writing");
+      await writeAsync?.();
+    },
+    isLoading:
+      isLoadingPrepareContractWrite ||
+      isLoadingContractWrite ||
+      isLoadingWaitForTransaction,
+    isError: isPrepareError || isWriteError || isWaitError,
+    error: prepareError || writeError || waitError,
+    step,
+    isReadyToWrite,
+  };
+};
+
+export const useMintHyperCertificateAllowlistEntry = ({
+  onComplete,
+  args,
+  enabled,
+}: {
+  onComplete?: () => void;
+  args: MintHypercertAllowlistEntryArgs;
+  enabled: boolean;
+}) => {
+  const [step, setStep] = useState<
+    "initial" | "preparing" | "writing" | "awaiting" | "complete"
+  >("initial");
+  const parseBlockchainError = useParseBlockchainError();
+  const toast = useToast();
+
+  const parseError = useParseBlockchainError();
+  const {
+    config,
+    error: prepareError,
+    isError: isPrepareError,
+    isLoading: isLoadingPrepareContractWrite,
+    isSuccess: isReadyToWrite,
+  } = usePrepareContractWrite({
+    address: CONTRACT_ADDRESS,
+    args: [
+      args.proofs,
+      args.claimId,
+      args.units,
+    ],
+    abi: HyperCertMinterFactory.abi,
+    functionName: "mintClaimFromAllowList",
     onError: (error) => {
       parseError(error, "the fallback");
       toast({

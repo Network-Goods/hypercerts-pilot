@@ -157,8 +157,6 @@ export const AllowlistClaimForm = ({
     const tree = StandardMerkleTree.of(mappedEntries, ["address", "uint256"]);
     const cid = await storeData(tree, client);
 
-    console.log("SUM: ", sum);
-
     setMerkleTree(tree);
     setMerkleCID(cid);
     setUnits(sum);
@@ -199,8 +197,6 @@ export const AllowlistClaimForm = ({
       uri: cid,
     });
   };
-
-  console.log("UNITS: ", units);
 
   return (
     <VStack>
