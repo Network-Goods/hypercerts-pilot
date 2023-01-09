@@ -21,7 +21,7 @@ import Head from "next/head";
 import { QueryClient } from "@tanstack/query-core";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { sepolia } from "@wagmi/chains";
+import { hardhat, sepolia } from "@wagmi/chains";
 import { GRAPH_ENDPOINT } from "../constants";
 
 import "@rainbow-me/rainbowkit/styles.css";
@@ -82,7 +82,7 @@ const apolloClient = new ApolloClient({
 const queryClient = new QueryClient({});
 
 const { provider, webSocketProvider, chains } = configureChains(
-  [mainnet, goerli, sepolia],
+  [mainnet, goerli, sepolia, hardhat],
   [publicProvider()]
 );
 
