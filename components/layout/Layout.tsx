@@ -3,11 +3,13 @@ import Link from "next/link";
 import { Box, Center, Flex, HStack, Text } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { FORMAT_VERSION, urls } from "../../constants";
-import { WrongNetworkBanner } from "./WrongNetworkBanner";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 
 const ConnectWallet = dynamic(() => import("../ConnectWallet"), { ssr: false });
+const WrongNetworkBanner = dynamic(() => import("./WrongNetworkBanner"), {
+  ssr: false,
+});
 
 export const Layout = ({ children }: PropsWithChildren) => {
   const { pathname } = useRouter();
