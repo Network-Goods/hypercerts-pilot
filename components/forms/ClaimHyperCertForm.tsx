@@ -20,7 +20,6 @@ import {
   useToast,
   VStack,
 } from "@chakra-ui/react";
-import { MintHypercertArgs } from "../../hooks/mint";
 import * as Yup from "yup";
 import { FORMAT_VERSION } from "../../constants";
 import {
@@ -43,7 +42,6 @@ import { isAddress } from "ethers/lib/utils";
 import {
   validateMetaData,
   validateClaimData,
-  storeMetadata,
   HypercertMetadata,
 } from "@network-goods/hypercerts-sdk";
 import dayjs from "dayjs";
