@@ -1,5 +1,5 @@
 import { useToast } from "@chakra-ui/react";
-import { BigNumber, BigNumberish, Bytes, BytesLike } from "ethers";
+import { BigNumber, BigNumberish, Bytes, BytesLike, ethers } from "ethers";
 import { useParseBlockchainError } from "../utils/parseBlockchainError";
 import { mintInteractionLabels } from "../content/chainInteractions";
 import {

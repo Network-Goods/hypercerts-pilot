@@ -46,7 +46,7 @@ const FindAllowlistProof = ({
 
   //Claim for user
   const claimID =
-    "0xcc08266250930e98256182734913bf1b361020720x900000000000000000000000000000000";
+    "0xcc08266250930e98256182734913bf1b361020720xc00000000000000000000000000000000";
 
   useEffect(() => {
     const _fetchMerkleCID = async (claimID: string) => {
@@ -109,7 +109,12 @@ const FindAllowlistProof = ({
           const proof = tree.getProof(i);
           setMerkleProofs(proof);
           setUnits(Number(v[1]));
-          console.log(`proof `, proof);
+
+          console.log(tree);
+
+          console.log(tree);
+          console.log(`address ${i} `, v[0]);
+          console.log(`proof ${i} `, proof);
         }
       }
     };

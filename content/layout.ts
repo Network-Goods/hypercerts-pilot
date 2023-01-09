@@ -1,6 +1,7 @@
 import { formatAddress } from "../utils/formatting";
 
 export const headerLinkLabels = {
+  airdrop: "Airdrop",
   allowlist: "Allowlist",
   claim: "Claim",
   donate: "Donate",

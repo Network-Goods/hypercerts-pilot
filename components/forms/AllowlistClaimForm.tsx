@@ -119,7 +119,7 @@ export const AllowlistClaimForm = ({
 }) => {
   const toast = useToast();
   const [merkleTree, setMerkleTree] =
-    useState<StandardMerkleTree<(string | number)[]>>();
+    useState<StandardMerkleTree<(string | string)[]>>();
   const [merkleCID, setMerkleCID] = useState<CID>();
   const [units, setUnits] = useState<number>();
 
@@ -133,7 +133,7 @@ export const AllowlistClaimForm = ({
     console.log("Contributors: ", contributors);
     const validEntries = contributors.filter(
       (entry) =>
-        ethers.utils.isAddress(entry.address) && parseInt(entry.fraction, 10)
+        ethers.utils.isAddress(entry.address) && entry.fraction
     );
 
     if (validEntries.length === 0) {
@@ -147,7 +147,7 @@ export const AllowlistClaimForm = ({
     // Entries to arrays
     const mappedEntries = validEntries.map((validEntry) => [
       validEntry.address,
-      parseInt(validEntry.fraction, 10),
+      validEntry.fraction,
     ]);
 
     const sum = validEntries
