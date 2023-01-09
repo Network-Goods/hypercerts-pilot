@@ -10,12 +10,12 @@ export const ImpactScopesAutoComplete = ({
   value,
 }: Pick<AutoCompleteProps, "onChange" | "disabled" | "value">) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { data: impactScopeData, loading: impactScopesLoading } =
+  const { data: impactScopeData, isLoading: impactScopesLoading } =
     useImpactScopes();
   const impactScopeOption: Option[] =
-    impactScopeData?.impactScopes.map((w) => ({
-      label: w.text,
-      value: w.id,
+    impactScopeData?.map((w) => ({
+      label: w,
+      value: w,
     })) || [];
 
   return (

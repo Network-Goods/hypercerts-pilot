@@ -1,15 +1,30 @@
-import { useQuery } from "@apollo/client";
-import { graphql } from "../gql";
-
-const IMPACT_SCOPES_QUERY = graphql(`
-  query getImpactScopes {
-    impactScopes {
-      id
-      text
-    }
-  }
-`);
+import { SHEET_BEST_ENDPOINT } from "../constants";
+import { useQuery } from "@tanstack/react-query";
+import { useToast } from "@chakra-ui/react";
 
 export const useImpactScopes = () => {
-  return useQuery(IMPACT_SCOPES_QUERY);
+  const toast = useToast();
+  const searchParams = new URLSearchParams();
+  searchParams.set("_format", "list");
+
+  const url = `${SHEET_BEST_ENDPOINT}/tabs/ImpactScopes?${searchParams}`;
+  return useQuery(
+    ["sheets", "impactScopes"],
+    () =>
+      fetch(url)
+        .then(async (res) => (await res.json()) as { value: string[] })
+        .then((res) => res.value),
+    {
+      cacheTime: Infinity,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+      keepPreviousData: true,
+      onError: () => {
+        toast({
+          status: "error",
+          description: "Could not fetch ImpactScopes collections",
+        });
+      },
+    }
+  );
 };
