@@ -70,7 +70,7 @@ export const BurnFractionModal = ({
 
   const onClickBurn = async () => {
     setStep("burning");
-    await split(tokenId);
+    await split(tokenId, 0);
   };
 
   const disabled = false;

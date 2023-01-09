@@ -23,4 +23,7 @@ export const burnFractionModal = {
     title: "Burned fraction successfully!",
     confirmButton: "Done",
   },
+  error: {
+    noWalletConnected: 'Connect a wallet before burning hypercerts'
+  }
 };

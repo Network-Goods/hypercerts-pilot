@@ -3,96 +3,56 @@ import type { AppProps } from "next/app";
 import { ChakraProvider } from "@chakra-ui/react";
 import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 
-import { WalletProvider, NetworkConfig } from "@raidguild/quiver";
+import {
+  WagmiConfig,
+  createClient,
+  configureChains,
+  mainnet,
+  goerli,
+} from "wagmi";
+import { publicProvider } from "wagmi/providers/public";
 
 // If using Frame provider
 // @ts-ignore
 import ethProvider from "eth-provider";
 // If using wallet connect
-import WalletConnectProvider from "@walletconnect/web3-provider";
-import { IProviderOptions } from "web3modal";
 import { Layout } from "../components/layout/Layout";
 import Head from "next/head";
-import { DEFAULT_CHAIN_ID } from "../constants";
 import { QueryClient } from "@tanstack/query-core";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { hardhat, sepolia } from "@wagmi/chains";
+import { GRAPH_ENDPOINT } from "../constants";
 
-export const SUPPORTED_NETWORKS: NetworkConfig = {
-  "0x1": {
-    chainId: "0x1",
-    name: "Mainnet",
-    symbol: "ETH",
-    explorer: "https://etherscan.io",
-    rpc: "https://mainnet.infura.io/v3/5cb8eeb2e5ec436aadff9da1e482adac",
-  },
-  "0x4": {
-    chainId: "0x4",
-    name: "Rinkeby",
-    symbol: "ETH",
-    explorer: "https://rinkeby.etherscan.io",
-    rpc: "https://rinkeby.infura.io/v3/5cb8eeb2e5ec436aadff9da1e482adac",
-  },
-  "0x5": {
-    chainId: "0x5",
-    name: "Goerli testnet",
-    symbol: "ETH",
-    explorer: "https://goerli.etherscan.io/",
-    rpc: "https://goerli.infura.io/v3/5cb8eeb2e5ec436aadff9da1e482adac",
-  },
-  "0x7A69": {
-    chainId: "0x7A69",
-    name: "Hardhat",
-    symbol: "ETH",
-    explorer: "http://localhost:1234",
-    rpc: "http://localhost:8545",
-  },
-  "0x89": {
-    chainId: "0x89",
-    name: "Polygon",
-    symbol: "MATIC",
-    explorer: "https://polygonscan.com",
-    rpc: "https://polygon-rpc.com/",
-  },
-  "0x13881": {
-    chainId: "0x13881",
-    name: "Mumbai Testnet",
-    symbol: "MATIC",
-    explorer: "https://mumbai.polygonscan.com",
-    rpc: "https://matic-mumbai.chainstacklabs.com",
-  },
-};
+import "@rainbow-me/rainbowkit/styles.css";
 
-const providerOptions: IProviderOptions = {
-  frame: {
-    package: ethProvider,
-  },
-  walletconnect: {
-    package: WalletConnectProvider,
-    options: {
-      rpc: {
-        1: SUPPORTED_NETWORKS["0x1"].rpc,
-        4: SUPPORTED_NETWORKS["0x4"].rpc,
-        5: SUPPORTED_NETWORKS["0x5"].rpc,
-        31337: SUPPORTED_NETWORKS["0x7A69"].rpc,
-      },
-    },
-  },
-};
-
-const web3modalOptions = {
-  cacheProvider: true,
-  providerOptions,
-  theme: "dark",
-};
+import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import { ContractInteractionModalProvider } from "../components/ContractInteractionModalContext";
 
 const apolloClient = new ApolloClient({
-  uri: "https://api.thegraph.com/subgraphs/name/bitbeckers/hypercerts-goerli",
+  uri: GRAPH_ENDPOINT,
   cache: new InMemoryCache(),
   connectToDevTools: true,
 });
 
 const queryClient = new QueryClient({});
+
+const { provider, webSocketProvider, chains } = configureChains(
+  [mainnet, goerli, sepolia, hardhat],
+  [publicProvider()]
+);
+
+const { connectors } = getDefaultWallets({
+  appName: "Hypercerts Pilot",
+  chains,
+});
+
+const wagmiClient = createClient({
+  autoConnect: true,
+  provider,
+  webSocketProvider,
+  connectors,
+});
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -105,24 +65,18 @@ function MyApp({ Component, pageProps }: AppProps) {
             },
           }}
         >
-          <WalletProvider
-            web3modalOptions={web3modalOptions}
-            networks={SUPPORTED_NETWORKS}
-            // Optional if you want to auto switch the network
-            defaultChainId={DEFAULT_CHAIN_ID}
-            // Optional but useful to handle events.
-            handleModalEvents={(eventName, error) => {
-              console.error(error);
-              console.log(eventName);
-            }}
-          >
-            <Head>
-              <title>HyperCert v0.2</title>
-            </Head>
-            <Layout>
-              <Component {...pageProps} />
-            </Layout>
-          </WalletProvider>
+          <WagmiConfig client={wagmiClient}>
+            <RainbowKitProvider chains={chains}>
+              <ContractInteractionModalProvider>
+                <Head>
+                  <title>HyperCert v0.2</title>
+                </Head>
+                <Layout>
+                  <Component {...pageProps} />
+                </Layout>
+              </ContractInteractionModalProvider>
+            </RainbowKitProvider>
+          </WagmiConfig>
         </ChakraProvider>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>

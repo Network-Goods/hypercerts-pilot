@@ -3,8 +3,8 @@ import {
   Alert,
   AlertIcon,
   AlertTitle,
+  Box,
   Button,
-  Container,
   Divider,
   Flex,
   FormControl,
@@ -12,15 +12,16 @@ import {
   FormHelperText,
   FormLabel,
   HStack,
+  Icon,
   Input,
+  InputGroup,
+  InputRightElement,
   Textarea,
   useToast,
   VStack,
 } from "@chakra-ui/react";
-import { useWallet } from "@raidguild/quiver";
-import { useMintHyperCertificate } from "../../hooks/mint";
 import * as Yup from "yup";
-import { FORMAT_VERSION, urls } from "../../constants";
+import { FORMAT_VERSION } from "../../constants";
 import {
   alerts,
   buttons,
@@ -35,11 +36,19 @@ import { RightsAutoComplete } from "../AutoComplete/RightsAutoComplete";
 import { Option } from "../AutoComplete/AutoComplete";
 import { useRouter } from "next/router";
 import qs from "qs";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import _ from "lodash";
 import { isAddress } from "ethers/lib/utils";
-import { uploadCertificateToIpfs } from "../../utils/ipfsClient";
+import {
+  validateMetaData,
+  validateClaimData,
+  HypercertMetadata,
+} from "@network-goods/hypercerts-sdk";
 import dayjs from "dayjs";
+import { useAccount } from "wagmi";
+import { SVGPreview } from "./SVGPreview";
+import { FiUpload } from "react-icons/fi";
+import exportAsImage from "../../utils/exportRefAsImage";
 
 const nameMinimumLength = 2;
 const nameMaximumLength = 50;
@@ -48,6 +57,10 @@ const descriptionMinimumLength = 20;
 const descriptionMaximumLength = 500;
 
 const defaultFractions = "100";
+
+const getCollectionLogoSrc = () => "/collection_logos/collection_logo.png";
+
+const previewWidth = "580px";
 
 const ValidationSchema = Yup.object().shape({
   name: Yup.string()
@@ -76,9 +89,9 @@ const ValidationSchema = Yup.object().shape({
         return false;
       }
     }),
-  workScopes: Yup.array().min(1),
-  impactScopes: Yup.array().min(1),
-  rights: Yup.array().min(1),
+  workScopes: Yup.array().min(0),
+  impactScopes: Yup.array().min(0),
+  rights: Yup.array().min(0),
   workTimeEnd: Yup.date().when("workTimeStart", (workTimeStart) => {
     return Yup.date().min(workTimeStart, "End date must be after start date");
   }),
@@ -135,19 +148,20 @@ const defaultValues = {
   impactTimeInfinite: false,
 };
 
-const ClaimHypercertPage = () => {
-  const { address, isConnected } = useWallet();
+const ClaimHypercertForm = ({
+  onSubmit,
+  units,
+  disabled: disabledProp,
+}: {
+  onSubmit: (args: {
+    metaData: HypercertMetadata;
+    fractions: number[];
+  }) => void;
+  units?: number;
+  disabled?: boolean;
+}) => {
+  const { address, isConnected } = useAccount();
   const { push } = useRouter();
-  const mintHyperCertificate = useMintHyperCertificate({
-    onComplete: async () => {
-      await push({
-        pathname: urls.myHypercerts.href,
-        query: {
-          withPolling: true,
-        },
-      });
-    },
-  });
   const toast = useToast();
   const [currentQuery, setCurrentQuery] = useState<string | undefined>(() =>
     window.location.search.replace("?", "")
@@ -159,6 +173,30 @@ const ClaimHypercertPage = () => {
     }
   }, [currentQuery]);
 
+  const fileUploadRef = useRef<HTMLInputElement | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string>();
+  useEffect(() => {
+    // create the preview
+    if (selectedFile) {
+      const objectUrl = URL.createObjectURL(selectedFile);
+      setPreview(objectUrl);
+
+      // free memory when ever this component is unmounted
+      return () => URL.revokeObjectURL(objectUrl);
+    }
+  }, [selectedFile]);
+
+  const onSelectFile = (e: ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) {
+      setSelectedFile(null);
+      return;
+    }
+
+    // I've kept this example simple by using the first image instead of multiple
+    setSelectedFile(e.target.files[0]);
+  };
+
   const updateQueryString = (values: Record<string, unknown>) => {
     const filteredValues = _.pickBy(values);
     const formattedQueryString = qs.stringify(filteredValues);
@@ -169,20 +207,38 @@ const ClaimHypercertPage = () => {
 
   const query = currentQuery !== undefined ? qs.parse(currentQuery) : {};
 
+  const previewRef = useRef<HTMLDivElement | null>(null);
+
+  const saveImageFromPreview = useCallback(async () => {
+    if (!previewRef?.current) {
+      throw new Error("No preview ref found, aborting");
+    }
+    return await exportAsImage(previewRef.current);
+  }, [previewRef]);
+
+  const _initialValues = units
+    ? {
+        ...defaultValues,
+        ...query,
+        fractions: units.toString(),
+      }
+    : {
+        ...defaultValues,
+        ...query,
+      };
+
   return (
-    <Container>
+    <Box overflow="hidden">
       <Formik
         validationSchema={ValidationSchema}
         validateOnMount={true}
         validate={(values) => {
           updateQueryString(values);
         }}
-        initialValues={{
-          ...defaultValues,
-          ...query,
-        }}
+        initialValues={_initialValues}
         enableReinitialize
         onSubmit={async (val) => {
+          const image = await saveImageFromPreview();
           window.scrollTo({ top: 0, behavior: "smooth" });
           /**
            * Steps:
@@ -201,40 +257,6 @@ const ClaimHypercertPage = () => {
           const contributorAddresses = contributorNamesAndAddresses.filter(
             (x) => isAddress(x)
           );
-
-          // Upload certificate metadata to ipfs
-          let certificateMetadataIpfsUrl: string | undefined;
-          toast({
-            description: toastMessages.metadataUploadStart,
-            status: "info",
-          });
-          try {
-            const metaData = {
-              name: val.name,
-              description: val.description,
-              contributor_names: contributorNames,
-              external_url: val.external_link,
-              format_version: FORMAT_VERSION,
-              prev_hypercert: val.prev_hypercert,
-              refs: [],
-            };
-            const certificateIpfsMetadata = await uploadCertificateToIpfs(
-              metaData
-            );
-            certificateMetadataIpfsUrl = certificateIpfsMetadata.url;
-            toast({
-              description: toastMessages.metadataUploadSuccess(
-                certificateMetadataIpfsUrl!
-              ),
-              status: "success",
-            });
-          } catch (error) {
-            toast({
-              description: toastMessages.metadataUploadError,
-              status: "error",
-            });
-            console.error(error);
-          }
 
           // Mint certificate using contract
           const workTimeStart = val.workTimeStart
@@ -256,18 +278,40 @@ const ClaimHypercertPage = () => {
               description: toastMessages.mintingStart,
               status: "info",
             });
-            await mintHyperCertificate({
+            const fractions = val.fractions
+              .split(",")
+              .map((x) => parseInt(x, 10));
+            const claimData = {
               contributors: _.uniq([address!, ...contributorAddresses]),
-              workTime: [workTimeStart, workTimeEnd],
-              impactTime: [impactTimeStart, impactTimeEnd],
-              uri: certificateMetadataIpfsUrl!,
-              workScopeIds: val.workScopes.map((s) => s.value),
-              impactScopeIds: val.impactScopes.map((option) => option.value),
+              workTimeframe: [workTimeStart, workTimeEnd],
+              impactTimeframe: [impactTimeStart, impactTimeEnd],
+              workScopes: val.workScopes[0]?.label || "",
+              impactScopes: val.impactScopes[0]?.value || "",
               rightsIds: val.rights.map((right) => right.value),
-              name: val.name,
-              description: val.description,
-              fractions: val.fractions.split(",").map((x) => parseInt(x, 10)),
-            });
+            };
+            const claimDataIsValid = validateClaimData(claimData);
+            if (claimDataIsValid) {
+              toast({
+                description:
+                  "Validation successful, uploading metadata to IPFS",
+                status: "success",
+              });
+              const metaData = {
+                name: val.name,
+                description: val.description,
+                image,
+                properties: claimData,
+              };
+
+              const metaDataIsValid = validateMetaData(metaData);
+
+              if (metaDataIsValid) {
+                onSubmit({
+                  metaData,
+                  fractions,
+                });
+              }
+            }
           } catch (error) {
             toast({
               description: toastMessages.mintingError,
@@ -286,299 +330,352 @@ const ClaimHypercertPage = () => {
           isSubmitting,
           setFieldValue,
         }) => {
-          const disabled = isSubmitting || !isConnected;
+          const disabled = disabledProp || isSubmitting || !isConnected;
           return (
-            <>
-              {isSubmitting && (
-                <Alert status="info" my={4}>
-                  <AlertIcon />
-                  <AlertTitle>{alerts.wait}</AlertTitle>
-                </Alert>
-              )}
-              <form onSubmit={handleSubmit}>
-                <VStack spacing={3}>
-                  <FormControl isRequired>
-                    <Flex>
-                      <FormLabel>{labels.name}</FormLabel>
-                      <ErrorMessage name="name" render={displayError} />
-                    </Flex>
-                    <Input
-                      type="text"
-                      name="name"
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      value={values.name}
-                      placeholder={placeholders.name}
-                      disabled={disabled}
-                    />
-                    <FormHelperText>
-                      {helperTexts.minMaxLength(
-                        values.name.length,
-                        nameMinimumLength,
-                        nameMaximumLength
-                      )}
-                    </FormHelperText>
-                  </FormControl>
-                  <FormControl isRequired>
-                    <Flex>
-                      <FormLabel>{labels.description}</FormLabel>
-                      <ErrorMessage name="description" render={displayError} />
-                    </Flex>
-                    <Textarea
-                      name="description"
-                      value={values.description}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      placeholder={placeholders.description}
-                      size="sm"
-                      disabled={disabled}
-                    />
-                    <FormHelperText>
-                      {helperTexts.minMaxLength(
-                        values.description.length,
-                        descriptionMinimumLength,
-                        descriptionMaximumLength
-                      )}
-                    </FormHelperText>
-                  </FormControl>
-                  <FormControl isRequired>
-                    <Flex>
-                      <FormLabel>{labels.contributors}</FormLabel>
-                    </Flex>
-                    <Textarea
-                      name="contributors"
-                      value={values.contributors}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      placeholder={placeholders.description}
-                      size="sm"
-                      disabled={disabled}
-                    />
-                    <FormHelperText>{helperTexts.contributors}</FormHelperText>
-                  </FormControl>
-                  <FormControl isRequired>
-                    <Flex>
-                      <FormLabel>{labels.externalLink}</FormLabel>
-                      <ErrorMessage
-                        name="external_link"
-                        render={displayError}
-                      />
-                    </Flex>
-                    <Input
-                      type="text"
-                      name="external_link"
-                      onChange={handleChange}
-                      onBlur={(e) => {
-                        if (
-                          e.target.value &&
-                          !e.target.value.match(/^(https|http|ftp|ipfs):\/\//)
-                        ) {
-                          setFieldValue(
-                            "external_link",
-                            "https://" + e.target.value
-                          );
-                        }
-                        handleBlur(e);
-                      }}
-                      value={values.external_link}
-                      placeholder={placeholders.external_link}
-                      disabled={disabled}
-                    />
-                  </FormControl>
-                  <FormControl isRequired>
-                    <Flex>
-                      <FormLabel>{labels.fractions}</FormLabel>
-                      <ErrorMessage name="fractions" render={displayError} />
-                    </Flex>
-                    <Alert status="info" borderRadius="md" mb={3}>
-                      <AlertIcon />
-                      <AlertTitle>{helperTexts.fractions}</AlertTitle>
-                    </Alert>
-                    <Input
-                      type="text"
-                      name="fractions"
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      value={values.fractions}
-                      placeholder={placeholders.external_link}
-                      disabled={disabled}
-                    />
-                  </FormControl>
-                </VStack>
-                <Divider my={3} />
-                <HStack>
-                  <FormControl isRequired>
-                    <FormLabel>{placeholders.workTimeStartLabel}</FormLabel>
-                    <Input
-                      type="date"
-                      name="workTimeStart"
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      value={values.workTimeStart}
-                      disabled={disabled}
-                    />
-                  </FormControl>
-                  <FormControl isRequired>
-                    <Flex>
-                      <FormLabel>{placeholders.workTimeEndLabel}</FormLabel>
-                    </Flex>
-
-                    <Input
-                      type="date"
-                      name="workTimeEnd"
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      value={values.workTimeEnd}
-                      disabled={disabled}
-                    />
-                  </FormControl>
-                </HStack>
-                <FormControl
-                  isInvalid={!!(errors.workTimeStart || errors.workTimeEnd)}
-                >
-                  {!errors.workTimeStart && !errors.workTimeEnd ? (
-                    <FormHelperText>
-                      {placeholders.workTimeDescription}
-                    </FormHelperText>
-                  ) : (
-                    <FormErrorMessage>
-                      {errors.workTimeStart || errors.workTimeEnd}
-                    </FormErrorMessage>
-                  )}
-                </FormControl>
-                <Divider my={3} />
-                <HStack>
-                  <FormControl isRequired>
-                    <FormLabel>{placeholders.impactTimeStartLabel}</FormLabel>
-                    <Input
-                      type="date"
-                      name="impactTimeStart"
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      value={values.impactTimeStart}
-                      disabled={disabled}
-                    />
-                  </FormControl>
-                  <FormControl isRequired>
-                    <FormLabel>{placeholders.impactTimeEndLabel}</FormLabel>
-                    <Flex>
+            <Flex>
+              <Box maxWidth={`calc(100vw - ${previewWidth})`} p={4} px={8}>
+                {isSubmitting && (
+                  <Alert status="info" my={4}>
+                    <AlertIcon />
+                    <AlertTitle>{alerts.wait}</AlertTitle>
+                  </Alert>
+                )}
+                <form onSubmit={handleSubmit}>
+                  <VStack spacing={3}>
+                    <FormControl isRequired>
+                      <Flex>
+                        <FormLabel>{labels.name}</FormLabel>
+                        <ErrorMessage name="name" render={displayError} />
+                      </Flex>
                       <Input
-                        type="date"
-                        name="impactTimeEnd"
+                        type="text"
+                        name="name"
                         onChange={handleChange}
                         onBlur={handleBlur}
-                        value={values.impactTimeEnd}
-                        disabled={disabled || !!values.impactTimeInfinite}
-                      />
-                      <Button
-                        onClick={() =>
-                          setFieldValue(
-                            "impactTimeInfinite",
-                            !values.impactTimeInfinite
-                          )
-                        }
-                        ml={2}
-                        colorScheme="green"
-                        variant={values.impactTimeInfinite ? "solid" : "ghost"}
-                        fontSize="24px"
+                        value={values.name}
+                        placeholder={placeholders.name}
                         disabled={disabled}
-                      >
-                        &infin;
-                      </Button>
-                    </Flex>
+                      />
+                      <FormHelperText>
+                        {helperTexts.minMaxLength(
+                          values.name.length,
+                          nameMinimumLength,
+                          nameMaximumLength
+                        )}
+                      </FormHelperText>
+                    </FormControl>
+                    <FormControl isRequired>
+                      <Flex>
+                        <FormLabel>{labels.description}</FormLabel>
+                        <ErrorMessage
+                          name="description"
+                          render={displayError}
+                        />
+                      </Flex>
+                      <Textarea
+                        name="description"
+                        value={values.description}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        placeholder={placeholders.description}
+                        size="sm"
+                        disabled={disabled}
+                      />
+                      <FormHelperText>
+                        {helperTexts.minMaxLength(
+                          values.description.length,
+                          descriptionMinimumLength,
+                          descriptionMaximumLength
+                        )}
+                      </FormHelperText>
+                    </FormControl>
+                    <FormControl>
+                      <Flex>
+                        <InputGroup
+                          onClick={() => fileUploadRef.current?.click()}
+                        >
+                          <Input
+                            type="text"
+                            value={selectedFile?.name || ""}
+                            readOnly
+                          />
+                          <InputRightElement>
+                            <Icon as={FiUpload} color="green.500" />
+                          </InputRightElement>
+                        </InputGroup>
+                        <Input
+                          ref={fileUploadRef}
+                          display="none"
+                          onChange={(e) => onSelectFile(e)}
+                          type="file"
+                          accept="image/*"
+                        />
+                      </Flex>
+                    </FormControl>
+                    <FormControl isRequired>
+                      <Flex>
+                        <FormLabel>{labels.contributors}</FormLabel>
+                      </Flex>
+                      <Textarea
+                        name="contributors"
+                        value={values.contributors}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        placeholder={placeholders.description}
+                        size="sm"
+                        disabled={disabled}
+                      />
+                      <FormHelperText>
+                        {helperTexts.contributors}
+                      </FormHelperText>
+                    </FormControl>
+                    <FormControl isRequired>
+                      <Flex>
+                        <FormLabel>{labels.externalLink}</FormLabel>
+                        <ErrorMessage
+                          name="external_link"
+                          render={displayError}
+                        />
+                      </Flex>
+                      <Input
+                        type="text"
+                        name="external_link"
+                        onChange={handleChange}
+                        onBlur={(e) => {
+                          if (
+                            e.target.value &&
+                            !e.target.value.match(/^(https|http|ftp|ipfs):\/\//)
+                          ) {
+                            setFieldValue(
+                              "external_link",
+                              "https://" + e.target.value
+                            );
+                          }
+                          handleBlur(e);
+                        }}
+                        value={values.external_link}
+                        placeholder={placeholders.external_link}
+                        disabled={disabled}
+                      />
+                    </FormControl>
+                    <FormControl isRequired>
+                      <Flex>
+                        <FormLabel>{labels.fractions}</FormLabel>
+                        <ErrorMessage name="fractions" render={displayError} />
+                      </Flex>
+                      <Alert status="info" borderRadius="md" mb={3}>
+                        <AlertIcon />
+                        <AlertTitle>{helperTexts.fractions}</AlertTitle>
+                      </Alert>
+                      <Input
+                        type="text"
+                        name="fractions"
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        value={values.fractions}
+                        placeholder={
+                          units ? units.toString() : placeholders.fractions
+                        }
+                        isReadOnly={units !== undefined}
+                        disabled={disabled}
+                      />
+                    </FormControl>
+                  </VStack>
+                  <Divider my={3} />
+                  <HStack>
+                    <FormControl isRequired>
+                      <FormLabel>{placeholders.workTimeStartLabel}</FormLabel>
+                      <Input
+                        type="date"
+                        name="workTimeStart"
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        value={values.workTimeStart}
+                        disabled={disabled}
+                      />
+                    </FormControl>
+                    <FormControl isRequired>
+                      <Flex>
+                        <FormLabel>{placeholders.workTimeEndLabel}</FormLabel>
+                      </Flex>
+
+                      <Input
+                        type="date"
+                        name="workTimeEnd"
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        value={values.workTimeEnd}
+                        disabled={disabled}
+                      />
+                    </FormControl>
+                  </HStack>
+                  <FormControl
+                    isInvalid={!!(errors.workTimeStart || errors.workTimeEnd)}
+                  >
+                    {!errors.workTimeStart && !errors.workTimeEnd ? (
+                      <FormHelperText>
+                        {placeholders.workTimeDescription}
+                      </FormHelperText>
+                    ) : (
+                      <FormErrorMessage>
+                        {errors.workTimeStart || errors.workTimeEnd}
+                      </FormErrorMessage>
+                    )}
                   </FormControl>
-                </HStack>
-                <FormControl
-                  isInvalid={!!(errors.impactTimeStart || errors.impactTimeEnd)}
-                >
-                  {!errors.impactTimeStart && !errors.impactTimeEnd ? (
+                  <Divider my={3} />
+                  <HStack>
+                    <FormControl isRequired>
+                      <FormLabel>{placeholders.impactTimeStartLabel}</FormLabel>
+                      <Input
+                        type="date"
+                        name="impactTimeStart"
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        value={values.impactTimeStart}
+                        disabled={disabled}
+                      />
+                    </FormControl>
+                    <FormControl isRequired>
+                      <FormLabel>{placeholders.impactTimeEndLabel}</FormLabel>
+                      <Flex>
+                        <Input
+                          type="date"
+                          name="impactTimeEnd"
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          value={values.impactTimeEnd}
+                          disabled={disabled || !!values.impactTimeInfinite}
+                        />
+                        <Button
+                          onClick={() =>
+                            setFieldValue(
+                              "impactTimeInfinite",
+                              !values.impactTimeInfinite
+                            )
+                          }
+                          ml={2}
+                          colorScheme="green"
+                          variant={
+                            values.impactTimeInfinite ? "solid" : "ghost"
+                          }
+                          fontSize="24px"
+                          disabled={disabled}
+                        >
+                          &infin;
+                        </Button>
+                      </Flex>
+                    </FormControl>
+                  </HStack>
+                  <FormControl
+                    isInvalid={
+                      !!(errors.impactTimeStart || errors.impactTimeEnd)
+                    }
+                  >
+                    {!errors.impactTimeStart && !errors.impactTimeEnd ? (
+                      <FormHelperText>
+                        {placeholders.impactTimeDescription}
+                      </FormHelperText>
+                    ) : (
+                      <FormErrorMessage>
+                        {errors.impactTimeStart || errors.impactTimeEnd}
+                      </FormErrorMessage>
+                    )}
+                  </FormControl>
+                  <Divider my={3} />
+                  <FormControl>
+                    <Flex>
+                      <FormLabel>{placeholders.workScopesLabel}</FormLabel>
+                      <ErrorMessage name="workScopes" render={displayError} />
+                    </Flex>
+                    <Field name="workScopes">
+                      {({ form }: FieldProps) => (
+                        <WorkScopesAutoComplete
+                          value={values.workScopes}
+                          disabled={disabled}
+                          onChange={(workScopes) =>
+                            form.setFieldValue("workScopes", workScopes)
+                          }
+                        />
+                      )}
+                    </Field>
                     <FormHelperText>
-                      {placeholders.impactTimeDescription}
+                      {placeholders.workScopesDescription}
                     </FormHelperText>
-                  ) : (
-                    <FormErrorMessage>
-                      {errors.impactTimeStart || errors.impactTimeEnd}
-                    </FormErrorMessage>
-                  )}
-                </FormControl>
-                <Divider my={3} />
-                <FormControl isRequired>
-                  <Flex>
-                    <FormLabel>{placeholders.workScopesLabel}</FormLabel>
-                    <ErrorMessage name="workScopes" render={displayError} />
-                  </Flex>
-                  <Field name="workScopes">
-                    {({ form }: FieldProps) => (
-                      <WorkScopesAutoComplete
-                        value={values.workScopes}
-                        disabled={disabled}
-                        onChange={(workScopes) =>
-                          form.setFieldValue("workScopes", workScopes)
-                        }
-                      />
-                    )}
-                  </Field>
-                  <FormHelperText>
-                    {placeholders.workScopesDescription}
-                  </FormHelperText>
-                </FormControl>
-                <Divider my={3} />
-                <FormControl isRequired>
-                  <Flex>
-                    <FormLabel>{placeholders.impactScopesLabel}</FormLabel>
-                    <ErrorMessage name="impactScopes" render={displayError} />
-                  </Flex>
-                  <Field name="impactScopes">
-                    {({ form }: FieldProps) => (
-                      <ImpactScopesAutoComplete
-                        value={values.impactScopes}
-                        disabled={disabled}
-                        onChange={(impactScopes) =>
-                          form.setFieldValue("impactScopes", impactScopes)
-                        }
-                      />
-                    )}
-                  </Field>
-                  <FormHelperText>
-                    {placeholders.impactScopesDescription}
-                  </FormHelperText>
-                </FormControl>
-                <Divider my={3} />
-                <FormControl isRequired>
-                  <Flex>
-                    <FormLabel>{placeholders.rightsLabel}</FormLabel>
-                    <ErrorMessage name="rights" render={displayError} />
-                  </Flex>
-                  <Field name="rights">
-                    {({ form }: FieldProps) => (
-                      <RightsAutoComplete
-                        value={values.rights}
-                        disabled={disabled}
-                        onChange={(rights) =>
-                          form.setFieldValue("rights", rights)
-                        }
-                      />
-                    )}
-                  </Field>
-                  <FormHelperText>
-                    {placeholders.rightsDescription}
-                  </FormHelperText>
-                </FormControl>
-                <Divider my={3} />
-                <Button
-                  width="100%"
-                  type="submit"
-                  disabled={!isValid || disabled}
-                  colorScheme="green"
-                >
-                  {buttons.submit}
-                </Button>
-              </form>
-            </>
+                  </FormControl>
+                  <Divider my={3} />
+                  <FormControl>
+                    <Flex>
+                      <FormLabel>{placeholders.impactScopesLabel}</FormLabel>
+                      <ErrorMessage name="impactScopes" render={displayError} />
+                    </Flex>
+                    <Field name="impactScopes">
+                      {({ form }: FieldProps) => (
+                        <ImpactScopesAutoComplete
+                          value={values.impactScopes}
+                          disabled={disabled}
+                          onChange={(impactScopes) =>
+                            form.setFieldValue("impactScopes", impactScopes)
+                          }
+                        />
+                      )}
+                    </Field>
+                    <FormHelperText>
+                      {placeholders.impactScopesDescription}
+                    </FormHelperText>
+                  </FormControl>
+                  <Divider my={3} />
+                  <FormControl>
+                    <Flex>
+                      <FormLabel>{placeholders.rightsLabel}</FormLabel>
+                      <ErrorMessage name="rights" render={displayError} />
+                    </Flex>
+                    <Field name="rights">
+                      {({ form }: FieldProps) => (
+                        <RightsAutoComplete
+                          value={values.rights}
+                          disabled={disabled}
+                          onChange={(rights) =>
+                            form.setFieldValue("rights", rights)
+                          }
+                        />
+                      )}
+                    </Field>
+                    <FormHelperText>
+                      {placeholders.rightsDescription}
+                    </FormHelperText>
+                  </FormControl>
+                  <Divider my={3} />
+                  <Button
+                    width="100%"
+                    type="submit"
+                    disabled={!isValid || disabled}
+                    colorScheme="green"
+                  >
+                    {buttons.submit}
+                  </Button>
+                </form>
+              </Box>
+              <Box width={previewWidth}>
+                <Box top="120px" right="16px">
+                  <SVGPreview
+                    imageRef={previewRef}
+                    name={values.name}
+                    imageSrc={preview}
+                    impactScopeLabel={values.impactScopes
+                      .map((x) => x.label)
+                      .join(", ")}
+                    workScopeLabels={values.workScopes.map((x) => x.label)}
+                    workTimeStart={values.workTimeStart}
+                    workTimeEnd={values.workTimeEnd}
+                    collectionLogoSrc={getCollectionLogoSrc()}
+                  />
+                </Box>
+              </Box>
+            </Flex>
           );
         }}
       </Formik>
-    </Container>
+    </Box>
   );
 };
 
@@ -586,4 +683,4 @@ const displayError = (message: string) => (
   <span style={{ color: "red" }}>- {message}</span>
 );
 
-export default ClaimHypercertPage;
+export default ClaimHypercertForm;

@@ -1,63 +1,57 @@
-import { useToast } from "@chakra-ui/react";
-import { BigNumber, BigNumberish, Bytes, BytesLike, ethers } from "ethers";
+import { BigNumber, BigNumberish } from "ethers";
+import { useContractModal } from "../components/ContractInteractionModalContext";
 import { useParseBlockchainError } from "../utils/parseBlockchainError";
-import { mintInteractionLabels } from "../content/chainInteractions";
+import { useToast } from "@chakra-ui/react";
 import {
   useContractWrite,
   usePrepareContractWrite,
   useWaitForTransaction,
 } from "wagmi";
+import { CONTRACT_ADDRESS } from "../constants";
 import {
+  HypercertMetadata,
   HyperCertMinterFactory,
   storeMetadata,
 } from "@network-goods/hypercerts-sdk";
-import { CONTRACT_ADDRESS } from "../constants";
+import { mintInteractionLabels } from "../content/chainInteractions";
 import { useEffect, useState } from "react";
-import { formatBytes32String, parseBytes32String } from "ethers/lib/utils";
-import { useContractModal } from "../components/ContractInteractionModalContext";
 import { client } from "../utils/ipfsClient";
-import _ from "lodash";
-import { HyperCertMetadata } from "../contract-types";
 
-export interface MintHypercertArgs {
-  units: BigNumberish;
-  uri: string;
-}
-
-export interface MintHypercertWithAllowlistArgs {
-  units: BigNumberish;
-  merkleRoot: string;
-  uri: string;
-}
-
-export interface MintHypercertAllowlistEntryArgs {
-  proof: string[];
-  claimID: BigNumberish;
-  units: BigNumberish;
-}
-
-export const useMintHyperCertificateAllowlistEntry = ({
+export const useMintClaimAllowlist = ({
   onComplete,
-  args,
   enabled,
 }: {
   onComplete?: () => void;
-  args: MintHypercertAllowlistEntryArgs;
   enabled: boolean;
 }) => {
-  const [step, setStep] = useState<
-    "initial" | "preparing" | "writing" | "awaiting" | "complete"
-  >("initial");
+  const [cidUri, setCidUri] = useState<string>();
+  const [units, setUnits] = useState<number>();
+  const [merkleRoot, setMerkleRoot] = useState<`0x{string}`>();
+
+  const stepDescriptions = {
+    uploading: "Uploading metadata to ipfs",
+    writing: "Minting hypercert on-chain",
+    complete: "Done minting",
+  };
+
+  const { setStep, showModal } = useContractModal();
   const parseBlockchainError = useParseBlockchainError();
   const toast = useToast();
 
-  console.log("args: ", args);
-  console.log(
-    args.proof,
-    args.proof.map((p) => parseBytes32String(p))
-  );
+  const initializeWrite = async (
+    metaData: HypercertMetadata,
+    units: number,
+    merkleRoot: `0x{string}`
+  ) => {
+    if (enabled) {
+      setUnits(units);
+      setStep("uploading");
+      const cid = await storeMetadata(metaData, client);
+      setCidUri(cid);
+      setMerkleRoot(merkleRoot);
+    }
+  };
 
-  const parseError = useParseBlockchainError();
   const {
     config,
     error: prepareError,
@@ -66,15 +60,11 @@ export const useMintHyperCertificateAllowlistEntry = ({
     isSuccess: isReadyToWrite,
   } = usePrepareContractWrite({
     address: CONTRACT_ADDRESS,
-    args: [
-      args.proof as `0x{string}`[],
-      BigNumber.from(args.claimID),
-      BigNumber.from(args.units),
-    ],
+    args: [BigNumber.from(units || 0), merkleRoot!, cidUri!],
     abi: HyperCertMinterFactory.abi,
-    functionName: "mintClaimFromAllowlist",
+    functionName: "createAllowlist",
     onError: (error) => {
-      parseError(error, "the fallback");
+      parseBlockchainError(error, "the fallback");
       toast({
         description: parseBlockchainError(
           error,
@@ -92,7 +82,7 @@ export const useMintHyperCertificateAllowlistEntry = ({
       });
       setStep("writing");
     },
-    enabled,
+    enabled: !!cidUri && units !== undefined && merkleRoot !== undefined,
   });
 
   const {
@@ -100,10 +90,8 @@ export const useMintHyperCertificateAllowlistEntry = ({
     error: writeError,
     isError: isWriteError,
     isLoading: isLoadingContractWrite,
-    status,
     writeAsync,
   } = useContractWrite(config);
-  console.log(status);
 
   const {
     isLoading: isLoadingWaitForTransaction,
@@ -121,11 +109,24 @@ export const useMintHyperCertificateAllowlistEntry = ({
     },
   });
 
+  useEffect(() => {
+    const perform = async () => {
+      if (isReadyToWrite && writeAsync) {
+        await writeAsync();
+      }
+    };
+    perform();
+  }, [isReadyToWrite]);
+
   return {
-    write: async () => {
+    write: async (
+      metaData: HypercertMetadata,
+      units: number,
+      merkleRoot: `0x{string}`
+    ) => {
+      showModal({ stepDescriptions });
       setStep("preparing");
-      console.log("Started writing");
-      await writeAsync?.();
+      await initializeWrite(metaData, units, merkleRoot);
     },
     isLoading:
       isLoadingPrepareContractWrite ||
@@ -133,7 +134,6 @@ export const useMintHyperCertificateAllowlistEntry = ({
       isLoadingWaitForTransaction,
     isError: isPrepareError || isWriteError || isWaitError,
     error: prepareError || writeError || waitError,
-    step,
     isReadyToWrite,
   };
 };

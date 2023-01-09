@@ -10,10 +10,9 @@ export const WorkScopesAutoComplete = ({
   value,
 }: Pick<AutoCompleteProps, "onChange" | "disabled" | "value">) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { data: workscopeData, loading: workscopesLoading } = useWorkScopes();
+  const { data: workScopeData, isLoading: workScopesLoading } = useWorkScopes();
   const workscopeOptions: Option[] =
-    workscopeData?.workScopes.map((w) => ({ label: w.text, value: w.id })) ||
-    [];
+    workScopeData?.map((w) => ({ label: w, value: w })) || [];
 
   return (
     <>
@@ -22,7 +21,7 @@ export const WorkScopesAutoComplete = ({
         options={workscopeOptions}
         onChange={onChange}
         onOpenAddModal={onOpen}
-        loading={workscopesLoading}
+        loading={workScopesLoading}
         placeholder={placeholders.workScopes}
         instanceId="work-scopes-autocomplete"
         disabled={disabled}

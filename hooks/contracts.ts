@@ -1,18 +1,19 @@
-import { useTypedContract } from "@raidguild/quiver";
-import { HyperCertMinter__factory } from "../contract-types";
-import { CONTRACT_ADDRESS, DEFAULT_CHAIN_ID } from "../constants";
+import { CONTRACT_ADDRESS } from "../constants";
+import { HypercertMinterABI } from "@network-goods/hypercerts-sdk";
+import { useContract, useProvider } from "wagmi";
 
 export const useHypercertContract = () => {
-  const { contract } = useTypedContract(
-    CONTRACT_ADDRESS,
-    HyperCertMinter__factory,
-    {
-      staticProvider: {
-        enable: true,
-        chainId: DEFAULT_CHAIN_ID,
-      },
-    }
-  );
-
-  return contract;
+  const provider = useProvider();
+  return useContract({
+    address: CONTRACT_ADDRESS,
+    abi: HypercertMinterABI,
+    signerOrProvider: provider,
+    // signerOrProvider: {
+    //
+    // }
+    // staticProvider: {
+    //   enable: true,
+    //   chainId: DEFAULT_CHAIN_ID,
+    // },
+  });
 };

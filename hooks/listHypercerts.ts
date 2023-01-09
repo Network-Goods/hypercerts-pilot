@@ -1,25 +1,23 @@
+import { firstClaims } from "@network-goods/hypercerts-sdk";
 import { useQuery } from "@apollo/client";
+import { useQuery as useReactQuery } from "@tanstack/react-query";
 import { graphql } from "../gql";
 
-const GET_ALL_CERTIFICATES_QUERY = graphql(`
-  query GetAllHypercerts {
-    hypercerts {
-      id
-      claimHash
-      minter
-      uri
-      fractions {
-        id
-      }
-      contributors {
-        id
-      }
-    }
-  }
-`);
+export type QueryResult<T> = {
+  data: T;
+};
 
-export const useListAllHypercerts = () => {
-  return useQuery(GET_ALL_CERTIFICATES_QUERY);
+export interface Claim {
+  id: string;
+  owner?: string;
+  totalUnits?: string;
+  uri: string | null;
+  contract?: string;
+  creator?: string;
+}
+
+export const useListFirstClaims = () => {
+  return useReactQuery(["firstClaims"], () => firstClaims(10));
 };
 
 export const useGetAllHypercertsMintedBy = (address: string) => {

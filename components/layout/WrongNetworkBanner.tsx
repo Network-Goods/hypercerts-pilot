@@ -1,15 +1,17 @@
 import { Flex } from "@chakra-ui/react";
-import { useWallet } from "@raidguild/quiver";
-import { SUPPORTED_NETWORKS } from "../../pages/_app";
 import { DEFAULT_CHAIN_ID } from "../../constants";
+import { useNetwork } from "wagmi";
 
 export const WrongNetworkBanner = () => {
-  const { chainId } = useWallet();
+  const { chain, chains } = useNetwork();
+  const chainId = chain?.id?.toString();
 
-  const isWrongNetwork = chainId !== undefined && chainId !== DEFAULT_CHAIN_ID;
-  const desiredNetwork = SUPPORTED_NETWORKS[DEFAULT_CHAIN_ID]?.name;
+  const isWrongNetwork = chainId !== DEFAULT_CHAIN_ID;
+  const desiredNetwork = chains.find(
+    (c) => c.id.toString() === DEFAULT_CHAIN_ID
+  );
 
-  if (!isWrongNetwork) {
+  if (!chainId || !isWrongNetwork) {
     return null;
   }
 
@@ -22,9 +24,16 @@ export const WrongNetworkBanner = () => {
       textAlign="center"
       py={2}
     >
-      Seems like you are on the wrong network.
-      <br />
-      Please switch to {desiredNetwork} to use the HyperCerts app
+      <>
+        Seems like you are on the wrong network.
+        <br />
+        {!desiredNetwork?.id && "Network provider not specified"}
+        {desiredNetwork?.id && (
+          <>Please switch to {desiredNetwork.id} to use the HyperCerts app</>
+        )}
+      </>
     </Flex>
   );
 };
+
+export default WrongNetworkBanner;

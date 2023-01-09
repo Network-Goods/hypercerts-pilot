@@ -18,6 +18,11 @@ export const CONTRACT_ADDRESS = requireEnv(
   "NEXT_PUBLIC_CONTRACT_ADDRESS"
 );
 
+export const GRAPH_ENDPOINT = requireEnv(
+  process.env.NEXT_PUBLIC_GRAPH_ENDPOINT,
+  "NEXT_PUBLIC_GRAPH_ENDPOINT"
+);
+
 export const urls = {
   browse: {
     label: headerLinkLabels.browse,
@@ -27,11 +32,16 @@ export const urls = {
   claim: {
     label: headerLinkLabels.claim,
     href: "/claim-hypercert",
-    showOnlyWhenConnected: true,
+    showOnlyWhenConnected: false,
   },
-  myHypercerts: {
-    label: headerLinkLabels.myHypercerts,
-    href: "/my-hypercerts",
-    showOnlyWhenConnected: true,
+  allowlist: {
+    label: headerLinkLabels.allowlist,
+    href: "/claim-allowlist-hypercert",
+    showOnlyWhenConnected: false,
   },
+  // myHypercerts: {
+  //   label: headerLinkLabels.myHypercerts,
+  //   href: "/my-hypercerts",
+  //   showOnlyWhenConnected: false,
+  // },
 };

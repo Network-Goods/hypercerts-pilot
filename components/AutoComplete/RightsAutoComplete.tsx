@@ -10,9 +10,9 @@ export const RightsAutoComplete = ({
   value,
 }: Pick<AutoCompleteProps, "onChange" | "disabled" | "value">) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { data: rightsData, loading: rightsLoading } = useRights();
+  const { data: rightsData, isLoading: rightsLoading } = useRights();
   const rightsOptions: Option[] =
-    rightsData?.rights.map((w) => ({ label: w.text, value: w.id })) || [];
+    rightsData?.map((w) => ({ label: w, value: w })) || [];
 
   return (
     <>

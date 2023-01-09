@@ -12,48 +12,55 @@ import {
   Spinner,
   useToast,
 } from "@chakra-ui/react";
-import { useHypercertContract } from "../../hooks/contracts";
-import { useWriteContract } from "@raidguild/quiver";
+// import { useHypercertContract } from "../../hooks/contracts";
+// import { useWriteContract } from "@raidguild/quiver";
 import { useState } from "react";
 import { addImpactScopeModal } from "../../content/claim-hypercert-content";
 import { formatScope } from "../../utils/formatting";
 import { useImpactScopes } from "../../hooks/listImpactScopes";
-import { useParseBlockchainError } from "../../utils/parseBlockchainError";
+// import { useParseBlockchainError } from "../../utils/parseBlockchainError";
 
 export const AddImpactScopeModal = ({
   isOpen,
   onClose,
 }: Omit<ModalProps, "children">) => {
-  const contract = useHypercertContract();
+  // const contract = useHypercertContract();
   const toast = useToast();
-  const parseBlockchainError = useParseBlockchainError();
-  const { startPolling } = useImpactScopes();
+  // const parseBlockchainError = useParseBlockchainError();
   const [value, setValue] = useState<string>("");
   const [addingScope, setAddingScope] = useState(false);
-  const { mutate } = useWriteContract(contract, "addImpactScope", {
-    onError: (error) => {
-      toast({
-        description: parseBlockchainError(
-          error,
-          addImpactScopeModal.toastError
-        ),
-        status: "error",
-      });
-      console.error(error);
-    },
-    onConfirmation: (receipt) => {
-      toast({
-        description: addImpactScopeModal.toastSuccess(
-          value,
-          receipt.transactionHash
-        ),
-        status: "success",
-        isClosable: true,
-      });
-      setAddingScope(false);
-      onClose();
-    },
-  });
+
+  // TODO: Update to the new method for creating impact scopes
+  const mutate = async (formattedValue: string) => {
+    toast({
+      description: `Creating impact scopes is currently not implemented, could not add ${formattedValue}`,
+      status: "error",
+    });
+  };
+  // const { mutate } = useWriteContract(contract, "addImpactScope", {
+  //   onError: (error) => {
+  //     toast({
+  //       description: parseBlockchainError(
+  //         error,
+  //         addImpactScopeModal.toastError
+  //       ),
+  //       status: "error",
+  //     });
+  //     console.error(error);
+  //   },
+  //   onConfirmation: (receipt) => {
+  //     toast({
+  //       description: addImpactScopeModal.toastSuccess(
+  //         value,
+  //         receipt.transactionHash
+  //       ),
+  //       status: "success",
+  //       isClosable: true,
+  //     });
+  //     setAddingScope(false);
+  //     onClose();
+  //   },
+  // });
 
   const onConfirm = async () => {
     setAddingScope(true);
@@ -63,7 +70,6 @@ export const AddImpactScopeModal = ({
       await mutate(formattedValue);
     }
     setAddingScope(false);
-    startPolling(5000);
   };
 
   return (
