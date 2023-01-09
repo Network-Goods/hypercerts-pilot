@@ -139,8 +139,7 @@ export const AllowlistClaimForm = () => {
   const { write } = useMintClaimAllowlist({ onComplete, enabled: true });
 
   const toast = useToast();
-  const [merkleTree, setMerkleTree] =
-    useState<StandardMerkleTree<(string | string)[]>>();
+  const [merkleTree, setMerkleTree] = useState<StandardMerkleTree<string[]>>();
   const [merkleCID, setMerkleCID] = useState<CID>();
   const [units, setUnits] = useState<number>();
   const [disableClaimForm, setDisableClaimForm] = useState(true);
@@ -210,7 +209,11 @@ export const AllowlistClaimForm = () => {
       return;
     }
 
-    await write(metaData, _.sum(fractions), merkleTree.root as `0x{string}`);
+    await write(
+      { ...metaData, allowList: merkleCID },
+      _.sum(fractions),
+      merkleTree.root as `0x{string}`
+    );
   };
 
   return (
