@@ -7,10 +7,17 @@ import {
   usePrepareContractWrite,
   useWaitForTransaction,
 } from "wagmi";
-import { HyperCertMinterFactory } from "@network-goods/hypercerts-sdk";
+import {
+  HyperCertMinterFactory,
+  storeMetadata,
+} from "@network-goods/hypercerts-sdk";
 import { CONTRACT_ADDRESS } from "../constants";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { formatBytes32String, parseBytes32String } from "ethers/lib/utils";
+import { useContractModal } from "../components/ContractInteractionModalContext";
+import { client } from "../utils/ipfsClient";
+import _ from "lodash";
+import { HyperCertMetadata } from "../contract-types";
 
 export interface MintHypercertArgs {
   units: BigNumberish;
@@ -31,18 +38,35 @@ export interface MintHypercertAllowlistEntryArgs {
 
 export const useMintHyperCertificate = ({
   onComplete,
-  args,
   enabled,
 }: {
   onComplete?: () => void;
-  args: MintHypercertArgs;
   enabled: boolean;
 }) => {
-  const [step, setStep] = useState<
-    "initial" | "preparing" | "writing" | "awaiting" | "complete"
-  >("initial");
+  const [cidUri, setCidUri] = useState<string>();
+  const [units, setUnits] = useState<number>();
+
+  const stepDescriptions = {
+    uploading: "Uploading metadata to ipfs",
+    writing: "Minting hypercert on-chain",
+    complete: "Done minting",
+  };
+
+  const { setStep, showModal } = useContractModal();
   const parseBlockchainError = useParseBlockchainError();
   const toast = useToast();
+
+  const initializeWrite = async (
+    metaData: HyperCertMetadata,
+    units: number
+  ) => {
+    if (enabled) {
+      setUnits(units);
+      setStep("uploading");
+      const cid = await storeMetadata(metaData, client);
+      setCidUri(cid);
+    }
+  };
 
   const parseError = useParseBlockchainError();
   const {
@@ -53,7 +77,7 @@ export const useMintHyperCertificate = ({
     isSuccess: isReadyToWrite,
   } = usePrepareContractWrite({
     address: CONTRACT_ADDRESS,
-    args: [BigNumber.from(args.units), args.uri],
+    args: [BigNumber.from(units || 0), cidUri!],
     abi: HyperCertMinterFactory.abi,
     functionName: "mintClaim",
     onError: (error) => {
@@ -74,12 +98,12 @@ export const useMintHyperCertificate = ({
       });
       setStep("writing");
     },
-    enabled,
+    enabled: !!cidUri && units !== undefined,
   });
 
   const {
     data,
-    write,
+    writeAsync,
     error: writeError,
     isError: isWriteError,
     isLoading: isLoadingContractWrite,
@@ -104,10 +128,20 @@ export const useMintHyperCertificate = ({
     enabled,
   });
 
+  useEffect(() => {
+    const perform = async () => {
+      if (isReadyToWrite && writeAsync) {
+        await writeAsync();
+      }
+    };
+    perform();
+  }, [isReadyToWrite]);
+
   return {
-    write: async () => {
+    write: async (metaData: HyperCertMetadata, units: number) => {
+      showModal({ stepDescriptions });
       setStep("preparing");
-      await write?.();
+      await initializeWrite(metaData, units);
     },
     isLoading:
       isLoadingPrepareContractWrite ||
@@ -116,7 +150,6 @@ export const useMintHyperCertificate = ({
     isError: isPrepareError || isWriteError || isWaitError,
     error: prepareError || writeError || waitError,
     isReadyToWrite,
-    step,
   };
 };
 
@@ -129,9 +162,10 @@ export const useMintHyperCertificateWithAllowlist = ({
   args: MintHypercertWithAllowlistArgs;
   enabled: boolean;
 }) => {
-  const [step, setStep] = useState<
-    "initial" | "preparing" | "writing" | "awaiting" | "complete"
-  >("initial");
+  const { setStep, showModal } = useContractModal();
+  // const [step, setStep] = useState<
+  //   "initial" | "preparing" | "writing" | "awaiting" | "complete"
+  // >("initial");
   const parseBlockchainError = useParseBlockchainError();
   const toast = useToast();
 
@@ -201,9 +235,10 @@ export const useMintHyperCertificateWithAllowlist = ({
 
   return {
     write: async () => {
+      showModal({ stepDescriptions: { test: "This is a test step" } });
       setStep("preparing");
       console.log("Started writing");
-      await writeAsync?.();
+      // await writeAsync?.();
     },
     isLoading:
       isLoadingPrepareContractWrite ||
@@ -211,7 +246,6 @@ export const useMintHyperCertificateWithAllowlist = ({
       isLoadingWaitForTransaction,
     isError: isPrepareError || isWriteError || isWaitError,
     error: prepareError || writeError || waitError,
-    step,
     isReadyToWrite,
   };
 };

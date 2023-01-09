@@ -22,12 +22,6 @@ const ClaimHyperCertPage = () => {
       {step === "form" && (
         <RegularClaimForm onMetadataUploadedToIpfs={onMetadataUploadedToIpfs} />
       )}
-      {step === "minting" && claimMetadataArgs && (
-        <MintTransactionDialog
-          args={claimMetadataArgs}
-          onComplete={onMintComplete}
-        />
-      )}
     </>
   );
 };

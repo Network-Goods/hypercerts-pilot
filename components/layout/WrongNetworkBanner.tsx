@@ -27,7 +27,10 @@ export const WrongNetworkBanner = () => {
       <>
         Seems like you are on the wrong network.
         <br />
-        Please switch to {desiredNetwork.id} to use the HyperCerts app
+        {!desiredNetwork?.id && "Network provider not specified"}
+        {desiredNetwork?.id && (
+          <>Please switch to {desiredNetwork.id} to use the HyperCerts app</>
+        )}
       </>
     </Flex>
   );

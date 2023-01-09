@@ -3331,10 +3331,10 @@
   resolved "https://registry.yarnpkg.com/@network-goods/hypercerts-protocol/-/hypercerts-protocol-0.0.6.tgz#561f53e01c5db4784faf42ef6cfa7642969fac94"
   integrity sha512-EgD57tR+s1IAJyunOOTifP7JHS2VmSiBhvRHMTUKTT5/QS5FHo+aPWZVabgt0zeRvxFhf1kwzieus7EB1zYsbw==
 
-"@network-goods/hypercerts-sdk@0.0.4":
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/@network-goods/hypercerts-sdk/-/hypercerts-sdk-0.0.4.tgz#6e000c8d3516dca18b70215d60842c23b35a5ef7"
-  integrity sha512-zKLPm0EFEV8v2deoK2m+kMDaRq2Wle2owTbzSLKA7rK3uzILLz0WnFWLSU6uFjVJmpQkuozk9FyhUFgFEFYMAg==
+"@network-goods/hypercerts-sdk@0.0.5":
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/@network-goods/hypercerts-sdk/-/hypercerts-sdk-0.0.5.tgz#55a3eded93ecabf76b34f544d68a9a1b3c561810"
+  integrity sha512-+ZsiXFSl32/578FTRC37qj4xT8P4yKIF+36GxhSwXRZelJQjUnGVfyzLhqHUzU26QPZl8AhYmM+DgN5Cy+xmOQ==
   dependencies:
     "@network-goods/hypercerts-protocol" "0.0.6"
     ajv "^8.11.2"

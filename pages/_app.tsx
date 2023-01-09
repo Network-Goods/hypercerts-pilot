@@ -27,6 +27,7 @@ import { GRAPH_ENDPOINT } from "../constants";
 import "@rainbow-me/rainbowkit/styles.css";
 
 import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import { ContractInteractionModalProvider } from "../components/ContractInteractionModalContext";
 
 const apolloClient = new ApolloClient({
   uri: GRAPH_ENDPOINT,
@@ -66,12 +67,14 @@ function MyApp({ Component, pageProps }: AppProps) {
         >
           <WagmiConfig client={wagmiClient}>
             <RainbowKitProvider chains={chains}>
-              <Head>
-                <title>HyperCert v0.2</title>
-              </Head>
-              <Layout>
-                <Component {...pageProps} />
-              </Layout>
+              <ContractInteractionModalProvider>
+                <Head>
+                  <title>HyperCert v0.2</title>
+                </Head>
+                <Layout>
+                  <Component {...pageProps} />
+                </Layout>
+              </ContractInteractionModalProvider>
             </RainbowKitProvider>
           </WagmiConfig>
         </ChakraProvider>
