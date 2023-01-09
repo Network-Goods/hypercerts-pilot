@@ -9,10 +9,7 @@ import { graphql } from "../gql";
 import { Claim, QueryResult } from "./listHypercerts";
 
 export const useHyperCertById = (id: string) =>
-  useReactQuery(
-    ["graph", "claim", id],
-    () => claimById(id) as unknown as QueryResult<{ claim: Claim }>
-  );
+  useReactQuery(["graph", "claim", id], () => claimById(id));
 
 export const useHypercertFractions = (claimId: string) =>
   useReactQuery(["graph", "hypercert", "fractions", claimId], () =>
@@ -84,7 +81,7 @@ export const useHypercertInfo = (hypercertId: string) => {
   }
 };
 
-export const useClaimMetadata = (cid?: string) =>
-  useReactQuery(["claim", "metadata", cid], async () =>
+export const useClaimMetadata = (cid?: string | null) =>
+  useReactQuery(["ipfs", "claim", "metadata", cid], async () =>
     cid ? getMetadata(cid) : null
   );

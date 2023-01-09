@@ -7,16 +7,9 @@ import { HypercertTile } from "./HypercertTile";
 export const BrowsePage = () => {
   const { data: hypercertsResult, isLoading: loadingHypercerts } =
     useListFirstClaims();
-  const [filteredHypercerts, setFilteredHypercerts] = useState<Claim[]>([]);
   const { isLoading: loadingCollections, data: collections } = useCollections();
 
   console.log(hypercertsResult);
-
-  useEffect(() => {
-    if (hypercertsResult?.claims) {
-      setFilteredHypercerts(hypercertsResult.claims);
-    }
-  }, [loadingHypercerts]);
 
   // const onChangeCollectionFilter = (collectionId: string) => {
   //   if (!hypercertWithFractions) {
@@ -57,7 +50,7 @@ export const BrowsePage = () => {
         {loadingCollections && <Spinner ml={4} />}
       </Flex>
       <SimpleGrid columns={{ sm: 2, md: 2 }} spacing={8}>
-        {filteredHypercerts.map((cert) => (
+        {hypercertsResult?.claims.map((cert) => (
           <HypercertTile key={cert.id} {...cert} hoverEffect />
         ))}
       </SimpleGrid>

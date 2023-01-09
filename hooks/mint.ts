@@ -10,6 +10,7 @@ import {
 import { HyperCertMinterFactory } from "@network-goods/hypercerts-sdk";
 import { CONTRACT_ADDRESS } from "../constants";
 import { useState } from "react";
+import { formatBytes32String, parseBytes32String } from "ethers/lib/utils";
 
 export interface MintHypercertArgs {
   units: BigNumberish;
@@ -231,6 +232,10 @@ export const useMintHyperCertificateAllowlistEntry = ({
   const toast = useToast();
 
   console.log("args: ", args);
+  console.log(
+    args.proof,
+    args.proof.map((p) => parseBytes32String(p))
+  );
 
   const parseError = useParseBlockchainError();
   const {
@@ -242,7 +247,7 @@ export const useMintHyperCertificateAllowlistEntry = ({
   } = usePrepareContractWrite({
     address: CONTRACT_ADDRESS,
     args: [
-      args.proof as `0x${string}`[],
+      args.proof as `0x{string}`[],
       BigNumber.from(args.claimID),
       BigNumber.from(args.units),
     ],

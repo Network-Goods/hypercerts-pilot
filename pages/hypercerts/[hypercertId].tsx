@@ -29,7 +29,6 @@ import {
 import { HypercertTile } from "../../components/HypercertTile";
 import React from "react";
 import { MergeAllFractionsModal } from "../../components/Modals/MergeAllFractionsModal";
-import { GetHypercertByIdQuery } from "../../gql/graphql";
 import { UserInfo } from "../../components/UserInfo";
 import { hypercertDetailContent } from "../../content/hypercert-detail-content";
 import { MetaDataResponse } from "../../types/MetaData";
@@ -37,6 +36,7 @@ import { SplitFractionModal } from "../../components/Modals/SplitFractionModal";
 import { BurnFractionModal } from "../../components/Modals/BurnFractionModal";
 import { useAccount } from "wagmi";
 import { Claim } from "../../hooks/listHypercerts";
+import Link from "next/link";
 
 const HypercertPageWrapper = () => {
   const { query, isReady } = useRouter();
@@ -69,7 +69,7 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
     useHypercertFractions(hypercertId);
   const { address } = useAccount();
   const { data: hypercertInfo, isLoading: hypercertInfoLoading } =
-    useClaimMetadata(hypercertData?.data.claim.uri);
+    useClaimMetadata(hypercertData?.claim?.uri);
 
   if (hypercertLoading || fractionsLoading || hypercertInfoLoading) {
     return (
@@ -82,7 +82,7 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
     );
   }
 
-  const hypercert = hypercertData?.data.claim;
+  const hypercert = hypercertData?.claim;
 
   if (!hypercert) {
     return (
@@ -114,10 +114,7 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
             <Heading flexGrow={1}>{hypercertInfo?.name}</Heading>
           </Flex>
           <Center>
-            <HypercertTile
-              id={hypercertId}
-              uri={hypercertData.data.claim.uri}
-            />
+            <HypercertTile id={hypercertId} uri={hypercertData?.claim?.uri} />
           </Center>
         </Box>
 
@@ -126,6 +123,12 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
             <Heading mb={2}>{hypercertDetailContent.description}</Heading>
             <Text>{hypercertInfo.description}</Text>
           </Box>
+        )}
+
+        {hypercertInfo?.allowList && (
+          <Link href={`/mint-allowlist-fraction/${hypercertId}`}>
+            <Button colorScheme="green">Mint from allowlist</Button>
+          </Link>
         )}
 
         {/*{hypercertInfo && (*/}

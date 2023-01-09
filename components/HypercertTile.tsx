@@ -7,7 +7,7 @@ export const HypercertTile = ({
   id,
   uri,
   hoverEffect,
-}: Pick<Claim, "id" | "uri"> & { hoverEffect?: boolean }) => {
+}: Pick<Partial<Claim>, "id" | "uri"> & { hoverEffect?: boolean }) => {
   const { data } = useClaimMetadata(uri);
 
   if (!data) {
