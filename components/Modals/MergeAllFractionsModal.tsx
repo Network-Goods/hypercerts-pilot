@@ -33,12 +33,10 @@ export const MergeAllFractionsModal = ({
   hypercertId: string;
 }) => {
   const { isOpen, onClose, onOpen } = useDisclosure();
-  const { startPolling } = useHypercertFractions(hypercertId);
 
   const merge = useMergeFractions({
     onComplete: () => {
       setStep("complete");
-      startPolling(5000);
     },
     onError: () => {
       setStep("confirmation");

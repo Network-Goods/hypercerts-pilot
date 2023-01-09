@@ -39,7 +39,6 @@ export const SplitFractionModal = ({
   const { address } = useAccount();
   const toast = useToast();
   const { isOpen, onClose, onOpen } = useDisclosure();
-  const { startPolling } = useHypercertFractions(hypercertId);
 
   const [step, setStep] = useState<"input" | "splitting" | "complete">("input");
   const [value, setValue] = useState("");
@@ -48,7 +47,6 @@ export const SplitFractionModal = ({
   const split = useSplitFraction({
     onComplete: () => {
       setStep("complete");
-      startPolling(5000);
     },
     onError: () => {
       setStep("input");

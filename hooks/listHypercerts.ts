@@ -9,11 +9,11 @@ export type QueryResult<T> = {
 
 export interface Claim {
   id: string;
-  owner: string;
-  totalUnits: string;
-  uri: string;
-  contract: string;
-  creator: string;
+  owner?: string;
+  totalUnits?: string;
+  uri: string | null;
+  contract?: string;
+  creator?: string;
 }
 
 export const useListFirstClaims = () => {

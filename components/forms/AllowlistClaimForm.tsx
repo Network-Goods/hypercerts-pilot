@@ -21,7 +21,7 @@ import {
 } from "@chakra-ui/react";
 import { FieldArray, Form, Formik } from "formik";
 import { StandardMerkleTree } from "@openzeppelin/merkle-tree";
-import { BigNumber, ethers } from "ethers";
+import { ethers } from "ethers";
 import { CID } from "nft.storage/dist/src/lib/interface";
 import { client } from "../../utils/ipfsClient";
 
@@ -158,7 +158,7 @@ export const AllowlistClaimForm = ({
     const cid = await storeData(JSON.stringify(tree.dump()), client);
 
     setMerkleTree(tree);
-    setMerkleCID(cid);
+    setMerkleCID(cid as unknown as CID);
     setUnits(sum);
   };
 

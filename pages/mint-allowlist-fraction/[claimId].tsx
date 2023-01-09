@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { MintHypercertAllowlistEntryArgs } from "../hooks/mint";
-import MintTransactionAllowlistFraction from "../components/MintTransactionAllowlistFraction";
+import { MintHypercertAllowlistEntryArgs } from "../../hooks/mint";
+import MintTransactionAllowlistFraction from "../../components/MintTransactionAllowlistFraction";
 import { BigNumber, BytesLike } from "ethers";
 import {
   Box,
@@ -15,6 +15,7 @@ import {
 import { getMetadata, claimById, getData } from "@network-goods/hypercerts-sdk";
 import { StandardMerkleTree } from "@openzeppelin/merkle-tree";
 import { useAccount } from "wagmi";
+import { useRouter } from "next/router";
 
 const FindAllowlistProof = ({
   onProofFound,
@@ -27,6 +28,10 @@ const FindAllowlistProof = ({
 }) => {
   const toast = useToast();
   const { address, isConnected } = useAccount();
+  const { query } = useRouter();
+  console.log(query);
+
+  const claimID = query["claimId"] as string;
 
   const [merkleCID, setMerkleCID] = useState<string>();
   const [merkleTree, setMerkleTree] =
@@ -45,8 +50,6 @@ const FindAllowlistProof = ({
   };
 
   //Claim for user
-  const claimID =
-    "0xcc08266250930e98256182734913bf1b361020720x900000000000000000000000000000000";
 
   useEffect(() => {
     const _fetchMerkleCID = async (claimID: string) => {
@@ -107,6 +110,7 @@ const FindAllowlistProof = ({
         console.log("Entry: ", i);
         if (v[0] === address) {
           const proof = tree.getProof(i);
+          console.log(proof, v);
           setMerkleProofs(proof);
           setUnits(Number(v[1]));
           console.log(`proof `, proof);

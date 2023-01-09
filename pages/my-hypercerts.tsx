@@ -101,7 +101,8 @@ const MyHypercertsPage = ({ userAddress }: { userAddress: string }) => {
           <Heading mb={4}>{myHypercertsContent.myHypercertsHeader}</Heading>
           <SimpleGrid columns={[2, 2, 3]} spacing={4}>
             {uniqIds.map((id) => (
-              <HypercertTile hoverEffect key={id} id={id} />
+              <div>{id}</div>
+              // <HypercertTile hoverEffect key={id} id={id} />
             ))}
           </SimpleGrid>
         </>
@@ -112,7 +113,8 @@ const MyHypercertsPage = ({ userAddress }: { userAddress: string }) => {
           <Text>{myHypercertsContent.burnedHypercertsText}</Text>
           <SimpleGrid columns={[2, 2, 3]} spacing={4}>
             {uniqBurnedIds.map((id) => (
-              <HypercertTile hoverEffect key={id} id={id} />
+              <div>{id}</div>
+              // <HypercertTile hoverEffect key={id} id={id} />
             ))}
           </SimpleGrid>
         </VStack>
