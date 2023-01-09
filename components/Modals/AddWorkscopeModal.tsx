@@ -27,7 +27,6 @@ export const AddWorkscopeModal = ({
   // const contract = useHypercertContract();
   // const parseBlockchainError = useParseBlockchainError();
   const toast = useToast();
-  const { startPolling } = useWorkScopes();
   const [value, setValue] = useState<string>("");
   const [addingScope, setAddingScope] = useState(false);
   // TODO: Update to the new method for creating work scopes
@@ -67,7 +66,6 @@ export const AddWorkscopeModal = ({
       await mutate(formattedValue);
     }
     setAddingScope(false);
-    startPolling(5000);
   };
 
   return (

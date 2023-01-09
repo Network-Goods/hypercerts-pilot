@@ -39,11 +39,6 @@ export const urls = {
     href: "/claim-allowlist-hypercert",
     showOnlyWhenConnected: false,
   },
-  airdrop: {
-    label: headerLinkLabels.airdrop,
-    href: "/mint-allowlist-fraction",
-    showOnlyWhenConnected: false,
-  },
   myHypercerts: {
     label: headerLinkLabels.myHypercerts,
     href: "/my-hypercerts",

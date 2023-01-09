@@ -27,7 +27,6 @@ export const AddRightsModal = ({
   // const contract = useHypercertContract();
   // const parseBlockchainError = useParseBlockchainError();
   const toast = useToast();
-  const { startPolling } = useRights();
   const [value, setValue] = useState<string>("");
   const [addingRight, setAddingRight] = useState(false);
 
@@ -65,7 +64,6 @@ export const AddRightsModal = ({
       await mutate(formattedValue);
     }
     setAddingRight(false);
-    startPolling(5000);
   };
 
   return (

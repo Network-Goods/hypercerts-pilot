@@ -27,7 +27,6 @@ export const AddImpactScopeModal = ({
   // const contract = useHypercertContract();
   const toast = useToast();
   // const parseBlockchainError = useParseBlockchainError();
-  const { startPolling } = useImpactScopes();
   const [value, setValue] = useState<string>("");
   const [addingScope, setAddingScope] = useState(false);
 
@@ -35,9 +34,9 @@ export const AddImpactScopeModal = ({
   const mutate = async (formattedValue: string) => {
     toast({
       description: `Creating impact scopes is currently not implemented, could not add ${formattedValue}`,
-      status: 'error'
-    })
-  }
+      status: "error",
+    });
+  };
   // const { mutate } = useWriteContract(contract, "addImpactScope", {
   //   onError: (error) => {
   //     toast({
@@ -71,7 +70,6 @@ export const AddImpactScopeModal = ({
       await mutate(formattedValue);
     }
     setAddingScope(false);
-    startPolling(5000);
   };
 
   return (

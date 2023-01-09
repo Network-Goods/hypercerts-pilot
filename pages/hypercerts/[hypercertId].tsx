@@ -126,7 +126,7 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
         )}
 
         {hypercertInfo?.allowList && (
-          <Link href={`/mint-allowlist-fraction/${hypercertId}`}>
+          <Link href={`/airdrop/${hypercertId}`}>
             <Button colorScheme="green">Mint from allowlist</Button>
           </Link>
         )}
