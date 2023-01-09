@@ -56,58 +56,71 @@ const initialValues = {
 const AllowlistForm = ({
   onStore,
 }: {
-  onStore: (args: { contributors: AllowlistEntry[] }) => void;
+  onStore: (args: { contributors: AllowlistEntry[] }) => Promise<void>;
 }) => {
   return (
     <Formik
       initialValues={initialValues}
       onSubmit={({ contributors }) => onStore({ contributors })}
     >
-      {({ values, handleChange }) => (
-        <Box maxWidth={`calc(100vw - ${previewWidth})`} p={4} px={8}>
-          <Form>
-            <FieldArray name="contributors">
-              {({ remove, push }) => (
-                <div>
-                  {values.contributors.map((contributor, index) => (
-                    <HStack key={index}>
-                      <FormControl isRequired>
-                        <FormLabel>{"Address"}</FormLabel>
-                        <Input
-                          type="text"
-                          name={`contributors.${index}.address`}
-                          onChange={handleChange}
-                        />
-                      </FormControl>
-                      <FormControl isRequired>
-                        <FormLabel>{"Fraction"}</FormLabel>
-                        <Input
-                          type="text"
-                          name={`contributors.${index}.fraction`}
-                          onChange={handleChange}
-                        />
-                      </FormControl>
+      {({ values, handleChange, isSubmitting }) => {
+        const disabled = isSubmitting;
+        return (
+          <Box maxWidth={`calc(100vw - ${previewWidth})`} p={4} px={8}>
+            <Form>
+              <FieldArray name="contributors">
+                {({ remove, push }) => (
+                  <div>
+                    {values.contributors.map((contributor, index) => (
+                      <HStack key={index}>
+                        <FormControl isRequired>
+                          <FormLabel>{"Address"}</FormLabel>
+                          <Input
+                            type="text"
+                            name={`contributors.${index}.address`}
+                            onChange={handleChange}
+                            disabled={isSubmitting}
+                          />
+                        </FormControl>
+                        <FormControl isRequired>
+                          <FormLabel>{"Fraction"}</FormLabel>
+                          <Input
+                            type="text"
+                            name={`contributors.${index}.fraction`}
+                            disabled={isSubmitting}
+                            onChange={handleChange}
+                          />
+                        </FormControl>
+                        <Button
+                          onClick={() => remove(index)}
+                          colorScheme="red"
+                          disabled={isSubmitting}
+                          w={"125px"}
+                        >
+                          Remove
+                        </Button>
+                      </HStack>
+                    ))}
+                    <ButtonGroup
+                      width={"100%"}
+                      mt="1em"
+                      colorScheme="green"
+                      isDisabled={disabled}
+                    >
                       <Button
-                        onClick={() => remove(index)}
-                        colorScheme="red"
-                        w={"125px"}
+                        onClick={() => push({ address: "", fraction: "" })}
                       >
-                        Remove
+                        Add
                       </Button>
-                    </HStack>
-                  ))}
-                  <ButtonGroup width={"100%"} mt="1em" colorScheme="green">
-                    <Button onClick={() => push({ address: "", fraction: "" })}>
-                      Add
-                    </Button>
-                    <Button type="submit">Store</Button>
-                  </ButtonGroup>
-                </div>
-              )}
-            </FieldArray>
-          </Form>
-        </Box>
-      )}
+                      <Button type="submit">Store</Button>
+                    </ButtonGroup>
+                  </div>
+                )}
+              </FieldArray>
+            </Form>
+          </Box>
+        );
+      }}
     </Formik>
   );
 };
@@ -122,6 +135,7 @@ export const AllowlistClaimForm = ({
     useState<StandardMerkleTree<(string | number)[]>>();
   const [merkleCID, setMerkleCID] = useState<CID>();
   const [units, setUnits] = useState<number>();
+  const [disableClaimForm, setDisableClaimForm] = useState(true);
 
   const onStore = async ({
     contributors,
@@ -130,6 +144,7 @@ export const AllowlistClaimForm = ({
   }) => {
     //TODO data validation
     // 100% total
+    setDisableClaimForm(true);
     console.log("Contributors: ", contributors);
     const validEntries = contributors.filter(
       (entry) =>
@@ -160,6 +175,7 @@ export const AllowlistClaimForm = ({
     setMerkleTree(tree);
     setMerkleCID(cid as unknown as CID);
     setUnits(sum);
+    setDisableClaimForm(false);
   };
 
   const onSubmit = async ({
@@ -213,7 +229,11 @@ export const AllowlistClaimForm = ({
         </Alert>
       ) : undefined}
       <Divider />
-      <DynamicClaimHyperCertForm onSubmit={onSubmit} units={units} />
+      <DynamicClaimHyperCertForm
+        onSubmit={onSubmit}
+        units={units}
+        disabled={disableClaimForm}
+      />
     </VStack>
   );
 };

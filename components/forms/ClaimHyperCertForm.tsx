@@ -153,12 +153,14 @@ const defaultValues = {
 const ClaimHypercertForm = ({
   onSubmit,
   units,
+  disabled: disabledProp,
 }: {
   onSubmit: (args: {
     metaData: HypercertMetadata;
     fractions: number[];
   }) => void;
   units?: number;
+  disabled?: boolean;
 }) => {
   const { address, isConnected } = useAccount();
   const { push } = useRouter();
@@ -330,7 +332,7 @@ const ClaimHypercertForm = ({
           isSubmitting,
           setFieldValue,
         }) => {
-          const disabled = isSubmitting || !isConnected;
+          const disabled = disabledProp || isSubmitting || !isConnected;
           return (
             <Flex>
               <Box maxWidth={`calc(100vw - ${previewWidth})`} p={4} px={8}>
