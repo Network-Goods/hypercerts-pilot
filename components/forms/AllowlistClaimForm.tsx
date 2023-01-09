@@ -1,9 +1,7 @@
-import { HyperCertMetadata } from "../../contract-types";
 import dynamic from "next/dynamic";
 import React, { useState } from "react";
-import { storeMetadata, storeData } from "@network-goods/hypercerts-sdk";
+import { storeData, HypercertMetadata } from "@network-goods/hypercerts-sdk";
 import _ from "lodash";
-import { MintHypercertWithAllowlistArgs } from "../../hooks/mint";
 import {
   Alert,
   AlertIcon,
@@ -24,6 +22,9 @@ import { StandardMerkleTree } from "@openzeppelin/merkle-tree";
 import { ethers } from "ethers";
 import { CID } from "nft.storage/dist/src/lib/interface";
 import { client } from "../../utils/ipfsClient";
+import { useRouter } from "next/router";
+import { useContractModal } from "../ContractInteractionModalContext";
+import { useMintClaimAllowlist } from "../../hooks/mintClaimAllowlist";
 
 const previewWidth = "580px";
 
@@ -125,11 +126,18 @@ const AllowlistForm = ({
   );
 };
 
-export const AllowlistClaimForm = ({
-  onMetadataUploadedToIpfs,
-}: {
-  onMetadataUploadedToIpfs: (args: MintHypercertWithAllowlistArgs) => void;
-}) => {
+export const AllowlistClaimForm = () => {
+  const { push } = useRouter();
+  const { hideModal } = useContractModal();
+  const onComplete = () => {
+    setTimeout(() => {
+      hideModal();
+      push("/");
+    }, 5000);
+  };
+
+  const { write } = useMintClaimAllowlist({ onComplete, enabled: true });
+
   const toast = useToast();
   const [merkleTree, setMerkleTree] =
     useState<StandardMerkleTree<(string | string)[]>>();
@@ -147,8 +155,7 @@ export const AllowlistClaimForm = ({
     setDisableClaimForm(true);
     console.log("Contributors: ", contributors);
     const validEntries = contributors.filter(
-      (entry) =>
-        ethers.utils.isAddress(entry.address) && entry.fraction
+      (entry) => ethers.utils.isAddress(entry.address) && entry.fraction
     );
 
     if (validEntries.length === 0) {
@@ -182,7 +189,7 @@ export const AllowlistClaimForm = ({
     metaData,
     fractions,
   }: {
-    metaData: HyperCertMetadata;
+    metaData: HypercertMetadata;
     fractions: number[];
   }) => {
     if (!merkleCID) {
@@ -203,15 +210,7 @@ export const AllowlistClaimForm = ({
       return;
     }
 
-    const cid = await storeMetadata(
-      { ...metaData, allowList: merkleCID },
-      client
-    );
-    onMetadataUploadedToIpfs({
-      units: _.sum(fractions),
-      merkleRoot: merkleTree?.root,
-      uri: cid,
-    });
+    await write(metaData, _.sum(fractions), merkleTree.root as `0x{string}`);
   };
 
   return (

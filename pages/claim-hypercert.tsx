@@ -1,29 +1,44 @@
-import React, { useState } from "react";
-import { MintHypercertArgs } from "../hooks/mint";
-import MintTransactionDialog from "../components/MintTransactionDialog";
-import { RegularClaimForm } from "../components/forms/RegularClaimForm";
+import React from "react";
+import { useRouter } from "next/router";
+import { HypercertMetadata } from "@network-goods/hypercerts-sdk";
+import { useContractModal } from "../components/ContractInteractionModalContext";
+import _ from "lodash";
+import dynamic from "next/dynamic";
+import { useMintClaim } from "../hooks/mintClaim";
+
+const DynamicClaimHyperCertForm = dynamic(
+  () => import("../components/forms/ClaimHyperCertForm"),
+  {
+    ssr: false,
+  }
+);
 
 const ClaimHyperCertPage = () => {
-  const [step, setStep] = useState<"form" | "minting" | "complete">("form");
-  const [claimMetadataArgs, setClaimMetadataArgs] =
-    useState<MintHypercertArgs>();
-
-  const onMetadataUploadedToIpfs = (args: MintHypercertArgs) => {
-    setClaimMetadataArgs(args);
-    setStep("minting");
+  const { push } = useRouter();
+  const { hideModal } = useContractModal();
+  const onComplete = () => {
+    setTimeout(() => {
+      hideModal();
+      push("/");
+    }, 5000);
   };
 
-  const onMintComplete = () => {
-    setStep("complete");
+  const { write } = useMintClaim({
+    enabled: true,
+    onComplete,
+  });
+
+  const onSubmit = async ({
+    metaData,
+    fractions,
+  }: {
+    metaData: HypercertMetadata;
+    fractions: number[];
+  }) => {
+    await write(metaData, _.sum(fractions));
   };
 
-  return (
-    <>
-      {step === "form" && (
-        <RegularClaimForm onMetadataUploadedToIpfs={onMetadataUploadedToIpfs} />
-      )}
-    </>
-  );
+  return <DynamicClaimHyperCertForm onSubmit={onSubmit} />;
 };
 
 export default ClaimHyperCertPage;

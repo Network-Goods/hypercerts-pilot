@@ -1,39 +1,10 @@
 import React, { useState } from "react";
-import {
-  MintHypercertWithAllowlistArgs,
-} from "../hooks/mint";
+import { MintHypercertWithAllowlistArgs } from "../hooks/mint";
 import { AllowlistClaimForm } from "../components/forms/AllowlistClaimForm";
 import MintTransactionAllowlistOverview from "../components/MintTransactionAllowlistOverview";
 
 const ClaimHyperCertPage = () => {
-  const [step, setStep] = useState<"form" | "minting" | "complete">("form");
-  const [claimMetadataArgs, setClaimMetadataArgs] =
-    useState<MintHypercertWithAllowlistArgs>();
-
-  const onMetadataUploadedToIpfs = (args: MintHypercertWithAllowlistArgs) => {
-    setClaimMetadataArgs(args);
-    setStep("minting");
-  };
-
-  const onMintComplete = () => {
-    setStep("complete");
-  };
-
-  return (
-    <>
-      {step === "form" && (
-        <AllowlistClaimForm
-          onMetadataUploadedToIpfs={onMetadataUploadedToIpfs}
-        />
-      )}
-      {step === "minting" && claimMetadataArgs && (
-        <MintTransactionAllowlistOverview
-          args={claimMetadataArgs}
-          onComplete={onMintComplete}
-        />
-      )}
-    </>
-  );
+  return <AllowlistClaimForm />;
 };
 
 export default ClaimHyperCertPage;

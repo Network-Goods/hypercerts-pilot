@@ -13,12 +13,14 @@ type StepDescriptions = Record<string, string>;
 interface IContractInteractionModalProvider {
   showModal: (args: { stepDescriptions: StepDescriptions }) => void;
   setStep: (step: string) => void;
+  hideModal: () => void;
 }
 
 const ContractInteractionModalContext =
   React.createContext<IContractInteractionModalProvider>({
     showModal: () => {},
     setStep: () => {},
+    hideModal: () => {},
   });
 
 export const ContractInteractionModalProvider: React.FC<PropsWithChildren> = ({
@@ -46,6 +48,7 @@ export const ContractInteractionModalProvider: React.FC<PropsWithChildren> = ({
       value={{
         setStep,
         showModal: onShowModal,
+        hideModal: onCloseModal,
       }}
     >
       {children}
@@ -61,7 +64,11 @@ export const ContractInteractionModalProvider: React.FC<PropsWithChildren> = ({
           <ModalHeader>Contract interaction</ModalHeader>
           <ModalBody>
             {Object.keys(stepDescriptions).map((key) => (
-              <Text fontWeight={key === step ? 700 : 400} key={key}>
+              <Text
+                key={key}
+                fontWeight={key === step ? 700 : 400}
+                color={key === step ? "green" : undefined}
+              >
                 {stepDescriptions[key]}
               </Text>
             ))}
