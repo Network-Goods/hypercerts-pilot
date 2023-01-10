@@ -39,7 +39,7 @@
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.2.2",
     "react-icons": "^4.7.1",
-    "react-select": "^5.5.2",
+    "react-select": "^5.7.0",
     "wagmi": "^0.9.5",
     "yup": "^0.32.11"
   },

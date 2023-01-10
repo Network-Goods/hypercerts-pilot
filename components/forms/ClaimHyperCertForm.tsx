@@ -161,7 +161,7 @@ const ClaimHypercertForm = ({
   disabled?: boolean;
 }) => {
   const { address, isConnected } = useAccount();
-  const { push } = useRouter();
+  const { replace } = useRouter();
   const toast = useToast();
   const [currentQuery, setCurrentQuery] = useState<string | undefined>(() =>
     window.location.search.replace("?", "")
@@ -169,7 +169,7 @@ const ClaimHypercertForm = ({
 
   useEffect(() => {
     if (currentQuery !== undefined && currentQuery !== "") {
-      push({ query: currentQuery });
+      replace({ query: currentQuery }, undefined, { scroll: false });
     }
   }, [currentQuery]);
 
