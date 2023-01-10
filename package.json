@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "yarn graphql-codegen-once && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "codegen": "graph codegen graph/subgraph.yaml",
@@ -20,7 +20,7 @@
     "@graphprotocol/graph-cli": "^0.33.0",
     "@graphprotocol/graph-ts": "^0.27.0",
     "@network-goods/hypercerts-protocol": "^0.0.6",
-    "@network-goods/hypercerts-sdk": "0.0.9",
+    "@network-goods/hypercerts-sdk": "0.0.12",
     "@openzeppelin/merkle-tree": "^1.0.1",
     "@rainbow-me/rainbowkit": "^0.8.1",
     "@tanstack/react-query": "^4.10.1",
