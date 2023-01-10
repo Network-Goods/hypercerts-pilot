@@ -97,7 +97,7 @@ const FindAllowlistProof = ({
 
       const parsedResponse = JSON.parse(treeResponse);
       console.log(parsedResponse);
-      const t = MerkleTree.unmarshalTree(JSON.parse(parsedResponse.tree));
+      const t = MerkleTree.unmarshalTree(parsedResponse.tree);
       setMerkleTree(t);
       setAllowlist(parsedResponse.allowlist);
     };

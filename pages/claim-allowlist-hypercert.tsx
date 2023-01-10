@@ -187,7 +187,7 @@ export const AllowlistClaimForm = () => {
       return acc;
     }, {} as Record<string, number>);
     const data = {
-      tree: marshaledTree,
+      tree: JSON.parse(marshaledTree),
       allowlist,
     };
     const cid = await storeData(JSON.stringify(data), client);
