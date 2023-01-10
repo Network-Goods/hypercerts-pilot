@@ -51,11 +51,12 @@ export const useMintHyperCertificateAllowlistEntry = ({
   const parseBlockchainError = useParseBlockchainError();
   const toast = useToast();
 
-  console.log("args: ", args);
-  console.log(
-    args.proof,
-    args.proof.map((p) => parseBytes32String(p))
-  );
+  const argsForContract = [
+    args.proof as `0x{string}`[],
+    BigNumber.from(args.claimID),
+    BigNumber.from(args.units),
+  ];
+  console.log("args: ", argsForContract);
 
   const parseError = useParseBlockchainError();
   const {
