@@ -18,13 +18,15 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { FieldArray, Form, Formik } from "formik";
-import { StandardMerkleTree } from "@openzeppelin/merkle-tree";
+import { MerkleTree } from "merkletreejs";
 import { ethers } from "ethers";
 import { CID } from "nft.storage/dist/src/lib/interface";
 import { client } from "../utils/ipfsClient";
 import { useRouter } from "next/router";
 import { useContractModal } from "../components/ContractInteractionModalContext";
 import { useMintClaimAllowlist } from "../hooks/mintClaimAllowlist";
+import { keccak256 } from "web3-utils";
+import { hashLeaf } from "../utils/hashLeaf";
 
 const previewWidth = "580px";
 
@@ -139,7 +141,7 @@ export const AllowlistClaimForm = () => {
   const { write } = useMintClaimAllowlist({ onComplete, enabled: true });
 
   const toast = useToast();
-  const [merkleTree, setMerkleTree] = useState<StandardMerkleTree<string[]>>();
+  const [merkleTree, setMerkleTree] = useState<MerkleTree>();
   const [merkleCID, setMerkleCID] = useState<CID>();
   const [units, setUnits] = useState<number>();
   const [disableClaimForm, setDisableClaimForm] = useState(true);
@@ -153,9 +155,14 @@ export const AllowlistClaimForm = () => {
     // 100% total
     setDisableClaimForm(true);
     console.log("Contributors: ", contributors);
-    const validEntries = contributors.filter(
-      (entry) => ethers.utils.isAddress(entry.address) && entry.fraction
-    );
+    const validEntries = contributors
+      .filter(
+        (entry) => ethers.utils.isAddress(entry.address) && entry.fraction
+      )
+      .map((x) => ({
+        address: x.address,
+        fraction: parseInt(x.fraction, 10),
+      }));
 
     if (validEntries.length === 0) {
       toast({
@@ -166,17 +173,24 @@ export const AllowlistClaimForm = () => {
     }
 
     // Entries to arrays
-    const mappedEntries = validEntries.map((validEntry) => [
-      validEntry.address,
-      validEntry.fraction,
-    ]);
+
+    const leaves = validEntries.map((x) => hashLeaf(x.address, x.fraction));
 
     const sum = validEntries
-      .map((entry) => parseInt(entry.fraction, 10))
+      .map((entry) => entry.fraction)
       .reduce((acc, curr) => acc + curr);
 
-    const tree = StandardMerkleTree.of(mappedEntries, ["address", "uint256"]);
-    const cid = await storeData(JSON.stringify(tree.dump()), client);
+    const tree = new MerkleTree(leaves, keccak256, { sortPairs: true });
+    const marshaledTree = JSON.stringify(MerkleTree.marshalTree(tree));
+    const allowlist = validEntries.reduce((acc, entry) => {
+      acc[entry.address] = entry.fraction;
+      return acc;
+    }, {} as Record<string, number>);
+    const data = {
+      tree: marshaledTree,
+      allowlist,
+    };
+    const cid = await storeData(JSON.stringify(data), client);
 
     setMerkleTree(tree);
     setMerkleCID(cid as unknown as CID);
@@ -200,7 +214,7 @@ export const AllowlistClaimForm = () => {
       return;
     }
 
-    if (!merkleTree?.root) {
+    if (!merkleTree?.getHexRoot()) {
       toast({
         description: "Merkle root not found",
         status: "error",
@@ -212,7 +226,7 @@ export const AllowlistClaimForm = () => {
     await write(
       { ...metaData, allowList: merkleCID },
       _.sum(fractions),
-      merkleTree.root as `0x{string}`
+      merkleTree?.getHexRoot() as `0x{string}`
     );
   };
 
