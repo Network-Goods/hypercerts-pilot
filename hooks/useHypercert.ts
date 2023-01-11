@@ -1,43 +1,10 @@
 import { useQuery } from "@apollo/client";
-import {
-  getMetadata,
-  claimById,
-  fractionsByClaim,
-} from "@network-goods/hypercerts-sdk";
+import { getMetadata, claimById } from "@network-goods/hypercerts-sdk";
 import { useQuery as useReactQuery } from "@tanstack/react-query";
 import { graphql } from "../gql";
-import { Claim, QueryResult } from "./listHypercerts";
 
 export const useHyperCertById = (id: string) =>
   useReactQuery(["graph", "claim", id], () => claimById(id));
-
-export const useHypercertFractions = (claimId: string) =>
-  useReactQuery(["graph", "hypercert", "fractions", claimId], () =>
-    fractionsByClaim(claimId)
-  );
-//
-// export const useHypercertFractions = (id: string) => {
-//   const query = graphql(`
-//     query GetHypercertFractions($hypercertId: String!) {
-//       hypercertFractions(where: { hypercert: $hypercertId }) {
-//         id
-//         hypercert {
-//           id
-//           totalUnits
-//         }
-//         owner {
-//           id
-//         }
-//         units
-//       }
-//     }
-//   `);
-//   return useQuery(query, {
-//     variables: {
-//       hypercertId: id.toLowerCase(),
-//     },
-//   });
-// };
 
 interface HypercertInfo {
   name: string;

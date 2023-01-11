@@ -18,7 +18,6 @@ import {
 import {
   useClaimMetadata,
   useHyperCertById,
-  useHypercertFractions,
   useHypercertInfo,
 } from "../../hooks/useHypercert";
 import {
@@ -37,6 +36,7 @@ import { BurnFractionModal } from "../../components/Modals/BurnFractionModal";
 import { useAccount } from "wagmi";
 import { Claim } from "../../hooks/listHypercerts";
 import Link from "next/link";
+import { useFractionsByClaim } from "../../hooks/fractions";
 
 const HypercertPageWrapper = () => {
   const { query, isReady } = useRouter();
@@ -66,7 +66,7 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
   const { data: hypercertData, isLoading: hypercertLoading } =
     useHyperCertById(hypercertId);
   const { data: fractions, isLoading: fractionsLoading } =
-    useHypercertFractions(hypercertId);
+    useFractionsByClaim(hypercertId);
   const { address } = useAccount();
   const { data: hypercertInfo, isLoading: hypercertInfoLoading } =
     useClaimMetadata(hypercertData?.claim?.uri);

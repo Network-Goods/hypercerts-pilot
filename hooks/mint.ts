@@ -1,5 +1,5 @@
 import { useToast } from "@chakra-ui/react";
-import { BigNumber, BigNumberish, Bytes, BytesLike, ethers } from "ethers";
+import { BigNumber, BigNumberish } from "ethers";
 import { useParseBlockchainError } from "../utils/parseBlockchainError";
 import { mintInteractionLabels } from "../content/chainInteractions";
 import {
@@ -7,56 +7,44 @@ import {
   usePrepareContractWrite,
   useWaitForTransaction,
 } from "wagmi";
-import {
-  HyperCertMinterFactory,
-  storeMetadata,
-} from "@network-goods/hypercerts-sdk";
+import { HyperCertMinterFactory } from "@network-goods/hypercerts-sdk";
 import { CONTRACT_ADDRESS } from "../constants";
 import { useEffect, useState } from "react";
-import { formatBytes32String, parseBytes32String } from "ethers/lib/utils";
 import { useContractModal } from "../components/ContractInteractionModalContext";
-import { client } from "../utils/ipfsClient";
-import _ from "lodash";
-import { HyperCertMetadata } from "../contract-types";
-
-export interface MintHypercertArgs {
-  units: BigNumberish;
-  uri: string;
-}
-
-export interface MintHypercertWithAllowlistArgs {
-  units: BigNumberish;
-  merkleRoot: string;
-  uri: string;
-}
-
-export interface MintHypercertAllowlistEntryArgs {
-  proof: string[];
-  claimID: BigNumberish;
-  units: BigNumberish;
-}
 
 export const useMintHyperCertificateAllowlistEntry = ({
   onComplete,
-  args,
   enabled,
 }: {
   onComplete?: () => void;
-  args: MintHypercertAllowlistEntryArgs;
   enabled: boolean;
 }) => {
-  const [step, setStep] = useState<
-    "initial" | "preparing" | "writing" | "awaiting" | "complete"
-  >("initial");
+  const { setStep, showModal } = useContractModal();
+
   const parseBlockchainError = useParseBlockchainError();
   const toast = useToast();
 
-  const argsForContract = [
-    args.proof as `0x{string}`[],
-    BigNumber.from(args.claimID),
-    BigNumber.from(args.units),
-  ];
-  console.log("args: ", argsForContract);
+  const [_claimId, setClaimId] = useState<BigNumber>();
+  const [_units, setUnits] = useState<BigNumber>();
+  const [_proof, setProof] = useState<`0x{string}`[]>();
+
+  const stepDescriptions = {
+    initial: "Initializing interaction",
+    writing: "Minting fraction",
+    complete: "Done minting",
+  };
+
+  const write = (
+    proof: string[],
+    claimId: BigNumberish,
+    units: BigNumberish
+  ) => {
+    setClaimId(BigNumber.from(claimId));
+    setUnits(BigNumber.from(units));
+    setProof(proof as `0x{string}`[]);
+    setStep("initial");
+    showModal({ stepDescriptions });
+  };
 
   const parseError = useParseBlockchainError();
   const {
@@ -67,11 +55,7 @@ export const useMintHyperCertificateAllowlistEntry = ({
     isSuccess: isReadyToWrite,
   } = usePrepareContractWrite({
     address: CONTRACT_ADDRESS,
-    args: [
-      args.proof as `0x{string}`[],
-      BigNumber.from(args.claimID),
-      BigNumber.from(args.units),
-    ],
+    args: [_proof!, _claimId!, _units!],
     abi: HyperCertMinterFactory.abi,
     functionName: "mintClaimFromAllowlist",
     onError: (error) => {
@@ -93,7 +77,11 @@ export const useMintHyperCertificateAllowlistEntry = ({
       });
       setStep("writing");
     },
-    enabled,
+    enabled:
+      enabled &&
+      _proof !== undefined &&
+      _claimId !== undefined &&
+      _units !== undefined,
   });
 
   const {
@@ -101,10 +89,8 @@ export const useMintHyperCertificateAllowlistEntry = ({
     error: writeError,
     isError: isWriteError,
     isLoading: isLoadingContractWrite,
-    status,
     writeAsync,
   } = useContractWrite(config);
-  console.log(status);
 
   const {
     isLoading: isLoadingWaitForTransaction,
@@ -122,19 +108,19 @@ export const useMintHyperCertificateAllowlistEntry = ({
     },
   });
 
+  useEffect(() => {
+    if (isReadyToWrite) {
+      writeAsync?.();
+    }
+  }, [isReadyToWrite]);
+
   return {
-    write: async () => {
-      setStep("preparing");
-      console.log("Started writing");
-      await writeAsync?.();
-    },
+    write,
     isLoading:
       isLoadingPrepareContractWrite ||
       isLoadingContractWrite ||
       isLoadingWaitForTransaction,
     isError: isPrepareError || isWriteError || isWaitError,
     error: prepareError || writeError || waitError,
-    step,
-    isReadyToWrite,
   };
 };

@@ -3,10 +3,6 @@ import { useQuery } from "@apollo/client";
 import { useQuery as useReactQuery } from "@tanstack/react-query";
 import { graphql } from "../gql";
 
-export type QueryResult<T> = {
-  data: T;
-};
-
 export interface Claim {
   id: string;
   owner?: string;
