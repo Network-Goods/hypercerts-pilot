@@ -1,4 +1,4 @@
-import { Claim, useListFirstClaims } from "../hooks/listHypercerts";
+import { useListFirstClaims } from "../hooks/listHypercerts";
 import React, { useEffect, useState } from "react";
 import { useCollections } from "../hooks/useCollections";
 import { Container, Flex, SimpleGrid, Spinner } from "@chakra-ui/react";
@@ -51,7 +51,12 @@ export const BrowsePage = () => {
       </Flex>
       <SimpleGrid columns={{ sm: 2, md: 2 }} spacing={8}>
         {hypercertsResult?.claims.map((cert) => (
-          <HypercertTile key={cert.id} {...cert} hoverEffect />
+          <HypercertTile
+            key={cert.id}
+            id={cert.id}
+            uri={cert.uri!}
+            hoverEffect
+          />
         ))}
       </SimpleGrid>
     </Container>

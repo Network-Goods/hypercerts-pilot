@@ -22,7 +22,6 @@ import { splitFractionModal } from "../../content/split-hypercert-content";
 import { useFractionById } from "../../hooks/fractions";
 import { useSplitFraction } from "../../hooks/split";
 import _ from "lodash";
-import { useHypercertFractions } from "../../hooks/useHypercert";
 import { useAccount } from "wagmi";
 
 type C = (args: { onClick: () => void }) => JSX.Element;
@@ -43,7 +42,7 @@ export const SplitFractionModal = ({
   const [step, setStep] = useState<"input" | "splitting" | "complete">("input");
   const [value, setValue] = useState("");
 
-  const { data, loading } = useFractionById(tokenId);
+  const { data, isLoading } = useFractionById(tokenId);
   const split = useSplitFraction({
     onComplete: () => {
       setStep("complete");
@@ -55,7 +54,7 @@ export const SplitFractionModal = ({
 
   const [totalValue, setTotalValue] = useState(0);
 
-  const fractionValue = data?.hypercertFraction?.units;
+  const fractionValue = data?.claimToken?.units;
 
   const formatValues = (s: string) => {
     return s
@@ -69,7 +68,7 @@ export const SplitFractionModal = ({
     setTotalValue(_.sum(formatValues(fractionValue || "")));
   }, [fractionValue]);
 
-  if (loading || !data?.hypercertFraction) return null;
+  if (isLoading || !data?.claimToken) return null;
 
   const close = () => {
     setStep("input");
@@ -89,7 +88,7 @@ export const SplitFractionModal = ({
     // await split(address, tokenId, formattedValues);
   };
 
-  const fractionUnits = parseInt(data?.hypercertFraction?.units, 10);
+  const fractionUnits = parseInt(data?.claimToken?.units, 10);
   const valueIncorrect = totalValue !== fractionUnits || isNaN(totalValue);
 
   const onlyOneFraction = value?.split(",").length === 1;
@@ -108,15 +107,15 @@ export const SplitFractionModal = ({
       return splitFractionModal.define.notOneValue;
     }
 
-    if (!data.hypercertFraction) {
+    if (!data.claimToken) {
       return null;
     }
 
-    if (!onlyOneFraction && totalValue > data.hypercertFraction.units) {
+    if (!onlyOneFraction && totalValue > data.claimToken.units) {
       return splitFractionModal.define.valueTooHigh;
     }
 
-    if (!onlyOneFraction && totalValue < data.hypercertFraction.units) {
+    if (!onlyOneFraction && totalValue < data.claimToken.units) {
       return splitFractionModal.define.valueTooLow;
     }
   };
@@ -134,8 +133,8 @@ export const SplitFractionModal = ({
               <ModalBody>
                 <Text mb={4}>
                   {splitFractionModal.define.body(
-                    data.hypercertFraction.units,
-                    data.hypercertFraction.hypercert.totalUnits
+                    data.claimToken.units,
+                    data.claimToken.claim.totalUnits
                   )}
                 </Text>
 

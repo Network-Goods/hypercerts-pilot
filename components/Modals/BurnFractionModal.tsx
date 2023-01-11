@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { fractionById } from "@network-goods/hypercerts-sdk";
 import {
   Alert,
   AlertIcon,
@@ -16,12 +17,12 @@ import {
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useFractionById } from "../../hooks/fractions";
 import { useHypercertInfo } from "../../hooks/useHypercert";
 import { useBurnFraction } from "../../hooks/burn";
 import { burnFractionModal } from "../../content/burn-hypercert-content";
 import { formatFractionPercentage } from "../../utils/formatting";
 import { useRouter } from "next/router";
+import { useFractionById } from "../../hooks/fractions";
 
 type C = (args: { onClick: () => void }) => JSX.Element;
 
@@ -44,7 +45,7 @@ export const BurnFractionModal = ({
     "confirm"
   );
 
-  const { data, loading } = useFractionById(tokenId);
+  const { data, isLoading } = useFractionById(tokenId);
   const split = useBurnFraction({
     onComplete: async () => {
       setStep("complete");
@@ -55,12 +56,7 @@ export const BurnFractionModal = ({
     },
   });
 
-  if (
-    loading ||
-    loadingHypercertInfo ||
-    !data?.hypercertFraction ||
-    !hypercertInfo
-  )
+  if (isLoading || loadingHypercertInfo || !data?.claimToken || !hypercertInfo)
     return null;
 
   const close = () => {
@@ -88,10 +84,10 @@ export const BurnFractionModal = ({
               <ModalBody>
                 <Text mb={4}>
                   {burnFractionModal.confirm.body(
-                    data.hypercertFraction.units,
+                    data.claimToken.units,
                     formatFractionPercentage(
-                      data.hypercertFraction.units,
-                      data.hypercertFraction.hypercert.totalUnits
+                      data.claimToken.units,
+                      data.claimToken.claim.totalUnits
                     )
                   )}
                   {" '"}

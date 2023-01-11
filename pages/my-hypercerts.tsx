@@ -39,7 +39,7 @@ const MyHypercertsPageWrapper = () => {
           <Heading mb={4}>{myHypercertsContent.myHypercertsHeader}</Heading>
           <SimpleGrid columns={[2, 2, 3]} spacing={4}>
             {data.claimTokens.map(({ id, claim: { uri } }) => (
-              <HypercertTile hoverEffect key={id} id={id} uri={uri} />
+              <HypercertTile hoverEffect key={id} id={id} uri={uri!} />
             ))}
           </SimpleGrid>
         </>

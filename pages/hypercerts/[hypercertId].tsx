@@ -34,7 +34,6 @@ import { MetaDataResponse } from "../../types/MetaData";
 import { SplitFractionModal } from "../../components/Modals/SplitFractionModal";
 import { BurnFractionModal } from "../../components/Modals/BurnFractionModal";
 import { useAccount } from "wagmi";
-import { Claim } from "../../hooks/listHypercerts";
 import Link from "next/link";
 import { useFractionsByClaim } from "../../hooks/fractions";
 
@@ -114,7 +113,7 @@ const HypercertPage = ({ hypercertId }: { hypercertId: string }) => {
             <Heading flexGrow={1}>{hypercertInfo?.name}</Heading>
           </Flex>
           <Center>
-            <HypercertTile id={hypercertId} uri={hypercertData?.claim?.uri} />
+            <HypercertTile id={hypercertId} uri={hypercertData?.claim?.uri!} />
           </Center>
         </Box>
 
