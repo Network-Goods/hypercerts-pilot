@@ -1,4 +1,4 @@
-import { BigNumber, BigNumberish } from "ethers";
+import { BigNumber } from "ethers";
 import { useContractModal } from "../components/ContractInteractionModalContext";
 import { useParseBlockchainError } from "../utils/parseBlockchainError";
 import { useToast } from "@chakra-ui/react";
@@ -11,11 +11,35 @@ import { CONTRACT_ADDRESS } from "../constants";
 import {
   HypercertMetadata,
   HyperCertMinterFactory,
+  storeData,
   storeMetadata,
 } from "@network-goods/hypercerts-sdk";
 import { mintInteractionLabels } from "../content/chainInteractions";
 import { useEffect, useState } from "react";
 import { client } from "../utils/ipfsClient";
+import { hashLeaf } from "../utils/hashLeaf";
+import { MerkleTree } from "merkletreejs";
+import { keccak256 } from "web3-utils";
+import _ from "lodash";
+
+const generateAndStoreTree = async (
+  pairs: { address: string; fraction: number }[]
+) => {
+  const leaves = pairs.map((x) => hashLeaf(x.address, x.fraction));
+
+  const tree = new MerkleTree(leaves, keccak256, { sortPairs: true });
+  const marshaledTree = JSON.stringify(MerkleTree.marshalTree(tree));
+  const allowlist = pairs.reduce((acc, entry) => {
+    acc[entry.address] = entry.fraction;
+    return acc;
+  }, {} as Record<string, number>);
+  const data = {
+    tree: JSON.parse(marshaledTree),
+    allowlist,
+  };
+  const cid = await storeData(JSON.stringify(data), client);
+  return { cid, root: tree.getHexRoot() as `0x{string}` };
+};
 
 export const useMintClaimAllowlist = ({
   onComplete,
@@ -29,6 +53,7 @@ export const useMintClaimAllowlist = ({
   const [merkleRoot, setMerkleRoot] = useState<`0x{string}`>();
 
   const stepDescriptions = {
+    storeTree: "Generating and storing merkle tree",
     uploading: "Uploading metadata to ipfs",
     writing: "Minting hypercert on-chain",
     complete: "Done minting",
@@ -41,14 +66,19 @@ export const useMintClaimAllowlist = ({
   const initializeWrite = async (
     metaData: HypercertMetadata,
     units: number,
-    merkleRoot: `0x{string}`
+    pairs: { address: string; fraction: number }[]
   ) => {
     if (enabled) {
       setUnits(units);
+      setStep("storeTree");
+      const { cid: merkleCID, root } = await generateAndStoreTree(pairs);
       setStep("uploading");
-      const cid = await storeMetadata(metaData, client);
+      const cid = await storeMetadata(
+        { ...metaData, allowList: merkleCID },
+        client
+      );
       setCidUri(cid);
-      setMerkleRoot(merkleRoot);
+      setMerkleRoot(root);
     }
   };
 
@@ -90,7 +120,7 @@ export const useMintClaimAllowlist = ({
     error: writeError,
     isError: isWriteError,
     isLoading: isLoadingContractWrite,
-    writeAsync,
+    write,
   } = useContractWrite(config);
 
   const {
@@ -110,23 +140,23 @@ export const useMintClaimAllowlist = ({
   });
 
   useEffect(() => {
-    const perform = async () => {
-      if (isReadyToWrite && writeAsync) {
-        await writeAsync();
-      }
-    };
-    perform();
+    if (isReadyToWrite && write) {
+      write();
+    }
   }, [isReadyToWrite]);
 
   return {
     write: async (
       metaData: HypercertMetadata,
-      units: number,
-      merkleRoot: `0x{string}`
+      pairs: { address: string; fraction: number }[]
     ) => {
       showModal({ stepDescriptions });
       setStep("preparing");
-      await initializeWrite(metaData, units, merkleRoot);
+      await initializeWrite(
+        metaData,
+        _.sum(pairs.map((p) => p.fraction)),
+        pairs
+      );
     },
     isLoading:
       isLoadingPrepareContractWrite ||

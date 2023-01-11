@@ -1,11 +1,8 @@
 import dynamic from "next/dynamic";
 import React, { useState } from "react";
-import { storeData, HypercertMetadata } from "@network-goods/hypercerts-sdk";
+import { HypercertMetadata } from "@network-goods/hypercerts-sdk";
 import _ from "lodash";
 import {
-  Alert,
-  AlertIcon,
-  AlertTitle,
   Box,
   Button,
   ButtonGroup,
@@ -14,19 +11,13 @@ import {
   FormLabel,
   HStack,
   Input,
-  useToast,
   VStack,
 } from "@chakra-ui/react";
 import { FieldArray, Form, Formik } from "formik";
-import { MerkleTree } from "merkletreejs";
 import { ethers } from "ethers";
-import { CID } from "nft.storage/dist/src/lib/interface";
-import { client } from "../utils/ipfsClient";
 import { useRouter } from "next/router";
 import { useContractModal } from "../components/ContractInteractionModalContext";
 import { useMintClaimAllowlist } from "../hooks/mintClaimAllowlist";
-import { keccak256 } from "web3-utils";
-import { hashLeaf } from "../utils/hashLeaf";
 
 const previewWidth = "580px";
 
@@ -75,7 +66,7 @@ const AllowlistForm = ({
                 {({ remove, push }) => (
                   <div>
                     {values.contributors.map((contributor, index) => (
-                      <HStack key={index}>
+                      <HStack key={index} alignItems="flex-end">
                         <FormControl isRequired>
                           <FormLabel>{"Address"}</FormLabel>
                           <Input
@@ -140,11 +131,10 @@ export const AllowlistClaimForm = () => {
 
   const { write } = useMintClaimAllowlist({ onComplete, enabled: true });
 
-  const toast = useToast();
-  const [merkleTree, setMerkleTree] = useState<MerkleTree>();
-  const [merkleCID, setMerkleCID] = useState<CID>();
   const [units, setUnits] = useState<number>();
-  const [disableClaimForm, setDisableClaimForm] = useState(true);
+  const [pairs, setPairs] = useState<{ address: string; fraction: number }[]>(
+    []
+  );
 
   const onStore = async ({
     contributors,
@@ -153,7 +143,6 @@ export const AllowlistClaimForm = () => {
   }) => {
     //TODO data validation
     // 100% total
-    setDisableClaimForm(true);
     console.log("Contributors: ", contributors);
     const validEntries = contributors
       .filter(
@@ -163,92 +152,27 @@ export const AllowlistClaimForm = () => {
         address: x.address,
         fraction: parseInt(x.fraction, 10),
       }));
-
-    if (validEntries.length === 0) {
-      toast({
-        description: "No valid data submitted",
-        status: "error",
-      });
-      return;
-    }
-
-    // Entries to arrays
-
-    const leaves = validEntries.map((x) => hashLeaf(x.address, x.fraction));
-
-    const sum = validEntries
-      .map((entry) => entry.fraction)
-      .reduce((acc, curr) => acc + curr);
-
-    const tree = new MerkleTree(leaves, keccak256, { sortPairs: true });
-    const marshaledTree = JSON.stringify(MerkleTree.marshalTree(tree));
-    const allowlist = validEntries.reduce((acc, entry) => {
-      acc[entry.address] = entry.fraction;
-      return acc;
-    }, {} as Record<string, number>);
-    const data = {
-      tree: JSON.parse(marshaledTree),
-      allowlist,
-    };
-    const cid = await storeData(JSON.stringify(data), client);
-
-    setMerkleTree(tree);
-    setMerkleCID(cid as unknown as CID);
-    setUnits(sum);
-    setDisableClaimForm(false);
+    setPairs(validEntries);
+    setUnits(_.sum(validEntries.map((e) => e.fraction)));
   };
 
   const onSubmit = async ({
     metaData,
-    fractions,
   }: {
     metaData: HypercertMetadata;
     fractions: number[];
   }) => {
-    if (!merkleCID) {
-      toast({
-        description: "No allowlist ID found",
-        status: "error",
-      });
-      console.error("No allowlist ID found");
-      return;
-    }
-
-    if (!merkleTree?.getHexRoot()) {
-      toast({
-        description: "Merkle root not found",
-        status: "error",
-      });
-      console.error("Merkle root not found");
-      return;
-    }
-
-    await write(
-      { ...metaData, allowList: merkleCID },
-      _.sum(fractions),
-      merkleTree?.getHexRoot() as `0x{string}`
-    );
+    await write(metaData, pairs);
   };
 
   return (
     <VStack>
       <AllowlistForm onStore={onStore} />
-      {merkleCID ? (
-        <Alert
-          status="info"
-          borderRadius="md"
-          mb={3}
-          maxW={`calc(100vw - ${previewWidth})`}
-        >
-          <AlertIcon />
-          <AlertTitle>{`Uploaded allowlist to IPFS with CID: ${merkleCID}`}</AlertTitle>
-        </Alert>
-      ) : undefined}
       <Divider />
       <DynamicClaimHyperCertForm
         onSubmit={onSubmit}
         units={units}
-        disabled={disableClaimForm}
+        disabled={pairs.length === 0}
       />
     </VStack>
   );
