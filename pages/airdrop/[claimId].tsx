@@ -1,21 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { MintHypercertAllowlistEntryArgs } from "../../hooks/mint";
 import MintTransactionAllowlistFraction from "../../components/MintTransactionAllowlistFraction";
-import { BigNumber, BytesLike } from "ethers";
+import { BigNumber } from "ethers";
 import {
-  Box,
   Button,
   Heading,
   useToast,
   Text,
   Center,
-  HStack,
   VStack,
 } from "@chakra-ui/react";
 import { getMetadata, claimById, getData } from "@network-goods/hypercerts-sdk";
-import { StandardMerkleTree } from "@openzeppelin/merkle-tree";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/router";
+import { MerkleTree } from "merkletreejs";
+import { hashLeaf } from "../../utils/hashLeaf";
 
 const FindAllowlistProof = ({
   onProofFound,
@@ -27,15 +26,15 @@ const FindAllowlistProof = ({
   ) => void;
 }) => {
   const toast = useToast();
-  const { address, isConnected } = useAccount();
+  const { address } = useAccount();
   const { query } = useRouter();
   console.log(query);
 
   const claimID = query["claimId"] as string;
 
   const [merkleCID, setMerkleCID] = useState<string>();
-  const [merkleTree, setMerkleTree] =
-    useState<StandardMerkleTree<(string | number)[]>>();
+  const [merkleTree, setMerkleTree] = useState<MerkleTree>();
+  const [allowlist, setAllowlist] = useState<Record<string, number>>({});
   const [merkleProofs, setMerkleProofs] = useState<string[]>();
   const [units, setUnits] = useState<number>();
   const [claimIDContract, setClaimIDContract] = useState<BigNumber>();
@@ -90,12 +89,17 @@ const FindAllowlistProof = ({
   useEffect(() => {
     const _fetchMerkleTree = async (merkleCID: string) => {
       const treeResponse = await getData(merkleCID);
+      console.log(treeResponse);
 
       if (!treeResponse) {
         return;
       }
 
-      setMerkleTree(StandardMerkleTree.load(JSON.parse(treeResponse)));
+      const parsedResponse = JSON.parse(treeResponse);
+      console.log(parsedResponse);
+      const t = MerkleTree.unmarshalTree(parsedResponse.tree);
+      setMerkleTree(t);
+      setAllowlist(parsedResponse.allowlist);
     };
     if (merkleCID) {
       _fetchMerkleTree(merkleCID);
@@ -104,23 +108,36 @@ const FindAllowlistProof = ({
 
   // Proofs for user
   useEffect(() => {
-    const findProof = (tree: StandardMerkleTree<(string | number)[]>) => {
-      console.log("Entries: ", tree.entries());
-      for (const [i, v] of tree.entries()) {
-        console.log("Entry: ", i);
-        if (v[0] === address) {
-          const proof = tree.getProof(i);
-          console.log(proof, v);
-          setMerkleProofs(proof);
-          setUnits(Number(v[1]));
-
-          console.log(tree);
-
-          console.log(tree);
-          console.log(`address ${i} `, v[0]);
-          console.log(`proof ${i} `, proof);
-        }
+    const findProof = (tree: MerkleTree) => {
+      if (!address) {
+        return;
       }
+
+      const myValue = allowlist[address];
+      if (!myValue) {
+        console.log("Youre not on the allowlist");
+      }
+      const hash = hashLeaf(address, myValue);
+      const proof = tree.getHexProof(hash);
+      console.log(proof);
+      setMerkleProofs(proof);
+      setUnits(myValue);
+      // console.log("Entries: ", tree.entries());
+      // for (const [i, v] of tree.entries()) {
+      //   console.log("Entry: ", i);
+      //   if (v[0] === address) {
+      //     const proof = tree.getProof(i);
+      //     console.log(proof, v);
+      //     setMerkleProofs(proof);
+      //     setUnits(Number(v[1]));
+      //
+      //     console.log(tree);
+      //
+      //     console.log(tree);
+      //     console.log(`address ${i} `, v[0]);
+      //     console.log(`proof ${i} `, proof);
+      //   }
+      // }
     };
     if (!merkleTree || !address) {
       return;

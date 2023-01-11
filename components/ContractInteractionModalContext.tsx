@@ -1,10 +1,12 @@
 import React, { PropsWithChildren, useContext, useState } from "react";
 import {
+  Center,
   Modal,
   ModalBody,
   ModalContent,
   ModalHeader,
   ModalOverlay,
+  Spinner,
   Text,
 } from "@chakra-ui/react";
 
@@ -72,6 +74,9 @@ export const ContractInteractionModalProvider: React.FC<PropsWithChildren> = ({
                 {stepDescriptions[key]}
               </Text>
             ))}
+            <Center py={4}>
+              <Spinner />
+            </Center>
           </ModalBody>
         </ModalContent>
       </Modal>
