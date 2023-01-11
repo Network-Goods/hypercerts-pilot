@@ -17,28 +17,18 @@ import {
 import { mintInteractionLabels } from "../content/chainInteractions";
 import { useEffect, useState } from "react";
 import { client } from "../utils/ipfsClient";
-import { hashLeaf } from "../utils/hashLeaf";
-import { MerkleTree } from "merkletreejs";
-import { keccak256 } from "web3-utils";
 import _ from "lodash";
+import { StandardMerkleTree } from "@openzeppelin/merkle-tree";
 
 const generateAndStoreTree = async (
   pairs: { address: string; fraction: number }[]
 ) => {
-  const leaves = pairs.map((x) => hashLeaf(x.address, x.fraction));
-
-  const tree = new MerkleTree(leaves, keccak256, { sortPairs: true });
-  const marshaledTree = JSON.stringify(MerkleTree.marshalTree(tree));
-  const allowlist = pairs.reduce((acc, entry) => {
-    acc[entry.address] = entry.fraction;
-    return acc;
-  }, {} as Record<string, number>);
-  const data = {
-    tree: JSON.parse(marshaledTree),
-    allowlist,
-  };
-  const cid = await storeData(JSON.stringify(data), client);
-  return { cid, root: tree.getHexRoot() as `0x{string}` };
+  const tree = StandardMerkleTree.of(
+    pairs.map((p) => [p.address, p.fraction]),
+    ["address", "uint256"]
+  );
+  const cid = await storeData(JSON.stringify(tree.dump()), client);
+  return { cid, root: tree.root as `0x{string}` };
 };
 
 export const useMintClaimAllowlist = ({
