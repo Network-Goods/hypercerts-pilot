@@ -39,9 +39,9 @@ export const urls = {
     href: "/claim-allowlist-hypercert",
     showOnlyWhenConnected: false,
   },
-  // myHypercerts: {
-  //   label: headerLinkLabels.myHypercerts,
-  //   href: "/my-hypercerts",
-  //   showOnlyWhenConnected: false,
-  // },
+  myTokens: {
+    label: headerLinkLabels.myTokens,
+    href: "/my-tokens",
+    showOnlyWhenConnected: false,
+  },
 };

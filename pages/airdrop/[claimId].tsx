@@ -162,7 +162,7 @@ const MintAllowlistFractionPage = () => {
   const onComplete = () => {
     setTimeout(async () => {
       hideModal();
-      await push("/");
+      await push("/my-tokens");
     }, 5000);
   };
 

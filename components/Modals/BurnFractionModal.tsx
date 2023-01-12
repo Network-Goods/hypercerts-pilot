@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { fractionById } from "@network-goods/hypercerts-sdk";
 import {
   Alert,
   AlertIcon,
