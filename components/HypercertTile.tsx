@@ -20,7 +20,9 @@ export const HypercertTile = ({
   }
 
   if (disabled) {
-    return <Tile src={data.image} hoverEffect={hoverEffect} />;
+    return (
+      <Tile src={data.image} hoverEffect={hoverEffect} disabled={disabled} />
+    );
   }
 
   return (

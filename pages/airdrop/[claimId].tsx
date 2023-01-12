@@ -15,6 +15,7 @@ import { useAccount } from "wagmi";
 import { useRouter } from "next/router";
 import { useContractModal } from "../../components/ContractInteractionModalContext";
 
+// TODO: These hooks should be generalized
 const FindAllowlistProof = ({
   onProofFound,
 }: {
@@ -36,6 +37,7 @@ const FindAllowlistProof = ({
   const [merkleProofs, setMerkleProofs] = useState<string[]>();
   const [units, setUnits] = useState<number>();
   const [claimIDContract, setClaimIDContract] = useState<BigNumber>();
+  const [disabled, setDisabled] = useState(true);
 
   const onClick = () => {
     if (!merkleProofs || !claimIDContract || !units) {
@@ -111,6 +113,7 @@ const FindAllowlistProof = ({
           console.log(proof, v);
           setMerkleProofs(proof);
           setUnits(Number(v[1]));
+          setDisabled(false);
 
           console.log(tree);
 
@@ -148,7 +151,7 @@ const FindAllowlistProof = ({
 
         <Text>{units}</Text>
 
-        <Button onClick={onClick} colorScheme="green">
+        <Button onClick={onClick} disabled={disabled} colorScheme="green">
           Continue
         </Button>
       </VStack>
