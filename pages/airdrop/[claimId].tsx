@@ -1,21 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { MintHypercertAllowlistEntryArgs } from "../../hooks/mint";
-import MintTransactionAllowlistFraction from "../../components/MintTransactionAllowlistFraction";
-import { BigNumber, BytesLike } from "ethers";
+import { useMintHyperCertificateAllowlistEntry } from "../../hooks/mint";
+import { BigNumber } from "ethers";
 import {
-  Box,
   Button,
   Heading,
   useToast,
   Text,
   Center,
-  HStack,
   VStack,
 } from "@chakra-ui/react";
 import { getMetadata, claimById, getData } from "@network-goods/hypercerts-sdk";
 import { StandardMerkleTree } from "@openzeppelin/merkle-tree";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/router";
+import { useContractModal } from "../../components/ContractInteractionModalContext";
 
 const FindAllowlistProof = ({
   onProofFound,
@@ -27,9 +25,8 @@ const FindAllowlistProof = ({
   ) => void;
 }) => {
   const toast = useToast();
-  const { address, isConnected } = useAccount();
+  const { address } = useAccount();
   const { query } = useRouter();
-  console.log(query);
 
   const claimID = query["claimId"] as string;
 
@@ -95,6 +92,7 @@ const FindAllowlistProof = ({
         return;
       }
 
+      console.log(JSON.parse(treeResponse));
       setMerkleTree(StandardMerkleTree.load(JSON.parse(treeResponse)));
     };
     if (merkleCID) {
@@ -131,7 +129,6 @@ const FindAllowlistProof = ({
     }
   }, [merkleTree, address]);
 
-  // Return
   return (
     <Center>
       <VStack maxW={"50%"}>
@@ -160,34 +157,21 @@ const FindAllowlistProof = ({
 };
 
 const MintAllowlistFractionPage = () => {
-  const [step, setStep] = useState<"find" | "minting" | "complete">("find");
-  const [allowlistMintArgs, setAllowlistMintArgs] =
-    useState<MintHypercertAllowlistEntryArgs>();
-
-  const onProofFound = (
-    proof: string[],
-    claimID: BigNumber,
-    units: BigNumber
-  ) => {
-    setAllowlistMintArgs({ proof, claimID, units });
-    setStep("minting");
+  const { push } = useRouter();
+  const { hideModal } = useContractModal();
+  const onComplete = () => {
+    setTimeout(async () => {
+      hideModal();
+      await push("/my-tokens");
+    }, 5000);
   };
 
-  const onMintComplete = () => {
-    setStep("complete");
-  };
+  const { write } = useMintHyperCertificateAllowlistEntry({
+    onComplete,
+    enabled: true,
+  });
 
-  return (
-    <>
-      {step === "find" && <FindAllowlistProof onProofFound={onProofFound} />}
-      {step === "minting" && allowlistMintArgs && (
-        <MintTransactionAllowlistFraction
-          args={allowlistMintArgs}
-          onComplete={onMintComplete}
-        />
-      )}
-    </>
-  );
+  return <FindAllowlistProof onProofFound={write} />;
 };
 
 export default MintAllowlistFractionPage;

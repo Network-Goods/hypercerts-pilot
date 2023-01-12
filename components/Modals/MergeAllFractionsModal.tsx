@@ -19,7 +19,6 @@ import {
 import { mergeHypercertModalContent } from "../../content/merge-hypercert-content";
 import { useMergeFractions } from "../../hooks/merge";
 import { BigNumber } from "ethers";
-import { useHypercertFractions } from "../../hooks/useHypercert";
 
 type C = (args: { onClick: () => void }) => JSX.Element;
 

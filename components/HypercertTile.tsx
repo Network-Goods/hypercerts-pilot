@@ -1,17 +1,26 @@
 import { useClaimMetadata } from "../hooks/useHypercert";
 import { Tile } from "./Tile";
 import Link from "next/link";
-import { Claim } from "../hooks/listHypercerts";
 
 export const HypercertTile = ({
   id,
   uri,
   hoverEffect,
-}: Pick<Partial<Claim>, "id" | "uri"> & { hoverEffect?: boolean }) => {
+  disabled = false,
+}: {
+  id: string;
+  uri: string;
+  hoverEffect?: boolean;
+  disabled?: boolean;
+}) => {
   const { data } = useClaimMetadata(uri);
 
   if (!data) {
     return null;
+  }
+
+  if (disabled) {
+    return <Tile src={data.image} hoverEffect={hoverEffect} />;
   }
 
   return (

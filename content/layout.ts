@@ -6,7 +6,7 @@ export const headerLinkLabels = {
   claim: "Claim",
   donate: "Donate",
   browse: "Browse",
-  myHypercerts: "My HyperCerts",
+  myTokens: "My Tokens",
 };
 
 export const connectButtonLabels = {
