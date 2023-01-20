@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useMintHyperCertificateAllowlistEntry } from "../../hooks/mint";
+import { useMintHyperCertificateAllowlistEntry } from "../../hooks/mintHyperCertificateAllowlistEntry";
 import { BigNumber } from "ethers";
 import {
   Button,
