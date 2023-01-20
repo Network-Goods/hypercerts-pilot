@@ -9,8 +9,6 @@ export const BrowsePage = () => {
     useListFirstClaims();
   const { isLoading: loadingCollections, data: collections } = useCollections();
 
-  console.log(hypercertsResult);
-
   // const onChangeCollectionFilter = (collectionId: string) => {
   //   if (!hypercertWithFractions) {
   //     return;

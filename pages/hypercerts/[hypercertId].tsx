@@ -15,11 +15,7 @@ import {
   UnorderedList,
   VStack,
 } from "@chakra-ui/react";
-import {
-  useClaimMetadata,
-  useHyperCertById,
-  useHypercertInfo,
-} from "../../hooks/useHypercert";
+import { useClaimMetadata, useHyperCertById } from "../../hooks/useHypercert";
 import {
   formatFractionPercentage,
   formatTime,
