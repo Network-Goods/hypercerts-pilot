@@ -7,10 +7,11 @@ import {
   usePrepareContractWrite,
   useWaitForTransaction,
 } from "wagmi";
-import { HyperCertMinterFactory } from "@network-goods/hypercerts-sdk";
+// import { HyperCertMinterFactory } from "@network-goods/hypercerts-sdk";
 import { CONTRACT_ADDRESS } from "../constants";
 import { useEffect, useState } from "react";
 import { useContractModal } from "../components/ContractInteractionModalContext";
+import { HyperCertMinterFactory } from "@network-goods/hypercerts-protocol";
 
 export const useMintHyperCertificateAllowlistEntry = ({
   onComplete,

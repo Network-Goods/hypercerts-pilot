@@ -10,7 +10,6 @@ import {
 import { CONTRACT_ADDRESS } from "../constants";
 import {
   HypercertMetadata,
-  HyperCertMinterFactory,
   storeData,
   storeMetadata,
 } from "@network-goods/hypercerts-sdk";
@@ -19,6 +18,7 @@ import { useEffect, useState } from "react";
 import { client } from "../utils/ipfsClient";
 import _ from "lodash";
 import { StandardMerkleTree } from "@openzeppelin/merkle-tree";
+import { HyperCertMinterFactory } from "@network-goods/hypercerts-protocol";
 
 const generateAndStoreTree = async (
   pairs: { address: string; fraction: number }[]
@@ -80,7 +80,7 @@ export const useMintClaimAllowlist = ({
     isSuccess: isReadyToWrite,
   } = usePrepareContractWrite({
     address: CONTRACT_ADDRESS,
-    args: [BigNumber.from(units || 0), merkleRoot!, cidUri!],
+    args: [BigNumber.from(units || 0), merkleRoot!, cidUri!, 2],
     abi: HyperCertMinterFactory.abi,
     functionName: "createAllowlist",
     onError: (error) => {

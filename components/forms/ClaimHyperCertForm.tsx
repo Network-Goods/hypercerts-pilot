@@ -21,7 +21,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import * as Yup from "yup";
-import { FORMAT_VERSION } from "../../constants";
+import { FORMAT_VERSION, FRACTIONS_PER_CLAIM } from "../../constants";
 import {
   alerts,
   buttons,
@@ -104,6 +104,32 @@ const ValidationSchema = Yup.object().shape({
       );
     }
   ),
+  fractions: Yup.string()
+    .required()
+    .test(
+      "not enough fractions",
+      "Fractions should be 10000 in total, you have less than that",
+      (value) => {
+        if (value === undefined) {
+          return false;
+        }
+
+        const total = _.sum(value.split(", ").map((x) => parseInt(x, 10)));
+        return !(total < FRACTIONS_PER_CLAIM);
+      }
+    )
+    .test(
+      "too many fractions",
+      "Fractions should be 10000 in total, you have more than that",
+      (value) => {
+        if (value === undefined) {
+          return false;
+        }
+
+        const total = _.sum(value.split(", ").map((x) => parseInt(x, 10)));
+        return !(total > FRACTIONS_PER_CLAIM);
+      }
+    ),
 });
 
 const testValues = {

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import {
   HypercertMetadata,
-  HyperCertMinterFactory,
   storeMetadata,
 } from "@network-goods/hypercerts-sdk";
 import { useContractModal } from "../components/ContractInteractionModalContext";
@@ -16,6 +15,7 @@ import {
 import { CONTRACT_ADDRESS } from "../constants";
 import { BigNumber } from "ethers";
 import { mintInteractionLabels } from "../content/chainInteractions";
+import { HyperCertMinterFactory } from "@network-goods/hypercerts-protocol";
 
 export const useMintClaim = ({
   onComplete,
@@ -58,7 +58,7 @@ export const useMintClaim = ({
     isSuccess: isReadyToWrite,
   } = usePrepareContractWrite({
     address: CONTRACT_ADDRESS,
-    args: [BigNumber.from(units || 0), cidUri!],
+    args: [BigNumber.from(units || 0), cidUri!, 2],
     abi: HyperCertMinterFactory.abi,
     functionName: "mintClaim",
     onError: (error) => {
