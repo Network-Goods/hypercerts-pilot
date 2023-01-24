@@ -45,3 +45,5 @@ export const urls = {
     showOnlyWhenConnected: false,
   },
 };
+
+export const FRACTIONS_PER_CLAIM = 10000;

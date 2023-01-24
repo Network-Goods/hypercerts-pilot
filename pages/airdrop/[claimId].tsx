@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useMintHyperCertificateAllowlistEntry } from "../../hooks/mint";
+import { useMintHyperCertificateAllowlistEntry } from "../../hooks/mintHyperCertificateAllowlistEntry";
 import { BigNumber } from "ethers";
 import {
   Button,
@@ -9,11 +9,10 @@ import {
   Center,
   VStack,
 } from "@chakra-ui/react";
-import { getMetadata, claimById, getData } from "@network-goods/hypercerts-sdk";
-import { StandardMerkleTree } from "@openzeppelin/merkle-tree";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/router";
 import { useContractModal } from "../../components/ContractInteractionModalContext";
+import { verifyFractionClaim } from "../../lib/verifyFractionClaim";
 
 // TODO: These hooks should be generalized
 const FindAllowlistProof = ({
@@ -31,13 +30,34 @@ const FindAllowlistProof = ({
 
   const claimID = query["claimId"] as string;
 
-  const [merkleCID, setMerkleCID] = useState<string>();
-  const [merkleTree, setMerkleTree] =
-    useState<StandardMerkleTree<(string | number)[]>>();
   const [merkleProofs, setMerkleProofs] = useState<string[]>();
   const [units, setUnits] = useState<number>();
   const [claimIDContract, setClaimIDContract] = useState<BigNumber>();
   const [disabled, setDisabled] = useState(true);
+
+  useEffect(() => {
+    const verify = async (c: string, a: string) => {
+      try {
+        const {
+          proof,
+          units: _units,
+          claimIDContract: _claimIdContract,
+        } = await verifyFractionClaim(c, a);
+        setMerkleProofs(proof);
+        setUnits(_units);
+        setClaimIDContract(BigNumber.from(_claimIdContract));
+        setDisabled(false);
+      } catch (e: any) {
+        toast({
+          description: e.message || "Something went wrong",
+          status: "error",
+        });
+      }
+    };
+    if (address && claimID) {
+      verify(claimID, address);
+    }
+  }, [address, claimID]);
 
   const onClick = () => {
     if (!merkleProofs || !claimIDContract || !units) {
@@ -47,90 +67,6 @@ const FindAllowlistProof = ({
 
     onProofFound(merkleProofs, claimIDContract, BigNumber.from(units));
   };
-
-  //Claim for user
-
-  useEffect(() => {
-    const _fetchMerkleCID = async (claimID: string) => {
-      const claimByIdRes = await claimById(claimID);
-
-      if (!claimByIdRes.claim) {
-        toast({
-          description: `No claim found for ${claimID}`,
-          status: "error",
-        });
-        return;
-      }
-
-      const claim = claimByIdRes.claim;
-
-      // ClaimID
-      const _id = claim.tokenID;
-      setClaimIDContract(_id);
-
-      //Metadata
-      const metadata = await getMetadata(claim.uri || "");
-
-      if (!metadata?.allowList) {
-        toast({
-          description: `No allowlist found for ${claimID}`,
-          status: "error",
-        });
-        return;
-      }
-
-      setMerkleCID(metadata.allowList);
-    };
-    if (claimID && !merkleCID) {
-      _fetchMerkleCID(claimID);
-    }
-  }, [claimID]);
-
-  useEffect(() => {
-    const _fetchMerkleTree = async (merkleCID: string) => {
-      const treeResponse = await getData(merkleCID);
-
-      if (!treeResponse) {
-        return;
-      }
-
-      console.log(JSON.parse(treeResponse));
-      setMerkleTree(StandardMerkleTree.load(JSON.parse(treeResponse)));
-    };
-    if (merkleCID) {
-      _fetchMerkleTree(merkleCID);
-    }
-  }, [merkleCID]);
-
-  // Proofs for user
-  useEffect(() => {
-    const findProof = (tree: StandardMerkleTree<(string | number)[]>) => {
-      console.log("Entries: ", tree.entries());
-      for (const [i, v] of tree.entries()) {
-        console.log("Entry: ", i);
-        if (v[0] === address) {
-          const proof = tree.getProof(i);
-          console.log(proof, v);
-          setMerkleProofs(proof);
-          setUnits(Number(v[1]));
-          setDisabled(false);
-
-          console.log(tree);
-
-          console.log(tree);
-          console.log(`address ${i} `, v[0]);
-          console.log(`proof ${i} `, proof);
-        }
-      }
-    };
-    if (!merkleTree || !address) {
-      return;
-    }
-
-    if (merkleTree && address) {
-      findProof(merkleTree);
-    }
-  }, [merkleTree, address]);
 
   return (
     <Center>
