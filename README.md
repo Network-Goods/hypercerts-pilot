@@ -1,3 +1,7 @@
+**DEPRECATED** - Please refer to [https://github.com/Network-Goods/hypercerts](https://github.com/Network-Goods/hypercerts) for the latest docs
+
+---
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
